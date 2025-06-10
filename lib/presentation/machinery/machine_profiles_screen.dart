@@ -1,5 +1,6 @@
 // plastic_factory_management/lib/presentation/machinery/machine_profiles_screen.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
