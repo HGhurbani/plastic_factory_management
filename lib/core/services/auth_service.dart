@@ -55,6 +55,21 @@ class AuthService {
     }
   }
 
+  /// Attempts to sign in with the provided [email] and [password].
+  /// If the user does not exist, a new account will be created using
+  /// the provided [name] and [role].
+  Future<UserModel> signInOrCreateWithRole(
+      String email, String password, String name, UserRole role) async {
+    try {
+      return await signInWithEmailPassword(email, password);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        return await signUpWithEmailPassword(email, password, name, role);
+      }
+      rethrow;
+    }
+  }
+
   // تسجيل مستخدم جديد (قد يستخدمه المدير لإنشاء حسابات)
   Future<UserModel> signUpWithEmailPassword(String email, String password, String name, UserRole role) async {
     try {
