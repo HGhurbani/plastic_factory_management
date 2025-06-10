@@ -6,6 +6,15 @@ class AppLocalizations {
   final Map<String, String> _strings;
   AppLocalizations(this._strings);
 
+  /// Provides access to the nearest [AppLocalizations] instance up the tree.
+  static AppLocalizations? of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  }
+
+  /// A convenience [LocalizationsDelegate] for this class.
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      AppLocalizationsDelegate();
+
   String get loginTitle => _strings["loginTitle"] ?? "loginTitle";
   String get emailHint => _strings["emailHint"] ?? "emailHint";
   String get passwordHint => _strings["passwordHint"] ?? "passwordHint";
