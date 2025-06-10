@@ -1,0 +1,7 @@
+<svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" rx="20" fill="#1565C0"/>
+  <g fill="#fff">
+    <path d="M80 60a40 40 0 1 1 0 80a40 40 0 1 1 0-80zm-25 95c0-27 22-49 49-49h2c27 0 49 22 49 49v25H55z"/>
+    <text x="150" y="120" font-size="48" font-family="Arial, Helvetica, sans-serif" font-weight="bold">YourAppNameHere</text>
+  </g>
+</svg>
