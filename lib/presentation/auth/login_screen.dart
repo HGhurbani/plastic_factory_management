@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/core/services/auth_service.dart';
+import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/presentation/routes/app_router.dart'; // استخدام المسارات
 
 class LoginScreen extends StatefulWidget {
@@ -48,15 +49,56 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _quickSignIn() async {
+  final Map<UserRole, Map<String, String>> _roleCredentials = {
+    UserRole.factoryManager: {
+      'email': 'manager@example.com',
+      'password': 'password',
+      'name': 'مدير المصنع',
+    },
+    UserRole.productionOrderPreparer: {
+      'email': 'orderpreparer@example.com',
+      'password': 'password',
+      'name': 'مسؤول إعداد طلبات الإنتاج',
+    },
+    UserRole.moldInstallationSupervisor: {
+      'email': 'moldsupervisor@example.com',
+      'password': 'password',
+      'name': 'مشرف تركيب القوالب',
+    },
+    UserRole.productionShiftSupervisor: {
+      'email': 'shiftsupervisor@example.com',
+      'password': 'password',
+      'name': 'مشرف الوردية',
+    },
+    UserRole.machineOperator: {
+      'email': 'operator@example.com',
+      'password': 'password',
+      'name': 'مشغل الآلة',
+    },
+    UserRole.maintenanceManager: {
+      'email': 'maintenance@example.com',
+      'password': 'password',
+      'name': 'مسؤول الصيانة',
+    },
+    UserRole.salesRepresentative: {
+      'email': 'sales@example.com',
+      'password': 'password',
+      'name': 'مندوب المبيعات',
+    },
+  };
+
+  Future<void> _quickSignInRole(UserRole role) async {
+    final creds = _roleCredentials[role]!;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
     try {
-      await _authService.signInOrCreate(
-        _emailController.text,
-        _passwordController.text,
+      await _authService.signInOrCreateWithRole(
+        creds['email']!,
+        creds['password']!,
+        creds['name']!,
+        role,
       );
       if (mounted) {
         Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
@@ -164,22 +206,141 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        ElevatedButton(
-                          onPressed: _quickSignIn,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
-                            foregroundColor: Colors.white,
-                            minimumSize: const Size(double.infinity, 55),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+                        Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () =>
+                                  _quickSignInRole(UserRole.factoryManager),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.factoryManager,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            appLocalizations.quickSignInButton,
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () => _quickSignInRole(
+                                  UserRole.productionOrderPreparer),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.productionOrderPreparer,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () => _quickSignInRole(
+                                  UserRole.moldInstallationSupervisor),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.moldInstallationSupervisor,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () => _quickSignInRole(
+                                  UserRole.productionShiftSupervisor),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.productionShiftSupervisor,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () =>
+                                  _quickSignInRole(UserRole.machineOperator),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.machineOperator,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () =>
+                                  _quickSignInRole(UserRole.maintenanceManager),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.maintenanceManager,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () => _quickSignInRole(
+                                  UserRole.salesRepresentative),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.salesRepresentative,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
