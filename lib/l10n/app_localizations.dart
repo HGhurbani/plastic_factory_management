@@ -19,6 +19,7 @@ class AppLocalizations {
   String get emailHint => _strings["emailHint"] ?? "emailHint";
   String get passwordHint => _strings["passwordHint"] ?? "passwordHint";
   String get signInButton => _strings["signInButton"] ?? "signInButton";
+  String get quickSignInButton => _strings["quickSignInButton"] ?? "quickSignInButton";
   String get loginErrorGeneric => _strings["loginErrorGeneric"] ?? "loginErrorGeneric";
   String get factoryManager => _strings["factoryManager"] ?? "factoryManager";
   String get productionManager => _strings["productionManager"] ?? "productionManager";

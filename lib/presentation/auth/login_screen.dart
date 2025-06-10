@@ -48,6 +48,36 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _quickSignIn() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    try {
+      await _authService.signInOrCreate(
+        _emailController.text,
+        _passwordController.text,
+      );
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = AppLocalizations.of(context)!.loginErrorGeneric;
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -114,21 +144,45 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               _isLoading
                   ? CircularProgressIndicator()
-                  : ElevatedButton(
-                onPressed: _signIn,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor, // لون أساسي جميل
-                  foregroundColor: Colors.white,
-                  minimumSize: Size(double.infinity, 55), // زر بعرض كامل وارتفاع مناسب
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                child: Text(
-                  appLocalizations.signInButton,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
+                  : Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed: _signIn,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).primaryColor,
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(double.infinity, 55),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          child: Text(
+                            appLocalizations.signInButton,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: _quickSignIn,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary,
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(double.infinity, 55),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          child: Text(
+                            appLocalizations.quickSignInButton,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
             ],
           ),
         ),
