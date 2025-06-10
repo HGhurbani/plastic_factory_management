@@ -7,6 +7,8 @@ import 'package:plastic_factory_management/data/models/operator_model.dart';
 import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
 import 'package:intl/intl.dart' as intl;
 
+import '../../data/models/machine_model.dart';
+
 class OperatorProfilesScreen extends StatefulWidget {
   @override
   _OperatorProfilesScreenState createState() => _OperatorProfilesScreenState();

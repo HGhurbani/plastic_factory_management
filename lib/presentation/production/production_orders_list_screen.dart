@@ -88,7 +88,7 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                         _selectedStatusFilter = value;
                       });
                     }),
-                    _buildFilterChip(appLocalizations.rejected, ProductionOrderStatus.rejected.toFirestoreString(), _selectedStatusFilter, (value) {
+                    _buildFilterChip(appLocalizations.reject, ProductionOrderStatus.rejected.toFirestoreString(), _selectedStatusFilter, (value) {
                       setState(() {
                         _selectedStatusFilter = value;
                       });
