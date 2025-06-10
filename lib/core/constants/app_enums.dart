@@ -1,0 +1,90 @@
+// plastic_factory_management/lib/core/constants/app_enums.dart
+
+enum UserRole {
+  factoryManager, // مدير المصنع
+  productionManager, // مدير الإنتاج
+  productionOrderPreparer, // مسؤول إعداد طلبات الإنتاج
+  moldInstallationSupervisor, // مشرف تركيب القوالب
+  productionShiftSupervisor, // مشرف الوردية / مشرف الإنتاج
+  machineOperator, // مشغل المكينة
+  maintenanceManager, // مسؤول الصيانة
+  salesRepresentative, // مندوب المبيعات
+  unknown, // دور غير معروف
+}
+
+extension UserRoleExtension on UserRole {
+  /// يحول قيمة الدور إلى نص عربي مناسب للعرض.
+  String toArabicString() {
+    switch (this) {
+      case UserRole.factoryManager:
+        return 'مدير المصنع';
+      case UserRole.productionManager:
+        return 'مدير الإنتاج';
+      case UserRole.productionOrderPreparer:
+        return 'مسؤول إعداد طلبات الإنتاج';
+      case UserRole.moldInstallationSupervisor:
+        return 'مشرف تركيب القوالب';
+      case UserRole.productionShiftSupervisor:
+        return 'مشرف الوردية / مشرف الإنتاج';
+      case UserRole.machineOperator:
+        return 'مشغل المكينة';
+      case UserRole.maintenanceManager:
+        return 'مسؤول الصيانة';
+      case UserRole.salesRepresentative:
+        return 'مندوب المبيعات';
+      case UserRole.unknown:
+      default:
+        return 'غير معروف';
+    }
+  }
+
+  /// يحول سلسلة نصية (من Firestore مثلاً) إلى قيمة الدور المقابلة.
+  static UserRole fromString(String? roleString) {
+    if (roleString == null) return UserRole.unknown;
+    switch (roleString) {
+      case 'factory_manager':
+        return UserRole.factoryManager;
+      case 'production_manager':
+        return UserRole.productionManager;
+      case 'production_order_preparer':
+        return UserRole.productionOrderPreparer;
+      case 'mold_installation_supervisor':
+        return UserRole.moldInstallationSupervisor;
+      case 'production_shift_supervisor':
+        return UserRole.productionShiftSupervisor;
+      case 'machine_operator':
+        return UserRole.machineOperator;
+      case 'maintenance_manager':
+        return UserRole.maintenanceManager;
+      case 'sales_representative':
+        return UserRole.salesRepresentative;
+      default:
+        return UserRole.unknown;
+    }
+  }
+
+  /// يحول قيمة الدور إلى سلسلة نصية للاستخدام في Firestore (مثل 'factory_manager').
+  String toFirestoreString() {
+    switch (this) {
+      case UserRole.factoryManager:
+        return 'factory_manager';
+      case UserRole.productionManager:
+        return 'production_manager';
+      case UserRole.productionOrderPreparer:
+        return 'production_order_preparer';
+      case UserRole.moldInstallationSupervisor:
+        return 'mold_installation_supervisor';
+      case UserRole.productionShiftSupervisor:
+        return 'production_shift_supervisor';
+      case UserRole.machineOperator:
+        return 'machine_operator';
+      case UserRole.maintenanceManager:
+        return 'maintenance_manager';
+      case UserRole.salesRepresentative:
+        return 'sales_representative';
+      case UserRole.unknown:
+      default:
+        return 'unknown';
+    }
+  }
+}

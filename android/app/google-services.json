@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "92456828886",
+    "project_id": "factory-system-914ef",
+    "storage_bucket": "factory-system-914ef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92456828886:android:a22bb74b39a371bccfae77",
+        "android_client_info": {
+          "package_name": "com.factory.management.plastic_factory_management"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhtbaOJDh9rq0fHP6SmAseMO5FlYEExms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
