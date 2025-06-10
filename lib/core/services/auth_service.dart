@@ -42,14 +42,25 @@ class AuthService {
     try {
       return await signInWithEmailPassword(email, password);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
+      if (e.code == 'user-not-found' || e.code == 'invalid-credential') {
         final defaultName = email.split('@').first;
-        return await signUpWithEmailPassword(
-          email,
-          password,
-          defaultName,
-          UserRole.unknown,
-        );
+        try {
+          return await signUpWithEmailPassword(
+            email,
+            password,
+            defaultName,
+            UserRole.unknown,
+          );
+        } on FirebaseAuthException catch (e2) {
+          if (e2.code == 'email-already-in-use') {
+            throw FirebaseAuthException(
+              code: 'wrong-password',
+              message:
+                  'كلمة المرور غير صحيحة. تأكد من إدخال كلمة المرور الصحيحة لهذا البريد.',
+            );
+          }
+          rethrow;
+        }
       }
       rethrow;
     }
@@ -63,8 +74,18 @@ class AuthService {
     try {
       return await signInWithEmailPassword(email, password);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        return await signUpWithEmailPassword(email, password, name, role);
+      if (e.code == 'user-not-found' || e.code == 'invalid-credential') {
+        try {
+          return await signUpWithEmailPassword(email, password, name, role);
+        } on FirebaseAuthException catch (e2) {
+          if (e2.code == 'email-already-in-use') {
+            throw FirebaseAuthException(
+              code: 'wrong-password',
+              message: 'كلمة المرور غير صحيحة. تأكد من إدخال كلمة المرور الصحيحة لهذا البريد.',
+            );
+          }
+          rethrow;
+        }
       } else if (e.code == 'wrong-password') {
         throw FirebaseAuthException(
           code: 'wrong-password',
