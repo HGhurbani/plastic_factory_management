@@ -4,6 +4,7 @@
   "emailHint": "البريد الإلكتروني",
   "passwordHint": "كلمة المرور",
   "signInButton": "تسجيل الدخول",
+  "quickSignInButton": "تسجيل سريع",
   "loginErrorGeneric": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
   "factoryManager": "مدير المصنع",
   "productionManager": "مدير الإنتاج",
