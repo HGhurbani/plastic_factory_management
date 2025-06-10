@@ -248,6 +248,8 @@ class AppLocalizations {
   String get fulfill => _strings["fulfill"] ?? "fulfill";
   String get orderFulfilledSuccessfully => _strings["orderFulfilledSuccessfully"] ?? "orderFulfilledSuccessfully";
   String get errorFulfillingOrder => _strings["errorFulfillingOrder"] ?? "errorFulfillingOrder";
+  String get salesOrders => _strings["salesOrders"] ?? "salesOrders";
+  String get salesOrder => _strings["salesOrder"] ?? "salesOrder";
   String get quantityUnit => _strings["quantityUnit"] ?? "quantityUnit";
 }
 

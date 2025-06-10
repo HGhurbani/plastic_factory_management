@@ -234,5 +234,7 @@
   "orderFulfilledSuccessfully": "تم تحديد الطلب كمورد بنجاح!",
   "errorFulfillingOrder": "حدث خطأ أثناء تحديد الطلب كمورد",
   "salesRepresentative": "مندوب المبيعات",
+  "salesOrders": "Sales Orders",
+  "salesOrder": "Sales Order",
   "quantityUnit": "كمية"
 }
