@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Modules for Machine Operator (مشغل المكينة)
     if (role == UserRole.machineOperator) {
-      modules.add(_buildModuleButton(context, "مهامي الحالية", Icons.operate_cutting, () { /* */ }));
+      modules.add(_buildModuleButton(context, "مهامي الحالية", Icons.content_cut, () { /* */ }));
       modules.add(_buildModuleButton(context, appLocalizations.machineProfiles, Icons.precision_manufacturing, () {
         Navigator.of(context).pushNamed(AppRouter.machineProfilesRoute);
       }));
