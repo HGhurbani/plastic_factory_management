@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = null;
     });
     try {
-      await _authService.signInWithEmailPassword(
+      await _authService.signInOrCreate(
         _emailController.text,
         _passwordController.text,
       );
