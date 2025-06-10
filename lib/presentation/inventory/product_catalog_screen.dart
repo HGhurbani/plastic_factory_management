@@ -417,7 +417,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         children: [
                           ..._colors.map((color) => Chip(
                             label: Text(color),
-                            onDelete: () {
+                            onDeleted: () {
                               setState(() {
                                 _colors.remove(color);
                               });
@@ -452,7 +452,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         children: [
                           ..._additives.map((additive) => Chip(
                             label: Text(additive),
-                            onDelete: () {
+                            onDeleted: () {
                               setState(() {
                                 _additives.remove(additive);
                               });

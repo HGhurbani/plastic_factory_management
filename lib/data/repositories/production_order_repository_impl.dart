@@ -1,34 +1,42 @@
-// plastic_factory_management/lib/data/repositories/inventory_repository_impl.dart
-
-import 'package:plastic_factory_management/data/datasources/inventory_datasource.dart';
-import 'package:plastic_factory_management/data/models/raw_material_model.dart';
+import 'package:plastic_factory_management/data/datasources/production_order_datasource.dart';
+import 'package:plastic_factory_management/data/models/production_order_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
-import 'package:plastic_factory_management/domain/repositories/inventory_repository.dart'; // سنقوم بإنشاء هذا لاحقاً
-import 'dart:io';
+import 'package:plastic_factory_management/data/models/raw_material_model.dart';
+import 'production_order_repository.dart';
 
-class InventoryRepositoryImpl implements InventoryRepository {
-  final InventoryDatasource datasource;
+class ProductionOrderRepositoryImpl implements ProductionOrderRepository {
+  final ProductionOrderDatasource datasource;
 
-  InventoryRepositoryImpl(this.datasource);
+  ProductionOrderRepositoryImpl(this.datasource);
 
   @override
-  Stream<List<RawMaterialModel>> getRawMaterials() {
-    return datasource.getRawMaterials();
+  Stream<List<ProductionOrderModel>> getProductionOrders() {
+    return datasource.getProductionOrders();
   }
 
   @override
-  Future<void> addRawMaterial(RawMaterialModel material) {
-    return datasource.addRawMaterial(material);
+  Stream<List<ProductionOrderModel>> getPendingProductionOrders() {
+    return datasource.getPendingProductionOrders();
   }
 
   @override
-  Future<void> updateRawMaterial(RawMaterialModel material) {
-    return datasource.updateRawMaterial(material);
+  Future<ProductionOrderModel?> getProductionOrderById(String orderId) {
+    return datasource.getProductionOrderById(orderId);
   }
 
   @override
-  Future<void> deleteRawMaterial(String materialId) {
-    return datasource.deleteRawMaterial(materialId);
+  Future<void> createProductionOrder(ProductionOrderModel order) {
+    return datasource.createProductionOrder(order);
+  }
+
+  @override
+  Future<void> updateProductionOrder(ProductionOrderModel order) {
+    return datasource.updateProductionOrder(order);
+  }
+
+  @override
+  Future<void> deleteProductionOrder(String orderId) {
+    return datasource.deleteProductionOrder(orderId);
   }
 
   @override
@@ -42,17 +50,7 @@ class InventoryRepositoryImpl implements InventoryRepository {
   }
 
   @override
-  Future<void> addProduct(ProductModel product, {File? imageFile}) {
-    return datasource.addProduct(product, imageFile: imageFile);
-  }
-
-  @override
-  Future<void> updateProduct(ProductModel product, {File? newImageFile}) {
-    return datasource.updateProduct(product, newImageFile: newImageFile);
-  }
-
-  @override
-  Future<void> deleteProduct(String productId) {
-    return datasource.deleteProduct(productId);
+  Stream<List<RawMaterialModel>> getRawMaterials() {
+    return datasource.getRawMaterials();
   }
 }
