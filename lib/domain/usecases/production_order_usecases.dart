@@ -325,4 +325,8 @@ class ProductionOrderUseCases {
   Stream<List<ProductModel>> getProductsForSelection() {
     return repository.getProducts();
   }
+
+  Future<ProductModel?> getProductById(String productId) {
+    return repository.getProductById(productId);
+  }
 }
