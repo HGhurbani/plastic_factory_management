@@ -1,0 +1,50 @@
+
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="90" fill="#1565C0" stroke="#0D47A1" stroke-width="4"/>
+  
+  <!-- Factory Building -->
+  <rect x="60" y="80" width="80" height="60" fill="#FFFFFF" rx="4"/>
+  <rect x="65" y="85" width="10" height="15" fill="#1565C0"/>
+  <rect x="80" y="85" width="10" height="15" fill="#1565C0"/>
+  <rect x="95" y="85" width="10" height="15" fill="#1565C0"/>
+  <rect x="110" y="85" width="10" height="15" fill="#1565C0"/>
+  <rect x="125" y="85" width="10" height="15" fill="#1565C0"/>
+  
+  <!-- Smokestacks -->
+  <rect x="70" y="60" width="8" height="20" fill="#FFFFFF"/>
+  <rect x="85" y="55" width="8" height="25" fill="#FFFFFF"/>
+  <rect x="100" y="50" width="8" height="30" fill="#FFFFFF"/>
+  <rect x="115" y="55" width="8" height="25" fill="#FFFFFF"/>
+  
+  <!-- Smoke -->
+  <circle cx="74" cy="55" r="3" fill="#E3F2FD" opacity="0.7"/>
+  <circle cx="89" cy="50" r="3" fill="#E3F2FD" opacity="0.7"/>
+  <circle cx="104" cy="45" r="3" fill="#E3F2FD" opacity="0.7"/>
+  <circle cx="119" cy="50" r="3" fill="#E3F2FD" opacity="0.7"/>
+  
+  <!-- Gear Icon for Management -->
+  <circle cx="100" cy="115" r="15" fill="#FFC107"/>
+  <circle cx="100" cy="115" r="8" fill="#1565C0"/>
+  
+  <!-- Gear Teeth -->
+  <rect x="96" y="100" width="8" height="4" fill="#FFC107"/>
+  <rect x="96" y="126" width="8" height="4" fill="#FFC107"/>
+  <rect x="85" y="111" width="4" height="8" fill="#FFC107"/>
+  <rect x="111" y="111" width="4" height="8" fill="#FFC107"/>
+  
+  <!-- Security Shield -->
+  <path d="M 40 120 L 50 110 L 60 120 L 55 140 L 45 140 Z" fill="#4CAF50"/>
+  <path d="M 45 125 L 48 128 L 54 122" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+  
+  <!-- Productivity Arrow -->
+  <path d="M 140 120 L 155 115 L 150 125 L 160 125 L 160 130 L 150 130 L 155 140 Z" fill="#FF9800"/>
+  
+  <!-- Text Arc -->
+  <path id="textpath" d="M 30 100 A 70 70 0 0 1 170 100" fill="none"/>
+  <text font-family="Arial, sans-serif" font-size="12" fill="#FFFFFF" font-weight="bold">
+    <textPath href="#textpath" startOffset="50%" text-anchor="middle">
+      إدارة إنتاج المصنع المتكامل
+    </textPath>
+  </text>
+</svg>

@@ -65,9 +65,24 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         return await signUpWithEmailPassword(email, password, name, role);
+      } else if (e.code == 'wrong-password') {
+        throw FirebaseAuthException(
+          code: 'wrong-password',
+          message: 'كلمة المرور غير صحيحة. تأكد من إدخال كلمة المرور الصحيحة لهذا البريد.',
+        );
+      } else if (e.code == 'invalid-email') {
+        throw FirebaseAuthException(
+          code: 'invalid-email',
+          message: 'البريد الإلكتروني غير صالح. الرجاء التحقق.',
+        );
+      } else {
+        throw FirebaseAuthException(
+          code: e.code,
+          message: 'خطأ أثناء تسجيل الدخول: ${e.message}',
+        );
       }
-      rethrow;
     }
+
   }
 
   // تسجيل مستخدم جديد (قد يستخدمه المدير لإنشاء حسابات)
