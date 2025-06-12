@@ -252,11 +252,6 @@ class AppLocalizations {
   String get salesOrders => _strings["salesOrders"] ?? "salesOrders";
   String get salesOrder => _strings["salesOrder"] ?? "salesOrder";
   String get quantityUnit => _strings["quantityUnit"] ?? "quantityUnit";
-  String get managementDashboard => _strings["managementDashboard"] ?? "managementDashboard";
-  String get productionEfficiency => _strings["productionEfficiency"] ?? "productionEfficiency";
-  String get machineElectricityUsage => _strings["machineElectricityUsage"] ?? "machineElectricityUsage";
-  String get qualityReports => _strings["qualityReports"] ?? "qualityReports";
-  String get salesStatus => _strings["salesStatus"] ?? "salesStatus";
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -238,9 +238,4 @@
   "salesOrders": "طلبات المبيعات",
   "salesOrder": "طلب مبيعات",
   "quantityUnit": "كمية"
-  "managementDashboard": "لوحة القيادة والتقارير",
-  "productionEfficiency": "كفاءة الإنتاج",
-  "machineElectricityUsage": "استهلاك الكهرباء للآلات",
-  "qualityReports": "تقارير الجودة",
-  "salesStatus": "حالة المبيعات",
 }

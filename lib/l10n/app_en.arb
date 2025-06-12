@@ -237,10 +237,5 @@
   "salesRepresentative": "مندوب المبيعات",
   "salesOrders": "Sales Orders",
   "salesOrder": "Sales Order",
-  "managementDashboard": "Management Dashboard",
-  "productionEfficiency": "Production Efficiency",
-  "machineElectricityUsage": "Machine Electricity Usage",
-  "qualityReports": "Quality Reports",
-  "salesStatus": "Sales Status",
   "quantityUnit": "كمية"
 }
