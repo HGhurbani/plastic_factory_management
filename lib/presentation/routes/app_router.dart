@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:plastic_factory_management/presentation/auth/login_screen.dart';
 import 'package:plastic_factory_management/presentation/home/home_screen.dart';
+import 'package:plastic_factory_management/presentation/dashboard/manager_dashboard_screen.dart';
 import 'package:plastic_factory_management/presentation/production/create_production_order_screen.dart';
 import 'package:plastic_factory_management/presentation/production/production_orders_list_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/raw_materials_screen.dart';
@@ -24,6 +25,7 @@ class AppRouter {
   static const String machineProfilesRoute = '/machinery/machines';
   static const String operatorProfilesRoute = '/machinery/operators';
   static const String maintenanceProgramRoute = '/maintenance/program';
+  static const String managerDashboardRoute = '/management/dashboard';
   static const String customerManagementRoute = '/sales/customers'; // مسار جديد
   static const String createSalesOrderRoute = '/sales/orders/create'; // مسار جديد
   static const String salesOrdersListRoute = '/sales/orders/list'; // مسار جديد
@@ -48,6 +50,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => OperatorProfilesScreen());
       case maintenanceProgramRoute:
         return MaterialPageRoute(builder: (_) => MaintenanceProgramScreen());
+      case managerDashboardRoute:
+        return MaterialPageRoute(builder: (_) => ManagerDashboardScreen());
       case customerManagementRoute: // إضافة المسار الجديد
         return MaterialPageRoute(builder: (_) => CustomerManagementScreen());
       case createSalesOrderRoute: // إضافة المسار الجديد
