@@ -448,12 +448,94 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showApproveDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
+  void _showApproveDialog(BuildContext context, SalesUseCases useCases,
+      AppLocalizations appLocalizations, SalesOrderModel order) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(appLocalizations.approveOrderConfirmation),
-        content: Text('${appLocalizations.confirmApproveOrder}: "${order.customerName}"؟'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _buildDetailRow(appLocalizations.customerName, order.customerName),
+              _buildDetailRow(
+                  appLocalizations.salesRepresentative, order.salesRepresentativeName),
+              _buildDetailRow(appLocalizations.totalAmount,
+                  '\$${order.totalAmount.toStringAsFixed(2)}'),
+              _buildDetailRow(appLocalizations.status, order.status.toArabicString(),
+                  textColor: _getSalesOrderStatusColor(order.status), isBold: true),
+              _buildDetailRow('تاريخ الطلب',
+                  intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate())),
+              const SizedBox(height: 16),
+              Text(appLocalizations.orderItems,
+                  style:
+                      const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  textAlign: TextAlign.right),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: order.orderItems
+                    .map((item) => Text(
+                          '${item.productName} - ${item.quantity} ${appLocalizations.quantityUnit} @ \$${item.unitPrice.toStringAsFixed(2)}',
+                          textAlign: TextAlign.right,
+                          textDirection: TextDirection.rtl,
+                        ))
+                    .toList(),
+              ),
+              if (order.customerSignatureUrl != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(appLocalizations.customerSignature,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                          textAlign: TextAlign.right),
+                      const SizedBox(height: 8),
+                      Image.network(
+                        order.customerSignatureUrl!,
+                        height: 100,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                      ),
+                    ],
+                  ),
+                ),
+              if (order.warehouseNotes != null && order.warehouseNotes!.isNotEmpty)
+                _buildDetailRow(
+                    appLocalizations.warehouseNotes, order.warehouseNotes!),
+              if (order.warehouseImages.isNotEmpty)
+                Wrap(
+                  children: order.warehouseImages
+                      .map((e) => Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Image.network(e,
+                                width: 60, height: 60, fit: BoxFit.cover),
+                          ))
+                      .toList(),
+                ),
+              if (order.moldInstallationNotes != null &&
+                  order.moldInstallationNotes!.isNotEmpty)
+                _buildDetailRow(appLocalizations.moldInstallationNotes,
+                    order.moldInstallationNotes!),
+              if (order.moldInstallationImages.isNotEmpty)
+                Wrap(
+                  children: order.moldInstallationImages
+                      .map((e) => Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Image.network(e,
+                                width: 60, height: 60, fit: BoxFit.cover),
+                          ))
+                      .toList(),
+                ),
+              const SizedBox(height: 16),
+              Text('${appLocalizations.confirmApproveOrder}: "${order.customerName}"؟',
+                  textAlign: TextAlign.right),
+            ],
+          ),
+        ),
         actions: [
           TextButton(
             child: Text(appLocalizations.cancel),
@@ -467,11 +549,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 final user = Provider.of<UserModel?>(context, listen: false)!;
                 await useCases.approveSalesOrder(order, user);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(appLocalizations.orderApprovedSuccessfully)),
+                  SnackBar(
+                      content: Text(appLocalizations.orderApprovedSuccessfully)),
                 );
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${appLocalizations.errorApprovingOrder}: $e')),
+                  SnackBar(
+                      content: Text('${appLocalizations.errorApprovingOrder}: $e')),
                 );
               }
             },
