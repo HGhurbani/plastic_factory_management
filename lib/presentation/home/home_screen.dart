@@ -573,7 +573,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return modules;
   }
 
-  Widget _buildWelcomeCard() {
+  Widget _buildWelcomeHeader() {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -677,6 +677,174 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildKpiCard(BuildContext context, String title, String value) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+              textDirection: TextDirection.rtl,
+            ),
+            const Spacer(),
+            Text(
+              value,
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+              textDirection: TextDirection.rtl,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAlertCard(String text) {
+    return Card(
+      color: Colors.orange[50],
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          text,
+          textDirection: TextDirection.rtl,
+          style: const TextStyle(fontSize: 14),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTaskCard(String text) {
+    return Card(
+      child: ListTile(
+        title: Text(
+          text,
+          textDirection: TextDirection.rtl,
+        ),
+        trailing: const Icon(Icons.check_circle_outline),
+      ),
+    );
+  }
+
+  Widget _buildDashboardForRole(UserRole role) {
+    List<Widget> kpis = [];
+    List<Widget> alerts = [];
+    List<Widget> tasks = [];
+
+    if (role == UserRole.factoryManager) {
+      kpis = [
+        _buildKpiCard(context, 'إجمالي طلبات الإنتاج', '0'),
+        _buildKpiCard(context, 'عدد طلبات المبيعات', '0'),
+        _buildKpiCard(context, 'إجمالي عدد الآلات', '0'),
+        _buildKpiCard(context, 'عدد المواد الخام تحت حد الخطر', '0'),
+      ];
+      alerts = [
+        _buildAlertCard('مواد خام تحتاج لإعادة طلب'),
+        _buildAlertCard('آلات تحتاج صيانة عاجلة'),
+        _buildAlertCard('طلبات إنتاج/مبيعات عالقة'),
+      ];
+      tasks = [
+        _buildTaskCard('مراجعة طلبات الإنتاج المعلقة للموافقة'),
+        _buildTaskCard('مراجعة طلبات الصيانة'),
+      ];
+    } else if (role == UserRole.productionManager) {
+      kpis = [
+        _buildKpiCard(context, 'عدد طلبات الإنتاج المعلقة', '0'),
+        _buildKpiCard(context, 'عدد الطلبات قيد الإنتاج', '0'),
+        _buildKpiCard(context, 'نسبة إكمال الإنتاج', '0%'),
+      ];
+      alerts = [
+        _buildAlertCard('نقص في المواد الخام لطلبات مجدولة'),
+        _buildAlertCard('تأخير في مراحل الإنتاج'),
+      ];
+      tasks = [
+        _buildTaskCard('مراجعة طلبات الإنتاج الجديدة للموافقة/الرفض'),
+      ];
+    } else if (role == UserRole.salesRepresentative) {
+      kpis = [
+        _buildKpiCard(context, 'عدد العملاء المسجلين', '0'),
+        _buildKpiCard(context, 'عدد طلبات المبيعات المعلقة', '0'),
+        _buildKpiCard(context, 'إجمالي قيمة المبيعات الشهرية', '0'),
+      ];
+      alerts = [
+        _buildAlertCard('طلبات مبيعات بانتظار التوريد'),
+      ];
+      tasks = [
+        _buildTaskCard('متابعة طلبات المبيعات الخاصة به'),
+      ];
+    } else if (role == UserRole.maintenanceManager) {
+      kpis = [
+        _buildKpiCard(context, 'عدد مهام الصيانة المجدولة', '0'),
+        _buildKpiCard(context, 'عدد الآلات تحت الصيانة', '0'),
+        _buildKpiCard(context, 'عدد مهام الصيانة المكتملة', '0'),
+      ];
+      alerts = [
+        _buildAlertCard('آلات تحتاج صيانة عاجلة'),
+        _buildAlertCard('مهام صيانة فائتة'),
+      ];
+      tasks = [
+        _buildTaskCard('جدولة صيانة جديدة'),
+        _buildTaskCard('متابعة مهام الصيانة قيد التقدم'),
+      ];
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('المؤشرات الرئيسية', textDirection: TextDirection.rtl,
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: kpis,
+        ),
+        const SizedBox(height: 16),
+        if (alerts.isNotEmpty) ...[
+          const Text('التنبيهات', textDirection: TextDirection.rtl,
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Column(children: alerts),
+          const SizedBox(height: 16),
+        ],
+        if (tasks.isNotEmpty) ...[
+          const Text('المهام', textDirection: TextDirection.rtl,
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Column(children: tasks),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildDashboardContent() {
+    if (_currentUser == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildWelcomeHeader(),
+            _buildDashboardForRole(_currentUser!.userRoleEnum),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
@@ -763,35 +931,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
       )
-          : Directionality(
-        textDirection: TextDirection.rtl,
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: _buildWelcomeCard(),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.85,
-                ),
-                delegate: SliverChildListDelegate(
-                  _getModulesForRole(appLocalizations),
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 20),
-            ),
-          ],
-        ),
+          : _buildDashboardContent(),
       ),
     );
   }
