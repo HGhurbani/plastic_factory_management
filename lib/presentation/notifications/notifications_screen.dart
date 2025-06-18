@@ -53,8 +53,8 @@ class NotificationsScreen extends StatelessWidget {
                           : TextButton(
                               onPressed: () => notificationUseCases
                                   .markAsRead(notif.id),
-                              child: Text(appLocalizations.markAsRead),
-                            ),
+                              child: Text(appLocalizations.markAsFulfilled),
+                      )
                     );
                   },
                 );

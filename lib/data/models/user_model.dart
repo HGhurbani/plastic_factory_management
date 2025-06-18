@@ -79,5 +79,5 @@ class UserModel {
   }
 
   // دالة مساعدة للحصول على الدور كـ Enum
-  UserRole get userRoleEnum => UserRoleExtension.fromString(role);
+  // UserRole get userRoleEnum => UserRoleExtension.fromString(role);
 }
