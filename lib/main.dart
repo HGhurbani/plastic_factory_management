@@ -78,6 +78,34 @@ class MyApp extends StatelessWidget {
             return null;
           }),
         ),
+        // توفير Notifications Dependencies
+        Provider<NotificationDatasource>(
+          create: (_) => NotificationDatasource(),
+        ),
+        Provider<NotificationRepositoryImpl>(
+          create: (context) => NotificationRepositoryImpl(
+            Provider.of<NotificationDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<NotificationUseCases>(
+          create: (context) => NotificationUseCases(
+            Provider.of<NotificationRepositoryImpl>(context, listen: false),
+          ),
+        ),
+        // توفير User Management Dependencies
+        Provider<UserDatasource>(
+          create: (_) => UserDatasource(),
+        ),
+        Provider<UserRepositoryImpl>(
+          create: (context) => UserRepositoryImpl(
+            Provider.of<UserDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<UserUseCases>(
+          create: (context) => UserUseCases(
+            Provider.of<UserRepositoryImpl>(context, listen: false),
+          ),
+        ),
         // توفير Production Order Dependencies
         Provider<ProductionOrderDatasource>(
           create: (_) => ProductionOrderDatasource(),
@@ -150,34 +178,6 @@ class MyApp extends StatelessWidget {
             Provider.of<SalesRepositoryImpl>(context, listen: false),
             Provider.of<NotificationUseCases>(context, listen: false),
             Provider.of<UserUseCases>(context, listen: false),
-          ),
-        ),
-        // توفير Notifications Dependencies
-        Provider<NotificationDatasource>(
-          create: (_) => NotificationDatasource(),
-        ),
-        Provider<NotificationRepositoryImpl>(
-          create: (context) => NotificationRepositoryImpl(
-            Provider.of<NotificationDatasource>(context, listen: false),
-          ),
-        ),
-        Provider<NotificationUseCases>(
-          create: (context) => NotificationUseCases(
-            Provider.of<NotificationRepositoryImpl>(context, listen: false),
-          ),
-        ),
-        // توفير User Management Dependencies
-        Provider<UserDatasource>(
-          create: (_) => UserDatasource(),
-        ),
-        Provider<UserRepositoryImpl>(
-          create: (context) => UserRepositoryImpl(
-            Provider.of<UserDatasource>(context, listen: false),
-          ),
-        ),
-        Provider<UserUseCases>(
-          create: (context) => UserUseCases(
-            Provider.of<UserRepositoryImpl>(context, listen: false),
           ),
         ),
       ],
