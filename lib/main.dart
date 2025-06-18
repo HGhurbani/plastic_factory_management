@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:plastic_factory_management/firebase_options.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
@@ -174,7 +175,7 @@ class MyApp extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
-          fontFamily: 'Cairo',
+          fontFamily: GoogleFonts.tajawal().fontFamily,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         debugShowCheckedModeBanner: false,

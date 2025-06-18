@@ -1,7 +1,7 @@
 // plastic_factory_management/lib/data/datasources/sales_datasource.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:plastic_factory_management/core/services/file_upload_service.dart';
 import 'package:plastic_factory_management/data/models/customer_model.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart'; // لجلب المنتجات من المخزون
@@ -9,7 +9,7 @@ import 'dart:io';
 
 class SalesDatasource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FileUploadService _uploadService = FileUploadService();
 
   // --- Customer Operations ---
 
@@ -56,9 +56,10 @@ class SalesDatasource {
   Future<void> addSalesOrder(SalesOrderModel order, {File? signatureFile}) async {
     String? signatureUrl;
     if (signatureFile != null) {
-      final ref = _storage.ref().child('customer_signatures/${order.customerId}_${order.id}_${DateTime.now().microsecondsSinceEpoch}.png');
-      await ref.putFile(signatureFile);
-      signatureUrl = await ref.getDownloadURL();
+      signatureUrl = await _uploadService.uploadFile(
+        signatureFile,
+        'customer_signatures/${order.customerId}_${order.id}_${DateTime.now().microsecondsSinceEpoch}.png',
+      );
     }
     await _firestore.collection('sales_orders').add(order.copyWith(customerSignatureUrl: signatureUrl).toMap());
   }

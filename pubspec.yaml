@@ -17,13 +17,14 @@ dependencies:
   firebase_core: ^2.27.0 # أحدث إصدار متاح حالياً
   firebase_auth: ^4.17.8 # أحدث إصدار متاح حالياً
   cloud_firestore: ^4.15.8 # أحدث إصدار متاح حالياً
-  firebase_storage: ^11.6.9 # أحدث إصدار متاح حالياً
 
   # UI and Utilities
   image_picker: ^1.0.7 # لاختيار الصور
   signature: ^5.4.0 # لرسم التوقيع الرقمي
   provider: ^6.1.1 # لإدارة الحالة (State Management)
   path_provider: ^2.1.2 # أحدث إصدار متاح حالياً
+  http: ^0.13.6
+  google_fonts: ^6.1.0
   intl: ^0.19.0 # لتنسيق التواريخ والأرقام والتدويل
   flutter_localizations: # تبعية ضرورية للتدويل
     sdk: flutter
