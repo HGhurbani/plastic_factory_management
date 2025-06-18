@@ -7,6 +7,7 @@ import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -232,19 +233,15 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     if (isAccountant && order.status == SalesOrderStatus.pendingFulfillment) {
       return IconButton(
         icon: const Icon(Icons.local_shipping, color: Colors.blue),
-        onPressed: () async {
-          await useCases.initiateSupply(order, currentUser);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(appLocalizations.initiateSupply)),
-          );
-        },
+        onPressed: () => _showInitiateSupplyDialog(
+            context, useCases, appLocalizations, order, currentUser),
         tooltip: appLocalizations.initiateSupply,
       );
     }
     if (currentUser.userRoleEnum == UserRole.inventoryManager && order.status == SalesOrderStatus.warehouseProcessing) {
       return IconButton(
         icon: const Icon(Icons.camera_alt, color: Colors.orange),
-        onPressed: () => _showWarehouseDocDialog(context, useCases, appLocalizations, order),
+        onPressed: () => _showWarehouseDocDialog(context, useCases, appLocalizations, order, currentUser),
         tooltip: appLocalizations.warehouseDocumentation,
       );
     }
@@ -503,6 +500,47 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
+  void _showInitiateSupplyDialog(BuildContext context, SalesUseCases salesUseCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel accountant) async {
+    final userUseCases = Provider.of<UserUseCases>(context, listen: false);
+    final storekeepers = await userUseCases.getUsersByRole(UserRole.inventoryManager);
+    if (storekeepers.isEmpty) return;
+    UserModel selected = storekeepers.first;
+
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('اختر أمين المخزن'),
+          content: DropdownButton<UserModel>(
+            value: selected,
+            items: storekeepers
+                .map((u) => DropdownMenuItem(value: u, child: Text(u.name)))
+                .toList(),
+            onChanged: (u) => setState(() {
+              if (u != null) selected = u;
+            }),
+          ),
+          actions: [
+            TextButton(
+              child: Text(appLocalizations.cancel),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            ElevatedButton(
+              child: Text(appLocalizations.initiateSupply),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await salesUseCases.initiateSupply(order, accountant, selected);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(appLocalizations.initiateSupply)),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showMoldDocDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
     final TextEditingController notesController = TextEditingController(text: order.moldInstallationNotes);
     List<XFile> pickedImages = [];
@@ -598,7 +636,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showWarehouseDocDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
+  void _showWarehouseDocDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel storekeeper) {
     final TextEditingController notesController = TextEditingController(text: order.warehouseNotes);
     List<XFile> pickedImages = [];
     final ImagePicker picker = ImagePicker();
@@ -667,6 +705,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 try {
                   await useCases.documentWarehouseSupply(
                     order: order,
+                    storekeeper: storekeeper,
                     notes: notesController.text.trim(),
                     attachments: pickedImages.map((e) => File(e.path)).toList(),
                   );

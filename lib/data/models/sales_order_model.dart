@@ -100,6 +100,8 @@ class SalesOrderModel {
   final List<String> moldInstallationImages; // صور توثيقية للتركيب
   final String? warehouseNotes; // ملاحظات أمين المخزن
   final List<String> warehouseImages; // صور توثيق المخزن
+  final String? warehouseManagerUid; // UID أمين المخزن المسؤول
+  final String? warehouseManagerName; // اسم أمين المخزن المسؤول
 
   SalesOrderModel({
     required this.id,
@@ -120,6 +122,8 @@ class SalesOrderModel {
     this.moldInstallationImages = const [],
     this.warehouseNotes,
     this.warehouseImages = const [],
+    this.warehouseManagerUid,
+    this.warehouseManagerName,
   });
 
   factory SalesOrderModel.fromDocumentSnapshot(DocumentSnapshot doc) {
@@ -146,6 +150,8 @@ class SalesOrderModel {
       moldInstallationImages: List<String>.from(data['moldInstallationImages'] ?? []),
       warehouseNotes: data['warehouseNotes'],
       warehouseImages: List<String>.from(data['warehouseImages'] ?? []),
+      warehouseManagerUid: data['warehouseManagerUid'],
+      warehouseManagerName: data['warehouseManagerName'],
     );
   }
 
@@ -168,6 +174,8 @@ class SalesOrderModel {
       'moldInstallationImages': moldInstallationImages,
       'warehouseNotes': warehouseNotes,
       'warehouseImages': warehouseImages,
+      'warehouseManagerUid': warehouseManagerUid,
+      'warehouseManagerName': warehouseManagerName,
     };
   }
 
@@ -190,6 +198,8 @@ class SalesOrderModel {
     List<String>? moldInstallationImages,
     String? warehouseNotes,
     List<String>? warehouseImages,
+    String? warehouseManagerUid,
+    String? warehouseManagerName,
   }) {
     return SalesOrderModel(
       id: id ?? this.id,
@@ -210,6 +220,8 @@ class SalesOrderModel {
       moldInstallationImages: moldInstallationImages ?? this.moldInstallationImages,
       warehouseNotes: warehouseNotes ?? this.warehouseNotes,
       warehouseImages: warehouseImages ?? this.warehouseImages,
+      warehouseManagerUid: warehouseManagerUid ?? this.warehouseManagerUid,
+      warehouseManagerName: warehouseManagerName ?? this.warehouseManagerName,
     );
   }
 }

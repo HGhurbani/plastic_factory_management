@@ -160,23 +160,26 @@ class SalesUseCases {
   }
 
   // Accountant initiates supply to warehouse
-  Future<void> initiateSupply(SalesOrderModel order, UserModel accountant) async {
-    final updated = order.copyWith(status: SalesOrderStatus.warehouseProcessing);
+  Future<void> initiateSupply(
+      SalesOrderModel order, UserModel accountant, UserModel storekeeper) async {
+    final updated = order.copyWith(
+      status: SalesOrderStatus.warehouseProcessing,
+      warehouseManagerUid: storekeeper.uid,
+      warehouseManagerName: storekeeper.name,
+    );
     await repository.updateSalesOrder(updated);
 
-    final storekeepers = await userUseCases.getUsersByRole(UserRole.inventoryManager);
-    for (final s in storekeepers) {
-      await notificationUseCases.sendNotification(
-        userId: s.uid,
-        title: 'طلب توريد جديد',
-        message: 'الرجاء تجهيز طلب العميل ${order.customerName}',
-      );
-    }
+    await notificationUseCases.sendNotification(
+      userId: storekeeper.uid,
+      title: 'طلب توريد جديد',
+      message: 'الرجاء تجهيز طلب العميل ${order.customerName}',
+    );
   }
 
   // Warehouse manager documents supply and sends to production manager
   Future<void> documentWarehouseSupply({
     required SalesOrderModel order,
+    required UserModel storekeeper,
     String? notes,
     List<File>? attachments,
   }) async {
@@ -193,6 +196,8 @@ class SalesUseCases {
     final updated = order.copyWith(
       warehouseNotes: notes ?? order.warehouseNotes,
       warehouseImages: uploaded,
+      warehouseManagerUid: storekeeper.uid,
+      warehouseManagerName: storekeeper.name,
       status: SalesOrderStatus.pendingProductionApproval,
     );
     await repository.updateSalesOrder(updated);
