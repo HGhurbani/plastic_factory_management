@@ -37,6 +37,10 @@ import 'package:plastic_factory_management/domain/usecases/maintenance_usecases.
 import 'package:plastic_factory_management/data/datasources/sales_datasource.dart'; // استيراد جديد
 import 'package:plastic_factory_management/data/repositories/sales_repository_impl.dart'; // استيراد جديد
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart'; // استيراد جديد
+// استيرادات User Management
+import 'package:plastic_factory_management/data/datasources/user_datasource.dart';
+import 'package:plastic_factory_management/data/repositories/user_repository_impl.dart';
+import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
 
 
 import 'package:plastic_factory_management/presentation/auth/login_screen.dart';
@@ -138,6 +142,20 @@ class MyApp extends StatelessWidget {
         Provider<SalesUseCases>(
           create: (context) => SalesUseCases(
             Provider.of<SalesRepositoryImpl>(context, listen: false),
+          ),
+        ),
+        // توفير User Management Dependencies
+        Provider<UserDatasource>(
+          create: (_) => UserDatasource(),
+        ),
+        Provider<UserRepositoryImpl>(
+          create: (context) => UserRepositoryImpl(
+            Provider.of<UserDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<UserUseCases>(
+          create: (context) => UserUseCases(
+            Provider.of<UserRepositoryImpl>(context, listen: false),
           ),
         ),
       ],

@@ -59,4 +59,25 @@ class UserModel {
 
   // دالة مساعدة للحصول على الدور كـ Enum
   UserRole get userRoleEnum => UserRoleExtension.fromString(role);
+
+  UserModel copyWith({
+    String? uid,
+    String? email,
+    String? name,
+    String? role,
+    String? employeeId,
+    Timestamp? createdAt,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      name: name ?? this.name,
+      role: role ?? this.role,
+      employeeId: employeeId ?? this.employeeId,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  // دالة مساعدة للحصول على الدور كـ Enum
+  UserRole get userRoleEnum => UserRoleExtension.fromString(role);
 }

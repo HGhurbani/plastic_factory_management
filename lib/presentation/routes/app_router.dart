@@ -17,6 +17,7 @@ import 'package:plastic_factory_management/presentation/quality/quality_inspecti
 import 'package:plastic_factory_management/presentation/inventory/inventory_management_screen.dart';
 import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
 import 'package:plastic_factory_management/presentation/notifications/notifications_screen.dart';
+import 'package:plastic_factory_management/presentation/management/user_management_screen.dart';
 
 
 class AppRouter {
@@ -35,6 +36,7 @@ class AppRouter {
   static const String qualityInspectionRoute = '/quality/inspections';
   static const String inventoryManagementRoute = '/inventory/management';
   static const String accountingRoute = '/accounting';
+  static const String userManagementRoute = '/management/users';
   static const String notificationsRoute = '/notifications';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -69,6 +71,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => InventoryManagementScreen());
       case accountingRoute:
         return MaterialPageRoute(builder: (_) => AccountingScreen());
+      case userManagementRoute:
+        return MaterialPageRoute(builder: (_) => UserManagementScreen());
       case notificationsRoute:
         return MaterialPageRoute(builder: (_) => const NotificationsScreen());
       default:
