@@ -97,6 +97,9 @@ class AppLocalizations {
   String get notes => _strings["notes"] ?? "notes";
   String get checklist => _strings["checklist"] ?? "checklist";
   String get salesModule => _strings["salesModule"] ?? "salesModule";
+  String get inventoryModule => _strings["inventoryModule"] ?? "inventoryModule";
+  String get qualityModule => _strings["qualityModule"] ?? "qualityModule";
+  String get accountingModule => _strings["accountingModule"] ?? "accountingModule";
   String get customerManagement => _strings["customerManagement"] ?? "customerManagement";
   String get registerNewCustomer => _strings["registerNewCustomer"] ?? "registerNewCustomer";
   String get enterCustomerCode => _strings["enterCustomerCode"] ?? "enterCustomerCode";

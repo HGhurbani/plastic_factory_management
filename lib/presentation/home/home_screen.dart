@@ -17,6 +17,9 @@ import 'package:plastic_factory_management/presentation/maintenance/maintenance_
 import 'package:plastic_factory_management/presentation/sales/customer_management_screen.dart';
 import 'package:plastic_factory_management/presentation/sales/create_sales_order_screen.dart';
 import 'package:plastic_factory_management/presentation/sales/sales_orders_list_screen.dart';
+import 'package:plastic_factory_management/presentation/inventory/inventory_management_screen.dart';
+import 'package:plastic_factory_management/presentation/quality/quality_inspection_screen.dart';
+import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -277,6 +280,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'maintenance': const Color(0xFFEF6C00),
       'sales': const Color(0xFFD32F2F),
       'management': const Color(0xFF5D4037),
+      'quality': const Color(0xFF0097A7),
+      'accounting': const Color(0xFF455A64),
     };
 
     // Modules for Factory Manager (مدير المصنع) - Full Access
@@ -567,6 +572,60 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         icon: Icons.history,
         color: moduleColors['sales']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
+      ));
+    }
+
+    // Modules for Inventory Manager (أمين المخزن)
+    if (role == UserRole.inventoryManager) {
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.inventoryModule,
+        subtitle: "إدارة المخزون",
+        icon: Icons.inventory,
+        color: moduleColors['inventory']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.inventoryManagementRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.rawMaterials,
+        subtitle: "المواد الخام",
+        icon: Icons.warehouse,
+        color: moduleColors['inventory']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.rawMaterialsRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.productCatalog,
+        subtitle: "كتالوج المنتجات",
+        icon: Icons.category,
+        color: moduleColors['inventory']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productCatalogRoute),
+      ));
+    }
+
+    // Modules for Quality Inspector (مراقب الجودة)
+    if (role == UserRole.qualityInspector) {
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.qualityModule,
+        subtitle: "فحص الجودة",
+        icon: Icons.verified,
+        color: moduleColors['quality']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.qualityInspectionRoute),
+      ));
+    }
+
+    // Modules for Accountant (المحاسب)
+    if (role == UserRole.accountant) {
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.accountingModule,
+        subtitle: "اعتماد الطلبات", 
+        icon: Icons.account_balance,
+        color: moduleColors['accounting']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.accountingRoute),
       ));
     }
 

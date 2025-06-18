@@ -13,6 +13,9 @@ import 'package:plastic_factory_management/presentation/maintenance/maintenance_
 import 'package:plastic_factory_management/presentation/sales/customer_management_screen.dart'; // استيراد جديد
 import 'package:plastic_factory_management/presentation/sales/create_sales_order_screen.dart'; // استيراد جديد
 import 'package:plastic_factory_management/presentation/sales/sales_orders_list_screen.dart'; // استيراد جديد
+import 'package:plastic_factory_management/presentation/quality/quality_inspection_screen.dart';
+import 'package:plastic_factory_management/presentation/inventory/inventory_management_screen.dart';
+import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
 
 class AppRouter {
   static const String loginRoute = '/';
@@ -27,6 +30,9 @@ class AppRouter {
   static const String customerManagementRoute = '/sales/customers'; // مسار جديد
   static const String createSalesOrderRoute = '/sales/orders/create'; // مسار جديد
   static const String salesOrdersListRoute = '/sales/orders/list'; // مسار جديد
+  static const String qualityInspectionRoute = '/quality/inspections';
+  static const String inventoryManagementRoute = '/inventory/management';
+  static const String accountingRoute = '/accounting';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -54,6 +60,12 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => CreateSalesOrderScreen());
       case salesOrdersListRoute: // إضافة المسار الجديد
         return MaterialPageRoute(builder: (_) => SalesOrdersListScreen());
+      case qualityInspectionRoute:
+        return MaterialPageRoute(builder: (_) => QualityInspectionScreen());
+      case inventoryManagementRoute:
+        return MaterialPageRoute(builder: (_) => InventoryManagementScreen());
+      case accountingRoute:
+        return MaterialPageRoute(builder: (_) => AccountingScreen());
       default:
         return MaterialPageRoute(builder: (_) => Text('Error: Unknown route ${settings.name}'));
     }
