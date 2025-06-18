@@ -1,7 +1,7 @@
 // plastic_factory_management/lib/presentation/production/production_order_detail_screen.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:plastic_factory_management/core/services/file_upload_service.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +29,7 @@ class ProductionOrderDetailScreen extends StatefulWidget {
 class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScreen> {
   final ImagePicker _picker = ImagePicker();
   List<File> _pickedImages = [];
+  final FileUploadService _uploadService = FileUploadService();
   final SignatureController _signatureController = SignatureController(
     penStrokeWidth: 5,
     penColor: Colors.black,
@@ -881,12 +882,11 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     );
   }
 
-  // Helper function to upload file to Firebase Storage
+  // Helper function to upload file to external server
   Future<Uri?> _uploadFile(File file, String path) async {
     try {
-      final ref = FirebaseStorage.instance.ref().child(path);
-      await ref.putFile(file);
-      return Uri.parse(await ref.getDownloadURL());
+      final url = await _uploadService.uploadFile(file, path);
+      return url != null ? Uri.parse(url) : null;
     } catch (e) {
       print('Error uploading file: $e');
       return null;

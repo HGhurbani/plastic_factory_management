@@ -7,12 +7,12 @@ import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/data/repositories/production_order_repository.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:plastic_factory_management/core/services/file_upload_service.dart';
 import 'dart:io'; // لاستخدام File
 
 class ProductionOrderUseCases {
   final ProductionOrderRepository repository;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FileUploadService _uploadService = FileUploadService();
 
   ProductionOrderUseCases(this.repository);
 
@@ -185,14 +185,17 @@ class ProductionOrderUseCases {
       throw Exception('Stage "$stageName" not found or not pending for acceptance.');
     }
 
-    // Upload attachments to Firebase Storage
+    // Upload attachments to external server
     List<String> uploadedAttachmentUrls = [];
     if (attachments != null && attachments.isNotEmpty) {
       for (File file in attachments) {
-        final ref = _storage.ref().child('production_attachments/${order.id}/${stageName}_${DateTime.now().microsecondsSinceEpoch}.jpg');
-        await ref.putFile(file);
-        final downloadUrl = await ref.getDownloadURL();
-        uploadedAttachmentUrls.add(downloadUrl);
+        final url = await _uploadService.uploadFile(
+          file,
+          'production_attachments/${order.id}/${stageName}_${DateTime.now().microsecondsSinceEpoch}.jpg',
+        );
+        if (url != null) {
+          uploadedAttachmentUrls.add(url);
+        }
       }
     }
 
@@ -266,14 +269,17 @@ class ProductionOrderUseCases {
       throw Exception('Stage "$stageName" not found or not in progress.');
     }
 
-    // Upload attachments to Firebase Storage
+    // Upload attachments to external server
     List<String> uploadedAttachmentUrls = [];
     if (attachments != null && attachments.isNotEmpty) {
       for (File file in attachments) {
-        final ref = _storage.ref().child('production_attachments/${order.id}/${stageName}_${DateTime.now().microsecondsSinceEpoch}.jpg');
-        await ref.putFile(file);
-        final downloadUrl = await ref.getDownloadURL();
-        uploadedAttachmentUrls.add(downloadUrl);
+        final url = await _uploadService.uploadFile(
+          file,
+          'production_attachments/${order.id}/${stageName}_${DateTime.now().microsecondsSinceEpoch}.jpg',
+        );
+        if (url != null) {
+          uploadedAttachmentUrls.add(url);
+        }
       }
     }
 
