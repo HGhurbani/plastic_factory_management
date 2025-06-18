@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
+import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 
 class WarehouseRequestsScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class WarehouseRequestsScreen extends StatefulWidget {
 
 class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
   void _showWarehouseDocDialog(BuildContext context, SalesUseCases useCases,
-      AppLocalizations appLocalizations, SalesOrderModel order) {
+      AppLocalizations appLocalizations, SalesOrderModel order, UserModel storekeeper) {
     final TextEditingController notesController =
         TextEditingController(text: order.warehouseNotes);
     List<XFile> pickedImages = [];
@@ -100,6 +101,7 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
                 try {
                   await useCases.documentWarehouseSupply(
                     order: order,
+                    storekeeper: storekeeper,
                     notes: notesController.text.trim(),
                     attachments: pickedImages.map((e) => File(e.path)).toList(),
                   );
@@ -123,6 +125,17 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
   Widget build(BuildContext context) {
     final salesUseCases = Provider.of<SalesUseCases>(context);
     final appLocalizations = AppLocalizations.of(context)!;
+    final currentUser = Provider.of<UserModel?>(context);
+
+    if (currentUser == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(appLocalizations.warehouseRequests),
+          centerTitle: true,
+        ),
+        body: const Center(child: Text('لا يمكن عرض الطلبات بدون بيانات المستخدم.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -143,7 +156,9 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
           }
 
           final orders = snapshot.data!
-              .where((o) => o.status == SalesOrderStatus.warehouseProcessing)
+              .where((o) =>
+                  o.status == SalesOrderStatus.warehouseProcessing &&
+                  o.warehouseManagerUid == currentUser?.uid)
               .toList();
 
           if (orders.isEmpty) {
@@ -182,7 +197,7 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
                   trailing: ElevatedButton(
                     child: Text(appLocalizations.prepareOrder),
                     onPressed: () => _showWarehouseDocDialog(
-                        context, salesUseCases, appLocalizations, order),
+                        context, salesUseCases, appLocalizations, order, currentUser!),
                   ),
                 ),
               );
