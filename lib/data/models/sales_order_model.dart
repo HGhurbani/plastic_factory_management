@@ -6,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 enum SalesOrderStatus {
   pendingApproval,    // بانتظار اعتماد المحاسب
   pendingFulfillment, // بانتظار التوريد من المصنع
+  warehouseProcessing, // لدى أمين المخزن للتجهيز
+  pendingProductionApproval, // بانتظار اعتماد مسؤول الإنتاج
   fulfilled,          // تم التوريد
   canceled,           // ملغي
   rejected,           // مرفوض من المحاسب
@@ -18,6 +20,10 @@ extension SalesOrderStatusExtension on SalesOrderStatus {
         return 'بانتظار الاعتماد';
       case SalesOrderStatus.pendingFulfillment:
         return 'بانتظار التوريد';
+      case SalesOrderStatus.warehouseProcessing:
+        return 'قيد التحضير بالمخزن';
+      case SalesOrderStatus.pendingProductionApproval:
+        return 'بانتظار اعتماد الإنتاج';
       case SalesOrderStatus.fulfilled:
         return 'تم التوريد';
       case SalesOrderStatus.canceled:
@@ -92,6 +98,8 @@ class SalesOrderModel {
   final bool moldTasksEnabled; // هل تم تفعيل مهام تركيب القوالب
   final String? moldInstallationNotes; // ملاحظات عملية التركيب
   final List<String> moldInstallationImages; // صور توثيقية للتركيب
+  final String? warehouseNotes; // ملاحظات أمين المخزن
+  final List<String> warehouseImages; // صور توثيق المخزن
 
   SalesOrderModel({
     required this.id,
@@ -110,6 +118,8 @@ class SalesOrderModel {
     this.moldTasksEnabled = false,
     this.moldInstallationNotes,
     this.moldInstallationImages = const [],
+    this.warehouseNotes,
+    this.warehouseImages = const [],
   });
 
   factory SalesOrderModel.fromDocumentSnapshot(DocumentSnapshot doc) {
@@ -134,6 +144,8 @@ class SalesOrderModel {
       moldTasksEnabled: data['moldTasksEnabled'] ?? false,
       moldInstallationNotes: data['moldInstallationNotes'],
       moldInstallationImages: List<String>.from(data['moldInstallationImages'] ?? []),
+      warehouseNotes: data['warehouseNotes'],
+      warehouseImages: List<String>.from(data['warehouseImages'] ?? []),
     );
   }
 
@@ -154,6 +166,8 @@ class SalesOrderModel {
       'moldTasksEnabled': moldTasksEnabled,
       'moldInstallationNotes': moldInstallationNotes,
       'moldInstallationImages': moldInstallationImages,
+      'warehouseNotes': warehouseNotes,
+      'warehouseImages': warehouseImages,
     };
   }
 
@@ -174,6 +188,8 @@ class SalesOrderModel {
     bool? moldTasksEnabled,
     String? moldInstallationNotes,
     List<String>? moldInstallationImages,
+    String? warehouseNotes,
+    List<String>? warehouseImages,
   }) {
     return SalesOrderModel(
       id: id ?? this.id,
@@ -192,6 +208,8 @@ class SalesOrderModel {
       moldTasksEnabled: moldTasksEnabled ?? this.moldTasksEnabled,
       moldInstallationNotes: moldInstallationNotes ?? this.moldInstallationNotes,
       moldInstallationImages: moldInstallationImages ?? this.moldInstallationImages,
+      warehouseNotes: warehouseNotes ?? this.warehouseNotes,
+      warehouseImages: warehouseImages ?? this.warehouseImages,
     );
   }
 }
