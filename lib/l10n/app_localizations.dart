@@ -273,6 +273,8 @@ class AppLocalizations {
   String get uploadImages => _strings["uploadImages"] ?? "uploadImages";
   String get documentationSaved => _strings["documentationSaved"] ?? "documentationSaved";
   String get errorSavingDocumentation => _strings["errorSavingDocumentation"] ?? "errorSavingDocumentation";
+  String get warehouseRequests => _strings["warehouseRequests"] ?? "warehouseRequests";
+  String get prepareOrder => _strings["prepareOrder"] ?? "prepareOrder";
   String get notifications => _strings["notifications"] ?? "notifications";
   String get noNotifications => _strings["noNotifications"] ?? "noNotifications";
 }

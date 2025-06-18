@@ -15,6 +15,7 @@ import 'package:plastic_factory_management/presentation/sales/create_sales_order
 import 'package:plastic_factory_management/presentation/sales/sales_orders_list_screen.dart'; // استيراد جديد
 import 'package:plastic_factory_management/presentation/quality/quality_inspection_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/inventory_management_screen.dart';
+import 'package:plastic_factory_management/presentation/inventory/warehouse_requests_screen.dart';
 import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
 import 'package:plastic_factory_management/presentation/notifications/notifications_screen.dart';
 import 'package:plastic_factory_management/presentation/management/user_management_screen.dart';
@@ -35,6 +36,7 @@ class AppRouter {
   static const String salesOrdersListRoute = '/sales/orders/list'; // مسار جديد
   static const String qualityInspectionRoute = '/quality/inspections';
   static const String inventoryManagementRoute = '/inventory/management';
+  static const String warehouseRequestsRoute = '/inventory/warehouse_requests';
   static const String accountingRoute = '/accounting';
   static const String userManagementRoute = '/management/users';
   static const String notificationsRoute = '/notifications';
@@ -69,6 +71,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => QualityInspectionScreen());
       case inventoryManagementRoute:
         return MaterialPageRoute(builder: (_) => InventoryManagementScreen());
+      case warehouseRequestsRoute:
+        return MaterialPageRoute(builder: (_) => WarehouseRequestsScreen());
       case accountingRoute:
         return MaterialPageRoute(builder: (_) => AccountingScreen());
       case userManagementRoute:

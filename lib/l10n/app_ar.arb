@@ -259,6 +259,8 @@
   "uploadImages": "تحميل الصور",
   "documentationSaved": "تم حفظ التوثيق بنجاح",
   "errorSavingDocumentation": "حدث خطأ أثناء حفظ التوثيق",
+  "warehouseRequests": "طلبات المخزن",
+  "prepareOrder": "تجهيز الطلب",
   "performanceSummary": "ملخص الأداء",
   "productionRequests": "طلبات الإنتاج",
   "criticalRawMaterials": "مواد خام حرجة",
