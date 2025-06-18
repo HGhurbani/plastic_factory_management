@@ -29,6 +29,9 @@ class AppLocalizations {
   String get machineOperator => _strings["machineOperator"] ?? "machineOperator";
   String get maintenanceManager => _strings["maintenanceManager"] ?? "maintenanceManager";
   String get salesRepresentative => _strings["salesRepresentative"] ?? "salesRepresentative";
+  String get qualityInspector => _strings["qualityInspector"] ?? "qualityInspector";
+  String get inventoryManager => _strings["inventoryManager"] ?? "inventoryManager";
+  String get accountant => _strings["accountant"] ?? "accountant";
   String get unknownRole => _strings["unknownRole"] ?? "unknownRole";
   String get productionOrderManagement => _strings["productionOrderManagement"] ?? "productionOrderManagement";
   String get createOrder => _strings["createOrder"] ?? "createOrder";
