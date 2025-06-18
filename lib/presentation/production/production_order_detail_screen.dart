@@ -609,7 +609,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
               onPressed: () async {
                 if (selectedMachineId == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(appLocalizations.machineRequired)),
+                    SnackBar(content: Text('يرجى اختيار آلة لبدء الإنتاج.')), // Add to ARB
                   );
                   return;
                 }
@@ -817,10 +817,10 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                     }
                     if (actualTimeMinutes == null || actualTimeMinutes! <= 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(appLocalizations.enterActualTime)),
-                  );
-                  return;
-                }
+                        SnackBar(content: Text('الرجاء إدخال الوقت الفعلي المستغرق.')), // Add to ARB
+                      );
+                      return;
+                    }
 
                     if (requiresSignature) {
                       String? sigPath = await _exportSignature();
