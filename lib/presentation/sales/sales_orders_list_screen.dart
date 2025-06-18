@@ -245,7 +245,9 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         tooltip: appLocalizations.warehouseDocumentation,
       );
     }
-    if (currentUser.userRoleEnum == UserRole.productionManager && order.status == SalesOrderStatus.pendingProductionApproval) {
+    if ((currentUser.userRoleEnum == UserRole.productionManager ||
+            currentUser.userRoleEnum == UserRole.productionOrderPreparer) &&
+        order.status == SalesOrderStatus.pendingProductionApproval) {
       return IconButton(
         icon: const Icon(Icons.check_circle, color: Colors.green),
         onPressed: () async {
