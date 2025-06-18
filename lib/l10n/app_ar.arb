@@ -294,4 +294,11 @@
   "markAsRead": "تمت القراءة",
   "orderApprovedTitle": "تم اعتماد طلب الإنتاج",
   "orderApprovedMessage": "تم تعيينك للمرحلة التالية"
+  ,"warehouseNotes": "ملاحظات المخزن"
+  ,"warehouseImages": "صور المخزن"
+  ,"moldInstallationNotes": "ملاحظات تركيب القوالب"
+  ,"moldInstallationImages": "صور تركيب القوالب"
+  ,"orderFlowDetails": "تفاصيل الإعتمادات"
+  ,"approvedBy": "اعتمد بواسطة"
+  ,"approvalTime": "وقت الاعتماد"
 }

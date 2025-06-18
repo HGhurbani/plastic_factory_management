@@ -250,12 +250,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         order.status == SalesOrderStatus.pendingProductionApproval) {
       return IconButton(
         icon: const Icon(Icons.check_circle, color: Colors.green),
-        onPressed: () async {
-          await useCases.approveSupply(order, currentUser);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(appLocalizations.approveSupply)),
-          );
-        },
+        onPressed: () => _showProductionApprovalDialog(
+            context, useCases, appLocalizations, order, currentUser),
         tooltip: appLocalizations.approveSupply,
       );
     }
@@ -342,6 +338,34 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       ],
                     ),
                   ),
+                const SizedBox(height: 16),
+                Text(appLocalizations.orderFlowDetails, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textAlign: TextAlign.right),
+                if (order.approvedAt != null)
+                  _buildDetailRow(appLocalizations.approvalTime, intl.DateFormat('yyyy-MM-dd HH:mm').format(order.approvedAt!.toDate())),
+                if (order.warehouseManagerName != null)
+                  _buildDetailRow(appLocalizations.warehouseDocumentation, order.warehouseManagerName!),
+                if (order.warehouseNotes != null && order.warehouseNotes!.isNotEmpty)
+                  _buildDetailRow(appLocalizations.warehouseNotes, order.warehouseNotes!),
+                if (order.warehouseImages.isNotEmpty)
+                  Wrap(
+                    children: order.warehouseImages.map((e) => Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Image.network(e, width: 60, height: 60, fit: BoxFit.cover),
+                    )).toList(),
+                  ),
+                if (order.moldInstallationNotes != null && order.moldInstallationNotes!.isNotEmpty)
+                  _buildDetailRow(appLocalizations.moldInstallationNotes, order.moldInstallationNotes!),
+                if (order.moldInstallationImages.isNotEmpty)
+                  Wrap(
+                    children: order.moldInstallationImages.map((e) => Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Image.network(e, width: 60, height: 60, fit: BoxFit.cover),
+                    )).toList(),
+                  ),
+                if (order.productionManagerName != null)
+                  _buildDetailRow(appLocalizations.productionManager, order.productionManagerName!),
+                if (order.productionRejectionReason != null)
+                  _buildDetailRow(appLocalizations.rejectionReason, order.productionRejectionReason!),
               ],
             ),
           ),
@@ -723,6 +747,67 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showProductionApprovalDialog(BuildContext context, SalesUseCases useCases,
+      AppLocalizations appLocalizations, SalesOrderModel order, UserModel approver) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(appLocalizations.approveSupply),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (order.warehouseNotes != null && order.warehouseNotes!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text('${appLocalizations.warehouseNotes}: ${order.warehouseNotes!}', textDirection: TextDirection.rtl),
+                ),
+              if (order.warehouseImages.isNotEmpty)
+                Wrap(
+                  children: order.warehouseImages
+                      .map((img) => Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Image.network(img, width: 60, height: 60, fit: BoxFit.cover),
+                          ))
+                      .toList(),
+                ),
+              if (order.moldInstallationNotes != null && order.moldInstallationNotes!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                  child: Text('${appLocalizations.moldInstallationNotes}: ${order.moldInstallationNotes!}', textDirection: TextDirection.rtl),
+                ),
+              if (order.moldInstallationImages.isNotEmpty)
+                Wrap(
+                  children: order.moldInstallationImages
+                      .map((img) => Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Image.network(img, width: 60, height: 60, fit: BoxFit.cover),
+                          ))
+                      .toList(),
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: Text(appLocalizations.cancel),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          ElevatedButton(
+            child: Text(appLocalizations.approve),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await useCases.approveSupply(order, approver);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(appLocalizations.approveSupply)),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
