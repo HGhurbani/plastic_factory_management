@@ -9,6 +9,9 @@ enum UserRole {
   machineOperator, // مشغل المكينة
   maintenanceManager, // مسؤول الصيانة
   salesRepresentative, // مندوب المبيعات
+  qualityInspector, // مراقب الجودة
+  inventoryManager, // أمين المخزن
+  accountant, // المحاسب
   unknown, // دور غير معروف
 }
 
@@ -32,6 +35,12 @@ extension UserRoleExtension on UserRole {
         return 'مسؤول الصيانة';
       case UserRole.salesRepresentative:
         return 'مندوب المبيعات';
+      case UserRole.qualityInspector:
+        return 'مراقب الجودة';
+      case UserRole.inventoryManager:
+        return 'أمين المخزن';
+      case UserRole.accountant:
+        return 'المحاسب';
       case UserRole.unknown:
       default:
         return 'غير معروف';
@@ -58,6 +67,12 @@ extension UserRoleExtension on UserRole {
         return UserRole.maintenanceManager;
       case 'sales_representative':
         return UserRole.salesRepresentative;
+      case 'quality_inspector':
+        return UserRole.qualityInspector;
+      case 'inventory_manager':
+        return UserRole.inventoryManager;
+      case 'accountant':
+        return UserRole.accountant;
       default:
         return UserRole.unknown;
     }
@@ -82,6 +97,12 @@ extension UserRoleExtension on UserRole {
         return 'maintenance_manager';
       case UserRole.salesRepresentative:
         return 'sales_representative';
+      case UserRole.qualityInspector:
+        return 'quality_inspector';
+      case UserRole.inventoryManager:
+        return 'inventory_manager';
+      case UserRole.accountant:
+        return 'accountant';
       case UserRole.unknown:
       default:
         return 'unknown';

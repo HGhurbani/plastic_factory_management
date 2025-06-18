@@ -85,6 +85,21 @@ class _LoginScreenState extends State<LoginScreen> {
       'password': 'password',
       'name': 'مندوب المبيعات',
     },
+    UserRole.qualityInspector: {
+      'email': 'quality@example.com',
+      'password': 'password',
+      'name': 'مراقب الجودة',
+    },
+    UserRole.inventoryManager: {
+      'email': 'inventory@example.com',
+      'password': 'password',
+      'name': 'أمين المخزن',
+    },
+    UserRole.accountant: {
+      'email': 'accountant@example.com',
+      'password': 'password',
+      'name': 'المحاسب',
+    },
   };
 
   Future<void> _quickSignInRole(UserRole role) async {
@@ -336,6 +351,63 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               child: Text(
                                 appLocalizations.salesRepresentative,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () =>
+                                  _quickSignInRole(UserRole.qualityInspector),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.qualityInspector,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () =>
+                                  _quickSignInRole(UserRole.inventoryManager),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.inventoryManager,
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () =>
+                                  _quickSignInRole(UserRole.accountant),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 55),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              child: Text(
+                                appLocalizations.accountant,
                                 style: const TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold),
                               ),
