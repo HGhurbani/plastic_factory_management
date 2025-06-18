@@ -33,15 +33,16 @@ class QualityInspectionScreen extends StatelessWidget {
             leading: Icon(Icons.thumb_up_alt_outlined),
             title: Text('الموافقة على السليم ورفض المعيب', textDirection: TextDirection.rtl),
           ),
+          SizedBox(height: 20),
+          Center(
+            child: Text(
+              'هنا يمكن لمراقب الجودة تسجيل فحوصات الجودة ومراجعة النتائج.',
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
+            ),
+          ),
         ],
-
-      body: Center(
-        child: Text(
-          'هنا يمكن لمراقب الجودة تسجيل فحوصات الجودة ومراجعة النتائج.',
-          style: const TextStyle(fontSize: 16),
-          textAlign: TextAlign.center,
-          textDirection: TextDirection.rtl,
-        ),
       ),
     );
   }
