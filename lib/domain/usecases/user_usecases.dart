@@ -18,6 +18,10 @@ class UserUseCases {
     return repository.getUserById(uid);
   }
 
+  Future<List<UserModel>> getUsersByRole(UserRole role) {
+    return repository.getUsersByRole(role.toFirestoreString());
+  }
+
   Future<void> addUser({
     required String email,
     required String name,

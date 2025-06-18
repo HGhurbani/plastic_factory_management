@@ -31,3 +31,5 @@ samples, guidance on mobile development, and a full API reference.
 - المحاسب
 
 
+
+لمزيد من التفاصيل حول خطوات سير العمل المطبقة في النظام والصفحات المخصصة لكل دور يمكن الرجوع إلى [وثيقة مسارات العمل](docs/WORKFLOWS_AR.md).

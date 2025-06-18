@@ -40,4 +40,14 @@ class UserDatasource {
   Future<void> deleteUser(String uid) async {
     await _firestore.collection('users').doc(uid).delete();
   }
+
+  Future<List<UserModel>> getUsersByRole(String role) async {
+    final snapshot = await _firestore
+        .collection('users')
+        .where('role', isEqualTo: role)
+        .get();
+    return snapshot.docs
+        .map((doc) => UserModel.fromDocumentSnapshot(doc))
+        .toList();
+  }
 }

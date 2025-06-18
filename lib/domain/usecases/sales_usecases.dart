@@ -7,11 +7,16 @@ import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/repositories/sales_repository.dart';
 import 'dart:io';
+import 'notification_usecases.dart';
+import 'user_usecases.dart';
+import 'package:plastic_factory_management/core/constants/app_enums.dart';
 
 class SalesUseCases {
   final SalesRepository repository;
+  final NotificationUseCases notificationUseCases;
+  final UserUseCases userUseCases;
 
-  SalesUseCases(this.repository);
+  SalesUseCases(this.repository, this.notificationUseCases, this.userUseCases);
 
   // --- Customer Use Cases ---
 
@@ -91,7 +96,16 @@ class SalesUseCases {
     );
     await repository.addSalesOrder(newOrder, signatureFile: customerSignatureFile);
 
-    // TODO: Consider a Cloud Function to notify production/inventory managers about new sales order.
+    // Notify accountants for financial approval
+    final accountants = await userUseCases.getUsersByRole(UserRole.accountant);
+    for (final acc in accountants) {
+      await notificationUseCases.sendNotification(
+        userId: acc.uid,
+        title: 'طلب مبيعات جديد',
+        message:
+            'قام ${salesRepresentative.name} بإنشاء طلب مبيعات للعميل ${customer.name}',
+      );
+    }
   }
 
   Future<void> updateSalesOrderStatus(String orderId, SalesOrderStatus newStatus) async {

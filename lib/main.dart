@@ -37,6 +37,10 @@ import 'package:plastic_factory_management/domain/usecases/maintenance_usecases.
 import 'package:plastic_factory_management/data/datasources/sales_datasource.dart'; // استيراد جديد
 import 'package:plastic_factory_management/data/repositories/sales_repository_impl.dart'; // استيراد جديد
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart'; // استيراد جديد
+// استيرادات Notifications
+import 'package:plastic_factory_management/data/datasources/notification_datasource.dart';
+import 'package:plastic_factory_management/data/repositories/notification_repository_impl.dart';
+import 'package:plastic_factory_management/domain/usecases/notification_usecases.dart';
 // استيرادات User Management
 import 'package:plastic_factory_management/data/datasources/user_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/user_repository_impl.dart';
@@ -86,6 +90,8 @@ class MyApp extends StatelessWidget {
         Provider<ProductionOrderUseCases>(
           create: (context) => ProductionOrderUseCases(
             Provider.of<ProductionOrderRepositoryImpl>(context, listen: false),
+            Provider.of<NotificationUseCases>(context, listen: false),
+            Provider.of<UserUseCases>(context, listen: false),
           ),
         ),
         // توفير Inventory Dependencies
@@ -142,6 +148,22 @@ class MyApp extends StatelessWidget {
         Provider<SalesUseCases>(
           create: (context) => SalesUseCases(
             Provider.of<SalesRepositoryImpl>(context, listen: false),
+            Provider.of<NotificationUseCases>(context, listen: false),
+            Provider.of<UserUseCases>(context, listen: false),
+          ),
+        ),
+        // توفير Notifications Dependencies
+        Provider<NotificationDatasource>(
+          create: (_) => NotificationDatasource(),
+        ),
+        Provider<NotificationRepositoryImpl>(
+          create: (context) => NotificationRepositoryImpl(
+            Provider.of<NotificationDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<NotificationUseCases>(
+          create: (context) => NotificationUseCases(
+            Provider.of<NotificationRepositoryImpl>(context, listen: false),
           ),
         ),
         // توفير User Management Dependencies
