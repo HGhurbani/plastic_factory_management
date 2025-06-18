@@ -102,6 +102,9 @@ class SalesOrderModel {
   final List<String> warehouseImages; // صور توثيق المخزن
   final String? warehouseManagerUid; // UID أمين المخزن المسؤول
   final String? warehouseManagerName; // اسم أمين المخزن المسؤول
+  final String? productionManagerUid; // UID مسؤول الإنتاج
+  final String? productionManagerName; // اسم مسؤول الإنتاج
+  final String? productionRejectionReason; // سبب رفض الإنتاج
 
   SalesOrderModel({
     required this.id,
@@ -124,6 +127,9 @@ class SalesOrderModel {
     this.warehouseImages = const [],
     this.warehouseManagerUid,
     this.warehouseManagerName,
+    this.productionManagerUid,
+    this.productionManagerName,
+    this.productionRejectionReason,
   });
 
   factory SalesOrderModel.fromDocumentSnapshot(DocumentSnapshot doc) {
@@ -152,6 +158,9 @@ class SalesOrderModel {
       warehouseImages: List<String>.from(data['warehouseImages'] ?? []),
       warehouseManagerUid: data['warehouseManagerUid'],
       warehouseManagerName: data['warehouseManagerName'],
+      productionManagerUid: data['productionManagerUid'],
+      productionManagerName: data['productionManagerName'],
+      productionRejectionReason: data['productionRejectionReason'],
     );
   }
 
@@ -176,6 +185,9 @@ class SalesOrderModel {
       'warehouseImages': warehouseImages,
       'warehouseManagerUid': warehouseManagerUid,
       'warehouseManagerName': warehouseManagerName,
+      'productionManagerUid': productionManagerUid,
+      'productionManagerName': productionManagerName,
+      'productionRejectionReason': productionRejectionReason,
     };
   }
 
@@ -200,6 +212,9 @@ class SalesOrderModel {
     List<String>? warehouseImages,
     String? warehouseManagerUid,
     String? warehouseManagerName,
+    String? productionManagerUid,
+    String? productionManagerName,
+    String? productionRejectionReason,
   }) {
     return SalesOrderModel(
       id: id ?? this.id,
@@ -222,6 +237,9 @@ class SalesOrderModel {
       warehouseImages: warehouseImages ?? this.warehouseImages,
       warehouseManagerUid: warehouseManagerUid ?? this.warehouseManagerUid,
       warehouseManagerName: warehouseManagerName ?? this.warehouseManagerName,
+      productionManagerUid: productionManagerUid ?? this.productionManagerUid,
+      productionManagerName: productionManagerName ?? this.productionManagerName,
+      productionRejectionReason: productionRejectionReason ?? this.productionRejectionReason,
     );
   }
 }

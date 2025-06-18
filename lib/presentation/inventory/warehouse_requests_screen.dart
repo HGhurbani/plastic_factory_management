@@ -7,6 +7,7 @@ import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
 
 class WarehouseRequestsScreen extends StatefulWidget {
   const WarehouseRequestsScreen({Key? key}) : super(key: key);
@@ -17,6 +18,7 @@ class WarehouseRequestsScreen extends StatefulWidget {
 
 class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
   void _showWarehouseDocDialog(BuildContext context, SalesUseCases useCases,
+      ProductionOrderUseCases productionUseCases,
       AppLocalizations appLocalizations, SalesOrderModel order, UserModel storekeeper) {
     final TextEditingController notesController =
         TextEditingController(text: order.warehouseNotes);
@@ -105,6 +107,8 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
                     notes: notesController.text.trim(),
                     attachments: pickedImages.map((e) => File(e.path)).toList(),
                   );
+                  await productionUseCases.createProductionOrdersFromSalesOrder(
+                      order, storekeeper);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(appLocalizations.supplySaved)),
                   );
@@ -124,6 +128,7 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
   @override
   Widget build(BuildContext context) {
     final salesUseCases = Provider.of<SalesUseCases>(context);
+    final productionUseCases = Provider.of<ProductionOrderUseCases>(context);
     final appLocalizations = AppLocalizations.of(context)!;
     final currentUser = Provider.of<UserModel?>(context);
 
@@ -157,7 +162,8 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
 
           final orders = snapshot.data!
               .where((o) =>
-                  o.status == SalesOrderStatus.warehouseProcessing &&
+                  (o.status == SalesOrderStatus.warehouseProcessing ||
+                      o.status == SalesOrderStatus.pendingProductionApproval) &&
                   o.warehouseManagerUid == currentUser?.uid)
               .toList();
 
@@ -181,7 +187,7 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
+                  children: [
                       Text(
                         "${appLocalizations.totalAmount}: \$${order.totalAmount.toStringAsFixed(2)}",
                         textDirection: TextDirection.rtl,
@@ -192,13 +198,27 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
                         textDirection: TextDirection.rtl,
                         textAlign: TextAlign.right,
                       ),
+                      if (order.productionRejectionReason != null)
+                        Text(
+                          'سبب الرفض: ${order.productionRejectionReason}',
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(color: Colors.red),
+                        ),
                     ],
                   ),
-                  trailing: ElevatedButton(
-                    child: Text(appLocalizations.prepareOrder),
-                    onPressed: () => _showWarehouseDocDialog(
-                        context, salesUseCases, appLocalizations, order, currentUser!),
-                  ),
+                  trailing: order.status == SalesOrderStatus.warehouseProcessing
+                      ? ElevatedButton(
+                          child: Text(appLocalizations.prepareOrder),
+                          onPressed: () => _showWarehouseDocDialog(
+                              context,
+                              salesUseCases,
+                              productionUseCases,
+                              appLocalizations,
+                              order,
+                              currentUser!),
+                        )
+                      : Text(appLocalizations.pendingProductionApproval),
                 ),
               );
             },
