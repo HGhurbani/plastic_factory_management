@@ -229,6 +229,37 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         ],
       );
     }
+    if (isAccountant && order.status == SalesOrderStatus.pendingFulfillment) {
+      return IconButton(
+        icon: const Icon(Icons.local_shipping, color: Colors.blue),
+        onPressed: () async {
+          await useCases.initiateSupply(order, currentUser);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(appLocalizations.initiateSupply)),
+          );
+        },
+        tooltip: appLocalizations.initiateSupply,
+      );
+    }
+    if (currentUser.userRoleEnum == UserRole.inventoryManager && order.status == SalesOrderStatus.warehouseProcessing) {
+      return IconButton(
+        icon: const Icon(Icons.camera_alt, color: Colors.orange),
+        onPressed: () => _showWarehouseDocDialog(context, useCases, appLocalizations, order),
+        tooltip: appLocalizations.warehouseDocumentation,
+      );
+    }
+    if (currentUser.userRoleEnum == UserRole.productionManager && order.status == SalesOrderStatus.pendingProductionApproval) {
+      return IconButton(
+        icon: const Icon(Icons.check_circle, color: Colors.green),
+        onPressed: () async {
+          await useCases.approveSupply(order, currentUser);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(appLocalizations.approveSupply)),
+          );
+        },
+        tooltip: appLocalizations.approveSupply,
+      );
+    }
     if (isManager && order.status == SalesOrderStatus.pendingFulfillment) {
       return IconButton(
         icon: const Icon(Icons.check_circle, color: Colors.green),
@@ -254,6 +285,10 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         return Colors.blueGrey;
       case SalesOrderStatus.pendingFulfillment:
         return Colors.orange;
+      case SalesOrderStatus.warehouseProcessing:
+        return Colors.blue;
+      case SalesOrderStatus.pendingProductionApproval:
+        return Colors.deepPurple;
       case SalesOrderStatus.fulfilled:
         return Colors.green;
       case SalesOrderStatus.canceled:
@@ -533,6 +568,81 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('${appLocalizations.errorSavingDocumentation}: $e')),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showWarehouseDocDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
+    final TextEditingController notesController = TextEditingController(text: order.warehouseNotes);
+    List<XFile> pickedImages = [];
+    final ImagePicker picker = ImagePicker();
+
+    Future<void> pickImages() async {
+      final images = await picker.pickMultiImage();
+      if (images != null) {
+        pickedImages.addAll(images);
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(appLocalizations.warehouseDocumentation),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: notesController,
+                  decoration: InputDecoration(labelText: appLocalizations.enterNotes),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await pickImages();
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.photo),
+                  label: Text(appLocalizations.uploadImages),
+                ),
+                Wrap(
+                  children: pickedImages.map((e) => Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Image.file(File(e.path), width: 60, height: 60, fit: BoxFit.cover),
+                  )).toList(),
+                )
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(appLocalizations.cancel),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            ElevatedButton(
+              child: Text(appLocalizations.sendToProduction),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                try {
+                  await useCases.documentWarehouseSupply(
+                    order: order,
+                    notes: notesController.text.trim(),
+                    attachments: pickedImages.map((e) => File(e.path)).toList(),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(appLocalizations.supplySaved)),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${appLocalizations.errorSavingSupply}: $e')),
                   );
                 }
               },

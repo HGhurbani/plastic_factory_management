@@ -159,6 +159,69 @@ class SalesUseCases {
     }
   }
 
+  // Accountant initiates supply to warehouse
+  Future<void> initiateSupply(SalesOrderModel order, UserModel accountant) async {
+    final updated = order.copyWith(status: SalesOrderStatus.warehouseProcessing);
+    await repository.updateSalesOrder(updated);
+
+    final storekeepers = await userUseCases.getUsersByRole(UserRole.inventoryManager);
+    for (final s in storekeepers) {
+      await notificationUseCases.sendNotification(
+        userId: s.uid,
+        title: 'طلب توريد جديد',
+        message: 'الرجاء تجهيز طلب العميل ${order.customerName}',
+      );
+    }
+  }
+
+  // Warehouse manager documents supply and sends to production manager
+  Future<void> documentWarehouseSupply({
+    required SalesOrderModel order,
+    String? notes,
+    List<File>? attachments,
+  }) async {
+    List<String> uploaded = List<String>.from(order.warehouseImages);
+    if (attachments != null && attachments.isNotEmpty) {
+      for (final file in attachments) {
+        final url = await FileUploadService().uploadFile(
+          file,
+          'warehouse_docs/${order.id}_${DateTime.now().microsecondsSinceEpoch}.jpg',
+        );
+        if (url != null) uploaded.add(url);
+      }
+    }
+    final updated = order.copyWith(
+      warehouseNotes: notes ?? order.warehouseNotes,
+      warehouseImages: uploaded,
+      status: SalesOrderStatus.pendingProductionApproval,
+    );
+    await repository.updateSalesOrder(updated);
+
+    final managers = await userUseCases.getUsersByRole(UserRole.productionManager);
+    for (final m in managers) {
+      await notificationUseCases.sendNotification(
+        userId: m.uid,
+        title: 'طلب توريد جاهز',
+        message: 'تم تجهيز طلب العميل ${order.customerName} وبانتظار اعتمادكم',
+      );
+    }
+  }
+
+  // Production manager approves supply
+  Future<void> approveSupply(SalesOrderModel order, UserModel manager) async {
+    final updated = order.copyWith(status: SalesOrderStatus.fulfilled);
+    await repository.updateSalesOrder(updated);
+
+    final rep = await userUseCases.getUserById(order.salesRepresentativeUid);
+    if (rep != null) {
+      await notificationUseCases.sendNotification(
+        userId: rep.uid,
+        title: 'تم اعتماد توريد الطلب',
+        message: 'تم اعتماد توريد طلب العميل ${order.customerName}',
+      );
+    }
+  }
+
   // Mold installer adds documentation
   Future<void> addMoldInstallationDocs({
     required SalesOrderModel order,
