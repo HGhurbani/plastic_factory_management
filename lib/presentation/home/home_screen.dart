@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       setState(() {
         _isLoading = false;
       });
-      _showErrorSnackBar("حدث خطأ في تحميل بيانات المستخدم");
+      _showErrorSnackBar(AppLocalizations.of(context)!.errorLoadingUserData);
       _authService.signOut();
       if (mounted) {
         Navigator.of(context).pushReplacementNamed(AppRouter.loginRoute);
@@ -118,23 +118,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<bool?> _showSignOutDialog() {
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text(
-          "تأكيد تسجيل الخروج",
-          textDirection: TextDirection.rtl,
-          textAlign: TextAlign.center,
-        ),
-        content: const Text(
-          "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
-          textDirection: TextDirection.rtl,
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text("إلغاء"),
+      builder: (context) {
+        final appLocalizations = AppLocalizations.of(context)!;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: Text(
+            appLocalizations.confirmSignOut,
+            textDirection: TextDirection.rtl,
+            textAlign: TextAlign.center,
           ),
+          content: Text(
+            appLocalizations.areYouSureSignOut,
+            textDirection: TextDirection.rtl,
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(appLocalizations.cancel),
+            ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: ElevatedButton.styleFrom(
@@ -142,11 +144,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text("تسجيل الخروج"),
+            child: Text(appLocalizations.signOut),
           ),
         ],
-        actionsAlignment: MainAxisAlignment.spaceEvenly,
-      ),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+        );
+      },
     );
   }
 
@@ -870,7 +873,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             onPressed: () {
               // TODO: Implement notifications
             },
-            tooltip: "الإشعارات",
+            tooltip: appLocalizations.notifications,
           ),
           IconButton(
             icon: const Icon(Icons.logout_rounded),
@@ -881,14 +884,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
       drawer: _currentUser == null ? null : _buildDrawer(appLocalizations),
       body: _isLoading
-          ? const Center(
+          ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 16),
             Text(
-              "جاري تحميل البيانات...",
+              appLocalizations.loadingData,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -1017,7 +1020,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 _buildDrawerItem(
                   icon: Icons.dashboard_rounded,
-                  title: "لوحة المعلومات",
+                  title: appLocalizations.dashboard,
                   onTap: () {
                     Navigator.pop(context);
                     // TODO: Navigate to dashboard
@@ -1026,7 +1029,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 _buildDrawerItem(
                   icon: Icons.analytics_rounded,
-                  title: "التقارير والإحصائيات",
+                  title: appLocalizations.reportsAndStatistics,
                   onTap: () {
                     Navigator.pop(context);
                     // TODO: Navigate to reports
@@ -1035,7 +1038,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 _buildDrawerItem(
                   icon: Icons.settings_rounded,
-                  title: "الإعدادات",
+                  title: appLocalizations.settings,
                   onTap: () {
                     Navigator.pop(context);
                     // TODO: Navigate to settings
@@ -1044,7 +1047,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 _buildDrawerItem(
                   icon: Icons.help_rounded,
-                  title: "المساعدة والدعم",
+                  title: appLocalizations.helpAndSupport,
                   onTap: () {
                     Navigator.pop(context);
                     // TODO: Navigate to help
@@ -1081,7 +1084,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      "الحالة: متصل",
+                      appLocalizations.statusConnected,
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,
@@ -1091,7 +1094,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "الإصدار 1.0.0",
+                  '${appLocalizations.version} 1.0.0',
                   style: TextStyle(
                     color: Colors.grey[500],
                     fontSize: 11,

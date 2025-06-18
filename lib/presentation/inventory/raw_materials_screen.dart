@@ -211,7 +211,12 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                     }
                     Navigator.of(dialogContext).pop();
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorSavingMaterial}: $e'))); // أضف هذا النص في ARB
+                    final errorMessage = isEditing
+                        ? '${appLocalizations.errorSavingMaterial}: $e'
+                        : '${appLocalizations.errorAddingMaterial}$e';
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(errorMessage)),
+                    );
                   }
                 }
               },
