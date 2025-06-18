@@ -355,8 +355,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         subtitle: "صلاحيات المستخدمين",
         icon: Icons.manage_accounts,
         color: moduleColors['management']!,
-        onPressed: () {},
-        isComingSoon: true,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.userManagementRoute),
       ));
     }
 
