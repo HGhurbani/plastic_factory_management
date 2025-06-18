@@ -490,6 +490,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         color: moduleColors['inventory']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.productCatalogRoute),
       ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.warehouseRequests,
+        subtitle: "طلبات المخزن",
+        icon: Icons.local_shipping,
+        color: moduleColors['inventory']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.warehouseRequestsRoute),
+      ));
     }
 
     // Modules for Machine Operator (مشغل المكينة)

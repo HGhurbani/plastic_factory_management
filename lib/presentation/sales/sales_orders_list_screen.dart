@@ -515,6 +515,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       }
     }
 
+    Future<void> captureImage() async {
+      final image = await picker.pickImage(source: ImageSource.camera);
+      if (image != null) {
+        pickedImages.add(image);
+      }
+    }
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -530,13 +537,26 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   maxLines: 3,
                 ),
                 const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await pickImages();
-                    setState(() {});
-                  },
-                  icon: const Icon(Icons.photo),
-                  label: Text(appLocalizations.uploadImages),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        await captureImage();
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.camera_alt),
+                      label: Text(appLocalizations.camera),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        await pickImages();
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.photo),
+                      label: Text(appLocalizations.gallery),
+                    ),
+                  ],
                 ),
                 Wrap(
                   children: pickedImages.map((e) => Padding(
@@ -605,13 +625,26 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   maxLines: 3,
                 ),
                 const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await pickImages();
-                    setState(() {});
-                  },
-                  icon: const Icon(Icons.photo),
-                  label: Text(appLocalizations.uploadImages),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        await captureImage();
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.camera_alt),
+                      label: Text(appLocalizations.camera),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        await pickImages();
+                        setState(() {});
+                      },
+                      icon: const Icon(Icons.photo),
+                      label: Text(appLocalizations.gallery),
+                    ),
+                  ],
                 ),
                 Wrap(
                   children: pickedImages.map((e) => Padding(

@@ -265,6 +265,8 @@
   "uploadImages": "Upload images",
   "documentationSaved": "Documentation saved successfully",
   "errorSavingDocumentation": "Error saving documentation",
+  "warehouseRequests": "Warehouse Requests",
+  "prepareOrder": "Prepare Order",
   "performanceSummary": "ملخص الأداء",
   "productionRequests": "طلبات الإنتاج",
   "criticalRawMaterials": "مواد خام حرجة",
