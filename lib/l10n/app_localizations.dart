@@ -247,8 +247,10 @@ class AppLocalizations {
   String get errorCreatingSalesOrder => _strings["errorCreatingSalesOrder"] ?? "errorCreatingSalesOrder";
   String get customerRequired => _strings["customerRequired"] ?? "customerRequired";
   String get atLeastOneItemRequired => _strings["atLeastOneItemRequired"] ?? "atLeastOneItemRequired";
+  String get pendingApproval => _strings["pendingApproval"] ?? "pendingApproval";
   String get pendingFulfillment => _strings["pendingFulfillment"] ?? "pendingFulfillment";
   String get fulfilled => _strings["fulfilled"] ?? "fulfilled";
+  String get rejected => _strings["rejected"] ?? "rejected";
   String get markAsFulfilled => _strings["markAsFulfilled"] ?? "markAsFulfilled";
   String get markAsFulfilledConfirmation => _strings["markAsFulfilledConfirmation"] ?? "markAsFulfilledConfirmation";
   String get confirmFulfillOrder => _strings["confirmFulfillOrder"] ?? "confirmFulfillOrder";
@@ -258,6 +260,11 @@ class AppLocalizations {
   String get salesOrders => _strings["salesOrders"] ?? "salesOrders";
   String get salesOrder => _strings["salesOrder"] ?? "salesOrder";
   String get quantityUnit => _strings["quantityUnit"] ?? "quantityUnit";
+  String get moldInstallationDocumentation => _strings["moldInstallationDocumentation"] ?? "moldInstallationDocumentation";
+  String get enterNotes => _strings["enterNotes"] ?? "enterNotes";
+  String get uploadImages => _strings["uploadImages"] ?? "uploadImages";
+  String get documentationSaved => _strings["documentationSaved"] ?? "documentationSaved";
+  String get errorSavingDocumentation => _strings["errorSavingDocumentation"] ?? "errorSavingDocumentation";
   String get notifications => _strings["notifications"] ?? "notifications";
   String get noNotifications => _strings["noNotifications"] ?? "noNotifications";
 }

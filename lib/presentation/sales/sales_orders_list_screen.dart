@@ -8,6 +8,8 @@ import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 import 'create_sales_order_screen.dart';
 
@@ -33,7 +35,10 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     }
 
     final bool isSalesRepresentative = currentUser.userRoleEnum == UserRole.salesRepresentative;
-    final bool isManager = currentUser.userRoleEnum == UserRole.factoryManager || currentUser.userRoleEnum == UserRole.productionManager;
+    final bool isManager = currentUser.userRoleEnum == UserRole.factoryManager ||
+        currentUser.userRoleEnum == UserRole.productionManager ||
+        currentUser.userRoleEnum == UserRole.accountant;
+    final bool isAccountant = currentUser.userRoleEnum == UserRole.accountant;
 
     return Scaffold(
       appBar: AppBar(
@@ -65,6 +70,11 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       _selectedStatusFilter = value;
                     });
                   }),
+                  _buildFilterChip(appLocalizations.pendingApproval, SalesOrderStatus.pendingApproval.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
                   _buildFilterChip(appLocalizations.pendingFulfillment, SalesOrderStatus.pendingFulfillment.toFirestoreString(), _selectedStatusFilter, (value) {
                     setState(() {
                       _selectedStatusFilter = value;
@@ -76,6 +86,11 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     });
                   }),
                   _buildFilterChip(appLocalizations.canceled, SalesOrderStatus.canceled.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                  _buildFilterChip(appLocalizations.rejected, SalesOrderStatus.rejected.toFirestoreString(), _selectedStatusFilter, (value) {
                     setState(() {
                       _selectedStatusFilter = value;
                     });
@@ -156,15 +171,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                             ),
                           ],
                         ),
-                        trailing: (isManager && order.status == SalesOrderStatus.pendingFulfillment)
-                            ? IconButton(
-                          icon: Icon(Icons.check_circle, color: Colors.green),
-                          onPressed: () {
-                            _showFulfillOrderDialog(context, salesUseCases, appLocalizations, order.id, order.customerName);
-                          },
-                          tooltip: appLocalizations.markAsFulfilled, // أضف هذا النص
-                        )
-                            : null,
+                        trailing: _buildTrailingActions(context, order, currentUser, salesUseCases, appLocalizations, isManager, isAccountant),
                       ),
                     );
                   },
@@ -197,14 +204,62 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
+  Widget _buildTrailingActions(
+      BuildContext context,
+      SalesOrderModel order,
+      UserModel currentUser,
+      SalesUseCases useCases,
+      AppLocalizations appLocalizations,
+      bool isManager,
+      bool isAccountant) {
+    if (isAccountant && order.status == SalesOrderStatus.pendingApproval) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.check, color: Colors.green),
+            onPressed: () => _showApproveDialog(context, useCases, appLocalizations, order),
+            tooltip: appLocalizations.approve,
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.red),
+            onPressed: () => _showRejectDialog(context, useCases, appLocalizations, order),
+            tooltip: appLocalizations.reject,
+          ),
+        ],
+      );
+    }
+    if (isManager && order.status == SalesOrderStatus.pendingFulfillment) {
+      return IconButton(
+        icon: const Icon(Icons.check_circle, color: Colors.green),
+        onPressed: () {
+          _showFulfillOrderDialog(context, useCases, appLocalizations, order.id, order.customerName);
+        },
+        tooltip: appLocalizations.markAsFulfilled,
+      );
+    }
+    if (currentUser.userRoleEnum == UserRole.moldInstallationSupervisor && order.moldTasksEnabled) {
+      return IconButton(
+        icon: const Icon(Icons.camera_alt, color: Colors.blueGrey),
+        onPressed: () => _showMoldDocDialog(context, useCases, appLocalizations, order),
+        tooltip: appLocalizations.moldInstallationDocumentation,
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
   Color _getSalesOrderStatusColor(SalesOrderStatus status) {
     switch (status) {
+      case SalesOrderStatus.pendingApproval:
+        return Colors.blueGrey;
       case SalesOrderStatus.pendingFulfillment:
         return Colors.orange;
       case SalesOrderStatus.fulfilled:
         return Colors.green;
       case SalesOrderStatus.canceled:
         return Colors.red;
+      case SalesOrderStatus.rejected:
+        return Colors.redAccent;
       default:
         return Colors.grey;
     }
@@ -332,6 +387,159 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           ],
         );
       },
+    );
+  }
+
+  void _showApproveDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(appLocalizations.approveOrderConfirmation),
+        content: Text('${appLocalizations.confirmApproveOrder}: "${order.customerName}"؟'),
+        actions: [
+          TextButton(
+            child: Text(appLocalizations.cancel),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          ElevatedButton(
+            child: Text(appLocalizations.approve),
+            onPressed: () async {
+              Navigator.of(context).pop();
+              try {
+                final user = Provider.of<UserModel?>(context, listen: false)!;
+                await useCases.approveSalesOrder(order, user);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(appLocalizations.orderApprovedSuccessfully)),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${appLocalizations.errorApprovingOrder}: $e')),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRejectDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
+    final TextEditingController reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(appLocalizations.rejectOrderConfirmation),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('${appLocalizations.confirmRejectOrder}: "${order.customerName}"؟'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonController,
+              decoration: InputDecoration(labelText: appLocalizations.rejectionReason),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text(appLocalizations.cancel),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          ElevatedButton(
+            child: Text(appLocalizations.reject),
+            onPressed: () async {
+              if (reasonController.text.trim().isEmpty) return;
+              Navigator.of(context).pop();
+              try {
+                final user = Provider.of<UserModel?>(context, listen: false)!;
+                await useCases.rejectSalesOrder(order, user, reasonController.text.trim());
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(appLocalizations.orderRejectedSuccessfully)),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${appLocalizations.errorRejectingOrder}: $e')),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showMoldDocDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
+    final TextEditingController notesController = TextEditingController(text: order.moldInstallationNotes);
+    List<XFile> pickedImages = [];
+    final ImagePicker picker = ImagePicker();
+
+    Future<void> pickImages() async {
+      final images = await picker.pickMultiImage();
+      if (images != null) {
+        pickedImages.addAll(images);
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(appLocalizations.moldInstallationDocumentation),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: notesController,
+                  decoration: InputDecoration(labelText: appLocalizations.enterNotes),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await pickImages();
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.photo),
+                  label: Text(appLocalizations.uploadImages),
+                ),
+                Wrap(
+                  children: pickedImages.map((e) => Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Image.file(File(e.path), width: 60, height: 60, fit: BoxFit.cover),
+                  )).toList(),
+                )
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text(appLocalizations.cancel),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            ElevatedButton(
+              child: Text(appLocalizations.save),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                try {
+                  await useCases.addMoldInstallationDocs(
+                    order: order,
+                    notes: notesController.text.trim(),
+                    attachments: pickedImages.map((e) => File(e.path)).toList(),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(appLocalizations.documentationSaved)),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${appLocalizations.errorSavingDocumentation}: $e')),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
