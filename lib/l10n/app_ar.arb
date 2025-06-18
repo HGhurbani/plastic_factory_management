@@ -254,6 +254,7 @@
   "reauthenticate": "إعادة تسجيل الدخول",
   "quickAccessModules": "وحدات الوصول السريع",
   "notifications": "الإشعارات",
+  "noNotifications": "لا توجد إشعارات حالياً",
   "dashboard": "لوحة المعلومات",
   "reportsAndStatistics": "التقارير والإحصائيات",
   "settings": "الإعدادات",

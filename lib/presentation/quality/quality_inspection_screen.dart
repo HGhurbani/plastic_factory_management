@@ -12,6 +12,29 @@ class QualityInspectionScreen extends StatelessWidget {
         title: Text(appLocalizations.qualityModule),
         centerTitle: true,
       ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: const [
+          Text(
+            'المهام المتاحة:',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            textDirection: TextDirection.rtl,
+          ),
+          SizedBox(height: 12),
+          ListTile(
+            leading: Icon(Icons.check_circle_outline),
+            title: Text('فحص المنتجات النهائية', textDirection: TextDirection.rtl),
+          ),
+          ListTile(
+            leading: Icon(Icons.photo),
+            title: Text('إرفاق صور وملاحظات توثيقية', textDirection: TextDirection.rtl),
+          ),
+          ListTile(
+            leading: Icon(Icons.thumb_up_alt_outlined),
+            title: Text('الموافقة على السليم ورفض المعيب', textDirection: TextDirection.rtl),
+          ),
+        ],
+
       body: Center(
         child: Text(
           'هنا يمكن لمراقب الجودة تسجيل فحوصات الجودة ومراجعة النتائج.',

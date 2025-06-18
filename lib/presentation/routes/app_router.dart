@@ -16,6 +16,8 @@ import 'package:plastic_factory_management/presentation/sales/sales_orders_list_
 import 'package:plastic_factory_management/presentation/quality/quality_inspection_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/inventory_management_screen.dart';
 import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
+import 'package:plastic_factory_management/presentation/notifications/notifications_screen.dart';
+
 
 class AppRouter {
   static const String loginRoute = '/';
@@ -33,6 +35,7 @@ class AppRouter {
   static const String qualityInspectionRoute = '/quality/inspections';
   static const String inventoryManagementRoute = '/inventory/management';
   static const String accountingRoute = '/accounting';
+  static const String notificationsRoute = '/notifications';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -66,8 +69,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => InventoryManagementScreen());
       case accountingRoute:
         return MaterialPageRoute(builder: (_) => AccountingScreen());
+      case notificationsRoute:
+        return MaterialPageRoute(builder: (_) => const NotificationsScreen());
       default:
-        return MaterialPageRoute(builder: (_) => Text('Error: Unknown route ${settings.name}'));
+        return MaterialPageRoute(builder: (_) => Text('Error: Unknown route \${settings.name}'));
     }
   }
 }

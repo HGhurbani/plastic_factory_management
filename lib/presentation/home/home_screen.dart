@@ -759,7 +759,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              // TODO: Implement notifications
+              Navigator.of(context).pushNamed(AppRouter.notificationsRoute);
             },
             tooltip: "الإشعارات",
           ),

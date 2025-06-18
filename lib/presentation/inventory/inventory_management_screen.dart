@@ -31,6 +31,19 @@ class InventoryManagementScreen extends StatelessWidget {
               onPressed: () =>
                   Navigator.of(context).pushNamed(AppRouter.productCatalogRoute),
             ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.inventory_2_outlined),
+              label: const Text('استلام المنتجات الجاهزة', textDirection: TextDirection.rtl),
+              onPressed: () {},
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.local_shipping_outlined),
+              label: const Text('صرف طلبات المبيعات', textDirection: TextDirection.rtl),
+              onPressed: () {},
+            ),
+
           ],
         ),
       ),

@@ -25,6 +25,27 @@ class AccountingScreen extends StatelessWidget {
               textDirection: TextDirection.rtl,
             ),
             const SizedBox(height: 24),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.receipt_long),
+            label: Text(appLocalizations.salesOrders),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.check_circle_outline),
+            label: const Text('مراجعة طلبات الشراء', textDirection: TextDirection.rtl),
+            onPressed: () {},
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            label: const Text('التحقق من الموازنات', textDirection: TextDirection.rtl),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    ),
             ElevatedButton.icon(
               icon: const Icon(Icons.receipt_long),
               label: Text(appLocalizations.salesOrders),

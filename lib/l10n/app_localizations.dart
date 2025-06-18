@@ -258,6 +258,8 @@ class AppLocalizations {
   String get salesOrders => _strings["salesOrders"] ?? "salesOrders";
   String get salesOrder => _strings["salesOrder"] ?? "salesOrder";
   String get quantityUnit => _strings["quantityUnit"] ?? "quantityUnit";
+  String get notifications => _strings["notifications"] ?? "notifications";
+  String get noNotifications => _strings["noNotifications"] ?? "noNotifications";
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
