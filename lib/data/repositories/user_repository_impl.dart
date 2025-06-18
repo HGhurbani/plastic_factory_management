@@ -20,6 +20,11 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
+  Future<List<UserModel>> getUsersByRole(String role) {
+    return datasource.getUsersByRole(role);
+  }
+
+  @override
   Future<void> addUser(UserModel user, String password) {
     return datasource.addUser(user, password);
   }

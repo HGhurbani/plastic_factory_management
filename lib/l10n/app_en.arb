@@ -279,5 +279,8 @@
   "installMoldCompletion": "إتمام تركيب القالب",
   "deliverMoldToSupervisor": "تسليم القالب لمشرف الإنتاج",
   "completeProduction": "إتمام الإنتاج",
-  "deliverToInventory": "تسليم للمخزون"
+  "deliverToInventory": "تسليم للمخزون",
+  "markAsRead": "Mark as read",
+  "orderApprovedTitle": "Production order approved",
+  "orderApprovedMessage": "You have been assigned to the next stage"
 }

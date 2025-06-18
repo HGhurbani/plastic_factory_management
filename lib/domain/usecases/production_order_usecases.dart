@@ -8,13 +8,19 @@ import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/data/repositories/production_order_repository.dart';
 import 'package:plastic_factory_management/core/services/file_upload_service.dart';
+import 'package:plastic_factory_management/core/constants/app_enums.dart';
+import 'notification_usecases.dart';
+import 'user_usecases.dart';
 import 'dart:io'; // لاستخدام File
 
 class ProductionOrderUseCases {
   final ProductionOrderRepository repository;
+  final NotificationUseCases notificationUseCases;
+  final UserUseCases userUseCases;
   final FileUploadService _uploadService = FileUploadService();
 
-  ProductionOrderUseCases(this.repository);
+  ProductionOrderUseCases(
+      this.repository, this.notificationUseCases, this.userUseCases);
 
   Stream<List<ProductionOrderModel>> getProductionOrders() {
     return repository.getProductionOrders();
@@ -129,6 +135,18 @@ class ProductionOrderUseCases {
       workflowStages: updatedWorkflow,
     );
     await repository.updateProductionOrder(updatedOrder);
+
+    // Notify mold installation supervisors about new stage
+    final supervisors =
+        await userUseCases.getUsersByRole(UserRole.moldInstallationSupervisor);
+    for (final sup in supervisors) {
+      await notificationUseCases.sendNotification(
+        userId: sup.uid,
+        title: 'تم اعتماد طلب الإنتاج',
+        message:
+            'يرجى استلام القالب للطلب رقم ${updatedOrder.batchNumber}',
+      );
+    }
 
     // TODO: هنا يمكن تفعيل Cloud Function لجرد المواد الأولية وتخصيصها.
     // هذا الجزء يتطلب منطقًا معقدًا قد لا يتم التعامل معه بالكامل في هذا الكود.
@@ -324,6 +342,30 @@ class ProductionOrderUseCases {
       status: newOverallStatus,
     );
     await repository.updateProductionOrder(updatedOrder);
+
+    // Notify next responsible role
+    UserRole? nextRole;
+    if (stageName == 'تركيب القالب') {
+      nextRole = UserRole.productionShiftSupervisor;
+    } else if (stageName == 'تسليم القالب لمشرف الإنتاج') {
+      nextRole = UserRole.productionShiftSupervisor;
+    } else if (stageName == 'بدء الإنتاج') {
+      nextRole = UserRole.productionShiftSupervisor;
+    } else if (stageName == 'انتهاء الإنتاج') {
+      nextRole = UserRole.inventoryManager;
+    }
+
+    if (nextRole != null) {
+      final users = await userUseCases.getUsersByRole(nextRole);
+      for (final u in users) {
+        await notificationUseCases.sendNotification(
+          userId: u.uid,
+          title: 'مرحلة جديدة في الإنتاج',
+          message:
+              'تم انتقال الطلب رقم ${updatedOrder.batchNumber} إلى مرحلة $nextStageName',
+        );
+      }
+    }
 
     // TODO: Trigger Cloud Function for inventory update when 'تسليم للمخزون' is completed
   }
