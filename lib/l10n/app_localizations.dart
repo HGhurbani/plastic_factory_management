@@ -29,6 +29,9 @@ class AppLocalizations {
   String get machineOperator => _strings["machineOperator"] ?? "machineOperator";
   String get maintenanceManager => _strings["maintenanceManager"] ?? "maintenanceManager";
   String get salesRepresentative => _strings["salesRepresentative"] ?? "salesRepresentative";
+  String get qualityInspector => _strings["qualityInspector"] ?? "qualityInspector";
+  String get inventoryManager => _strings["inventoryManager"] ?? "inventoryManager";
+  String get accountant => _strings["accountant"] ?? "accountant";
   String get unknownRole => _strings["unknownRole"] ?? "unknownRole";
   String get productionOrderManagement => _strings["productionOrderManagement"] ?? "productionOrderManagement";
   String get createOrder => _strings["createOrder"] ?? "createOrder";
@@ -94,6 +97,9 @@ class AppLocalizations {
   String get notes => _strings["notes"] ?? "notes";
   String get checklist => _strings["checklist"] ?? "checklist";
   String get salesModule => _strings["salesModule"] ?? "salesModule";
+  String get inventoryModule => _strings["inventoryModule"] ?? "inventoryModule";
+  String get qualityModule => _strings["qualityModule"] ?? "qualityModule";
+  String get accountingModule => _strings["accountingModule"] ?? "accountingModule";
   String get customerManagement => _strings["customerManagement"] ?? "customerManagement";
   String get registerNewCustomer => _strings["registerNewCustomer"] ?? "registerNewCustomer";
   String get enterCustomerCode => _strings["enterCustomerCode"] ?? "enterCustomerCode";
@@ -252,6 +258,8 @@ class AppLocalizations {
   String get salesOrders => _strings["salesOrders"] ?? "salesOrders";
   String get salesOrder => _strings["salesOrder"] ?? "salesOrder";
   String get quantityUnit => _strings["quantityUnit"] ?? "quantityUnit";
+  String get notifications => _strings["notifications"] ?? "notifications";
+  String get noNotifications => _strings["noNotifications"] ?? "noNotifications";
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
