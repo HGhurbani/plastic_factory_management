@@ -436,6 +436,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         color: moduleColors['production']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
       ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.salesOrders,
+        subtitle: "طلبات المبيعات",
+        icon: Icons.shopping_cart,
+        color: moduleColors['sales']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
+      ));
     }
 
     // Modules for Mold Installation Supervisor (مشرف تركيب القوالب)
