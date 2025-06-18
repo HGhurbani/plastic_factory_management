@@ -136,6 +136,17 @@ class SalesUseCases {
         message: 'اعتمد المحاسب الطلب للعميل ${order.customerName}',
       );
     }
+
+    // Notify mold installation supervisors to start their tasks
+    final moldSupervisors =
+        await userUseCases.getUsersByRole(UserRole.moldInstallationSupervisor);
+    for (final sup in moldSupervisors) {
+      await notificationUseCases.sendNotification(
+        userId: sup.uid,
+        title: 'طلب تركيب قوالب جديد',
+        message: 'يرجى متابعة طلب العميل ${order.customerName}',
+      );
+    }
   }
 
   // Accountant rejects a sales order
