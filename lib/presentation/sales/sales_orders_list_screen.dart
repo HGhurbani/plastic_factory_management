@@ -668,7 +668,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   children: [
                     ElevatedButton.icon(
                       onPressed: () async {
-                        await captureImage();
+                        // await captureImage();
                         setState(() {});
                       },
                       icon: const Icon(Icons.camera_alt),

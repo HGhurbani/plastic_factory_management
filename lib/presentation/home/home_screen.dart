@@ -491,14 +491,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.productCatalogRoute),
       ));
 
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.warehouseRequests,
-        subtitle: "طلبات المخزن",
-        icon: Icons.local_shipping,
-        color: moduleColors['inventory']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.warehouseRequestsRoute),
-      ));
+
     }
 
     // Modules for Machine Operator (مشغل المكينة)
@@ -592,6 +585,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         icon: Icons.inventory,
         color: moduleColors['inventory']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.inventoryManagementRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.warehouseRequests,
+        subtitle: "طلبات المخزن",
+        icon: Icons.local_shipping,
+        color: moduleColors['inventory']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.warehouseRequestsRoute),
       ));
 
       modules.add(_buildModuleButton(
