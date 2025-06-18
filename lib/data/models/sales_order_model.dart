@@ -4,20 +4,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Enum for Sales Order Status
 enum SalesOrderStatus {
+  pendingApproval,    // بانتظار اعتماد المحاسب
   pendingFulfillment, // بانتظار التوريد من المصنع
   fulfilled,          // تم التوريد
   canceled,           // ملغي
+  rejected,           // مرفوض من المحاسب
 }
 
 extension SalesOrderStatusExtension on SalesOrderStatus {
   String toArabicString() {
     switch (this) {
+      case SalesOrderStatus.pendingApproval:
+        return 'بانتظار الاعتماد';
       case SalesOrderStatus.pendingFulfillment:
         return 'بانتظار التوريد';
       case SalesOrderStatus.fulfilled:
         return 'تم التوريد';
       case SalesOrderStatus.canceled:
         return 'ملغي';
+      case SalesOrderStatus.rejected:
+        return 'مرفوض';
       default:
         return 'غير معروف';
     }
@@ -31,7 +37,7 @@ extension SalesOrderStatusExtension on SalesOrderStatus {
     try {
       return SalesOrderStatus.values.firstWhere((e) => e.name == status);
     } catch (e) {
-      return SalesOrderStatus.pendingFulfillment; // Default if unknown
+      return SalesOrderStatus.pendingApproval; // Default if unknown
     }
   }
 }
@@ -80,6 +86,12 @@ class SalesOrderModel {
   final SalesOrderStatus status; // حالة الطلب
   final Timestamp createdAt; // تاريخ إنشاء الطلب
   final String? customerSignatureUrl; // رابط صورة توقيع العميل
+  final String? approvedByUid; // UID المحاسب الذي اعتمد الطلب
+  final Timestamp? approvedAt; // وقت الاعتماد
+  final String? rejectionReason; // سبب الرفض إن وجد
+  final bool moldTasksEnabled; // هل تم تفعيل مهام تركيب القوالب
+  final String? moldInstallationNotes; // ملاحظات عملية التركيب
+  final List<String> moldInstallationImages; // صور توثيقية للتركيب
 
   SalesOrderModel({
     required this.id,
@@ -92,6 +104,12 @@ class SalesOrderModel {
     required this.status,
     required this.createdAt,
     this.customerSignatureUrl,
+    this.approvedByUid,
+    this.approvedAt,
+    this.rejectionReason,
+    this.moldTasksEnabled = false,
+    this.moldInstallationNotes,
+    this.moldInstallationImages = const [],
   });
 
   factory SalesOrderModel.fromDocumentSnapshot(DocumentSnapshot doc) {
@@ -107,9 +125,15 @@ class SalesOrderModel {
           .toList() ??
           [],
       totalAmount: (data['totalAmount'] as num?)?.toDouble() ?? 0.0,
-      status: SalesOrderStatusExtension.fromString(data['status'] ?? 'pendingFulfillment'),
+      status: SalesOrderStatusExtension.fromString(data['status'] ?? 'pendingApproval'),
       createdAt: data['createdAt'] ?? Timestamp.now(),
       customerSignatureUrl: data['customerSignatureUrl'],
+      approvedByUid: data['approvedByUid'],
+      approvedAt: data['approvedAt'],
+      rejectionReason: data['rejectionReason'],
+      moldTasksEnabled: data['moldTasksEnabled'] ?? false,
+      moldInstallationNotes: data['moldInstallationNotes'],
+      moldInstallationImages: List<String>.from(data['moldInstallationImages'] ?? []),
     );
   }
 
@@ -124,6 +148,12 @@ class SalesOrderModel {
       'status': status.toFirestoreString(),
       'createdAt': createdAt,
       'customerSignatureUrl': customerSignatureUrl,
+      'approvedByUid': approvedByUid,
+      'approvedAt': approvedAt,
+      'rejectionReason': rejectionReason,
+      'moldTasksEnabled': moldTasksEnabled,
+      'moldInstallationNotes': moldInstallationNotes,
+      'moldInstallationImages': moldInstallationImages,
     };
   }
 
@@ -138,6 +168,12 @@ class SalesOrderModel {
     SalesOrderStatus? status,
     Timestamp? createdAt,
     String? customerSignatureUrl,
+    String? approvedByUid,
+    Timestamp? approvedAt,
+    String? rejectionReason,
+    bool? moldTasksEnabled,
+    String? moldInstallationNotes,
+    List<String>? moldInstallationImages,
   }) {
     return SalesOrderModel(
       id: id ?? this.id,
@@ -150,6 +186,12 @@ class SalesOrderModel {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       customerSignatureUrl: customerSignatureUrl ?? this.customerSignatureUrl,
+      approvedByUid: approvedByUid ?? this.approvedByUid,
+      approvedAt: approvedAt ?? this.approvedAt,
+      rejectionReason: rejectionReason ?? this.rejectionReason,
+      moldTasksEnabled: moldTasksEnabled ?? this.moldTasksEnabled,
+      moldInstallationNotes: moldInstallationNotes ?? this.moldInstallationNotes,
+      moldInstallationImages: moldInstallationImages ?? this.moldInstallationImages,
     );
   }
 }

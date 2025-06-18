@@ -10,6 +10,7 @@ import 'dart:io';
 import 'notification_usecases.dart';
 import 'user_usecases.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
+import 'package:plastic_factory_management/core/services/file_upload_service.dart';
 
 class SalesUseCases {
   final SalesRepository repository;
@@ -91,7 +92,7 @@ class SalesUseCases {
       salesRepresentativeName: salesRepresentative.name,
       orderItems: orderItems,
       totalAmount: totalAmount,
-      status: SalesOrderStatus.pendingFulfillment, // Initial status
+      status: SalesOrderStatus.pendingApproval, // Initial status awaiting accountant
       createdAt: Timestamp.now(),
     );
     await repository.addSalesOrder(newOrder, signatureFile: customerSignatureFile);
@@ -114,6 +115,71 @@ class SalesUseCases {
       final updatedOrder = order.copyWith(status: newStatus);
       await repository.updateSalesOrder(updatedOrder);
     }
+  }
+
+  // Accountant approves a sales order
+  Future<void> approveSalesOrder(SalesOrderModel order, UserModel accountant) async {
+    final updatedOrder = order.copyWith(
+      status: SalesOrderStatus.pendingFulfillment,
+      approvedByUid: accountant.uid,
+      approvedAt: Timestamp.now(),
+      rejectionReason: null,
+      moldTasksEnabled: true,
+    );
+    await repository.updateSalesOrder(updatedOrder);
+
+    final managers = await userUseCases.getUsersByRole(UserRole.factoryManager);
+    for (final m in managers) {
+      await notificationUseCases.sendNotification(
+        userId: m.uid,
+        title: 'تم اعتماد طلب مبيعات',
+        message: 'اعتمد المحاسب الطلب للعميل ${order.customerName}',
+      );
+    }
+  }
+
+  // Accountant rejects a sales order
+  Future<void> rejectSalesOrder(SalesOrderModel order, UserModel accountant, String reason) async {
+    final updatedOrder = order.copyWith(
+      status: SalesOrderStatus.rejected,
+      approvedByUid: accountant.uid,
+      approvedAt: Timestamp.now(),
+      rejectionReason: reason,
+      moldTasksEnabled: false,
+    );
+    await repository.updateSalesOrder(updatedOrder);
+
+    final salesRep = await userUseCases.getUserById(order.salesRepresentativeUid);
+    if (salesRep != null) {
+      await notificationUseCases.sendNotification(
+        userId: salesRep.uid,
+        title: 'تم رفض طلب المبيعات',
+        message: 'تم رفض طلب العميل ${order.customerName}. السبب: $reason',
+      );
+    }
+  }
+
+  // Mold installer adds documentation
+  Future<void> addMoldInstallationDocs({
+    required SalesOrderModel order,
+    String? notes,
+    List<File>? attachments,
+  }) async {
+    List<String> uploaded = List<String>.from(order.moldInstallationImages);
+    if (attachments != null && attachments.isNotEmpty) {
+      for (final file in attachments) {
+        final url = await FileUploadService().uploadFile(
+          file,
+          'sales_mold_docs/${order.id}_${DateTime.now().microsecondsSinceEpoch}.jpg',
+        );
+        if (url != null) uploaded.add(url);
+      }
+    }
+    final updatedOrder = order.copyWith(
+      moldInstallationNotes: notes ?? order.moldInstallationNotes,
+      moldInstallationImages: uploaded,
+    );
+    await repository.updateSalesOrder(updatedOrder);
   }
 
   Future<void> deleteSalesOrder(String orderId) async {
