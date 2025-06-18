@@ -300,4 +300,11 @@
   "markAsRead": "Mark as read",
   "orderApprovedTitle": "Production order approved",
   "orderApprovedMessage": "You have been assigned to the next stage"
+  ,"warehouseNotes": "Warehouse Notes"
+  ,"warehouseImages": "Warehouse Images"
+  ,"moldInstallationNotes": "Mold Installation Notes"
+  ,"moldInstallationImages": "Mold Installation Images"
+  ,"orderFlowDetails": "Approval Details"
+  ,"approvedBy": "Approved By"
+  ,"approvalTime": "Approval Time"
 }

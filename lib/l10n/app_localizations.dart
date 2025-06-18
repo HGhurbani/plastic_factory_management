@@ -277,6 +277,13 @@ class AppLocalizations {
   String get prepareOrder => _strings["prepareOrder"] ?? "prepareOrder";
   String get notifications => _strings["notifications"] ?? "notifications";
   String get noNotifications => _strings["noNotifications"] ?? "noNotifications";
+  String get warehouseNotes => _strings["warehouseNotes"] ?? "warehouseNotes";
+  String get warehouseImages => _strings["warehouseImages"] ?? "warehouseImages";
+  String get moldInstallationNotes => _strings["moldInstallationNotes"] ?? "moldInstallationNotes";
+  String get moldInstallationImages => _strings["moldInstallationImages"] ?? "moldInstallationImages";
+  String get orderFlowDetails => _strings["orderFlowDetails"] ?? "orderFlowDetails";
+  String get approvedBy => _strings["approvedBy"] ?? "approvedBy";
+  String get approvalTime => _strings["approvalTime"] ?? "approvalTime";
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
