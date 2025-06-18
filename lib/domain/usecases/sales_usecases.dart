@@ -214,7 +214,12 @@ class SalesUseCases {
 
   // Production manager approves supply
   Future<void> approveSupply(SalesOrderModel order, UserModel manager) async {
-    final updated = order.copyWith(status: SalesOrderStatus.fulfilled);
+    final updated = order.copyWith(
+      status: SalesOrderStatus.fulfilled,
+      productionManagerUid: manager.uid,
+      productionManagerName: manager.name,
+      productionRejectionReason: null,
+    );
     await repository.updateSalesOrder(updated);
 
     final rep = await userUseCases.getUserById(order.salesRepresentativeUid);
@@ -223,6 +228,27 @@ class SalesUseCases {
         userId: rep.uid,
         title: 'تم اعتماد توريد الطلب',
         message: 'تم اعتماد توريد طلب العميل ${order.customerName}',
+      );
+    }
+  }
+
+  // Production manager rejects supply and sends back to warehouse
+  Future<void> rejectSupply(
+      SalesOrderModel order, UserModel manager, String reason) async {
+    final updated = order.copyWith(
+      status: SalesOrderStatus.warehouseProcessing,
+      productionManagerUid: manager.uid,
+      productionManagerName: manager.name,
+      productionRejectionReason: reason,
+    );
+    await repository.updateSalesOrder(updated);
+
+    if (order.warehouseManagerUid != null) {
+      await notificationUseCases.sendNotification(
+        userId: order.warehouseManagerUid!,
+        title: 'رفض طلب الإنتاج',
+        message:
+            'تم رفض بدء إنتاج طلب العميل ${order.customerName}. السبب: $reason',
       );
     }
   }

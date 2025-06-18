@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/data/models/production_order_model.da
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
+import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/repositories/production_order_repository.dart';
 import 'package:plastic_factory_management/core/services/file_upload_service.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
@@ -96,6 +97,45 @@ class ProductionOrderUseCases {
     await repository.createProductionOrder(newOrder);
   }
 
+  // Create production orders from a sales order (one per item)
+  Future<void> createProductionOrdersFromSalesOrder(
+      SalesOrderModel order, UserModel preparer) async {
+    for (int i = 0; i < order.orderItems.length; i++) {
+      final item = order.orderItems[i];
+      final List<ProductionWorkflowStage> initialWorkflow = [
+        ProductionWorkflowStage(
+          stageName: 'إعداد الطلب',
+          status: 'completed',
+          assignedToUid: preparer.uid,
+          assignedToName: preparer.name,
+          completedAt: Timestamp.now(),
+          notes: 'تم إعداد الطلب من طلب المبيعات.',
+        ),
+        ProductionWorkflowStage(
+          stageName: 'انتظار الموافقة',
+          status: 'pending',
+          assignedToUid: null,
+          assignedToName: null,
+        ),
+      ];
+
+      final newOrder = ProductionOrderModel(
+        id: '',
+        productId: item.productId,
+        productName: item.productName,
+        requiredQuantity: item.quantity,
+        batchNumber: '${order.id}-$i',
+        orderPreparerUid: preparer.uid,
+        orderPreparerName: preparer.name,
+        status: ProductionOrderStatus.pending,
+        createdAt: Timestamp.now(),
+        currentStage: 'انتظار الموافقة',
+        workflowStages: initialWorkflow,
+      );
+      await repository.createProductionOrder(newOrder);
+    }
+  }
+
   // Use case to approve a production order
   Future<void> approveProductionOrder(ProductionOrderModel order, UserModel approver) async {
     final updatedWorkflow = List<ProductionWorkflowStage>.from(order.workflowStages);
@@ -179,6 +219,12 @@ class ProductionOrderUseCases {
       workflowStages: updatedWorkflow,
     );
     await repository.updateProductionOrder(updatedOrder);
+
+    await notificationUseCases.sendNotification(
+      userId: order.orderPreparerUid,
+      title: 'تم رفض طلب الإنتاج',
+      message: 'تم رفض طلب إنتاج ${order.productName}. السبب: $reason',
+    );
   }
 
   // --- NEW WORKFLOW METHODS ---
