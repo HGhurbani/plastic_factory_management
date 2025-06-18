@@ -46,6 +46,15 @@ class AccountingScreen extends StatelessWidget {
         ],
       ),
     ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.receipt_long),
+              label: Text(appLocalizations.salesOrders),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

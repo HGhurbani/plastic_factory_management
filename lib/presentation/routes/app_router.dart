@@ -18,6 +18,7 @@ import 'package:plastic_factory_management/presentation/inventory/inventory_mana
 import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
 import 'package:plastic_factory_management/presentation/notifications/notifications_screen.dart';
 
+
 class AppRouter {
   static const String loginRoute = '/';
   static const String homeRoute = '/home';

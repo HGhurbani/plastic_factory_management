@@ -43,6 +43,7 @@ class InventoryManagementScreen extends StatelessWidget {
               label: const Text('صرف طلبات المبيعات', textDirection: TextDirection.rtl),
               onPressed: () {},
             ),
+
           ],
         ),
       ),
