@@ -124,7 +124,7 @@ class SalesUseCases {
       approvedByUid: accountant.uid,
       approvedAt: Timestamp.now(),
       rejectionReason: null,
-      moldTasksEnabled: true,
+      moldTasksEnabled: false,
     );
     await repository.updateSalesOrder(updatedOrder);
 
@@ -262,6 +262,24 @@ class SalesUseCases {
             'تم رفض بدء إنتاج طلب العميل ${order.customerName}. السبب: $reason',
       );
     }
+  }
+
+  // Mold supervisor approves order and enables mold tasks
+  Future<void> approveMoldTasks(SalesOrderModel order, UserModel supervisor) async {
+    if (order.moldTasksEnabled) return;
+    final updated = order.copyWith(
+      moldTasksEnabled: true,
+      moldSupervisorUid: supervisor.uid,
+      moldSupervisorName: supervisor.name,
+      moldSupervisorApprovedAt: Timestamp.now(),
+    );
+    await repository.updateSalesOrder(updated);
+
+    await notificationUseCases.sendNotification(
+      userId: supervisor.uid,
+      title: 'تم اعتماد مهام التركيب',
+      message: 'تم اعتماد طلب العميل ${order.customerName}' ,
+    );
   }
 
   // Mold installer adds documentation

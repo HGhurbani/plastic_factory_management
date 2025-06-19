@@ -8,6 +8,7 @@ import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -26,6 +27,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final salesUseCases = Provider.of<SalesUseCases>(context);
+    final productionUseCases = Provider.of<ProductionOrderUseCases>(context);
     final currentUser = Provider.of<UserModel?>(context);
 
     if (currentUser == null) {
@@ -172,7 +174,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                             ),
                           ],
                         ),
-                        trailing: _buildTrailingActions(context, order, currentUser, salesUseCases, appLocalizations, isManager, isAccountant),
+                        trailing: _buildTrailingActions(context, order, currentUser, salesUseCases, productionUseCases, appLocalizations, isManager, isAccountant),
                       ),
                     );
                   },
@@ -210,6 +212,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       SalesOrderModel order,
       UserModel currentUser,
       SalesUseCases useCases,
+      ProductionOrderUseCases productionUseCases,
       AppLocalizations appLocalizations,
       bool isManager,
       bool isAccountant) {
@@ -264,12 +267,21 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         tooltip: appLocalizations.markAsFulfilled,
       );
     }
-    if (currentUser.userRoleEnum == UserRole.moldInstallationSupervisor && order.moldTasksEnabled) {
-      return IconButton(
-        icon: const Icon(Icons.camera_alt, color: Colors.blueGrey),
-        onPressed: () => _showMoldDocDialog(context, useCases, appLocalizations, order),
-        tooltip: appLocalizations.moldInstallationDocumentation,
-      );
+    if (currentUser.userRoleEnum == UserRole.moldInstallationSupervisor) {
+      if (!order.moldTasksEnabled) {
+        return IconButton(
+          icon: const Icon(Icons.check_circle, color: Colors.green),
+          onPressed: () => _showMoldApprovalDialog(
+              context, useCases, productionUseCases, appLocalizations, order, currentUser),
+          tooltip: appLocalizations.approve,
+        );
+      } else {
+        return IconButton(
+          icon: const Icon(Icons.camera_alt, color: Colors.blueGrey),
+          onPressed: () => _showMoldDocDialog(context, useCases, appLocalizations, order),
+          tooltip: appLocalizations.moldInstallationDocumentation,
+        );
+      }
     }
     return const SizedBox.shrink();
   }
@@ -647,6 +659,40 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showMoldApprovalDialog(BuildContext context, SalesUseCases useCases, ProductionOrderUseCases productionUseCases,
+      AppLocalizations appLocalizations, SalesOrderModel order, UserModel supervisor) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(appLocalizations.approveOrderConfirmation),
+        content: Text('${appLocalizations.confirmApproveOrder}: "${order.customerName}"؟', textAlign: TextAlign.right),
+        actions: [
+          TextButton(
+            child: Text(appLocalizations.cancel),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          ElevatedButton(
+            child: Text(appLocalizations.approve),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              try {
+                await useCases.approveMoldTasks(order, supervisor);
+                await productionUseCases.createProductionOrdersFromSalesOrder(order, supervisor);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(appLocalizations.orderApprovedSuccessfully)),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${appLocalizations.errorApprovingOrder}: $e')),
+                );
+              }
+            },
+          ),
+        ],
       ),
     );
   }
