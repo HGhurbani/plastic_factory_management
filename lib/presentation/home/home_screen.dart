@@ -457,6 +457,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         color: moduleColors['machinery']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.moldInstallationTasksRoute),
       ));
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.salesOrders,
+        subtitle: "طلبات المبيعات",
+        icon: Icons.shopping_cart,
+        color: moduleColors['sales']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
+      ));
     }
 
     // Modules for Production Shift Supervisor (مشرف الوردية / مشرف الإنتاج)
@@ -586,23 +594,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     // Modules for Inventory Manager (أمين المخزن)
     if (role == UserRole.inventoryManager) {
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.inventoryModule,
-        subtitle: "إدارة المخزون",
-        icon: Icons.inventory,
-        color: moduleColors['inventory']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.inventoryManagementRoute),
-      ));
+      // modules.add(_buildModuleButton(
+      //   context: context,
+      //   title: appLocalizations.inventoryModule,
+      //   subtitle: "إدارة المخزون",
+      //   icon: Icons.inventory,
+      //   color: moduleColors['inventory']!,
+      //   onPressed: () => Navigator.of(context).pushNamed(AppRouter.inventoryManagementRoute),
+      // ));
 
       modules.add(_buildModuleButton(
         context: context,
-        title: appLocalizations.warehouseRequests,
-        subtitle: "طلبات المخزن",
-        icon: Icons.local_shipping,
-        color: moduleColors['inventory']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.warehouseRequestsRoute),
+        title: appLocalizations.salesOrders,
+        subtitle: "طلبات المبيعات",
+        icon: Icons.shopping_cart,
+        color: moduleColors['sales']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
       ));
+
+
 
       modules.add(_buildModuleButton(
         context: context,
