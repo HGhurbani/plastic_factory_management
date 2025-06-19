@@ -364,6 +364,24 @@ class AppLocalizations {
   String get reviewOrderDetails => _strings["reviewOrderDetails"] ?? "reviewOrderDetails";
   String get warehouseManager => _strings["warehouseManager"] ?? "warehouseManager";
   String get expectedDeliveryTime => _strings["expectedDeliveryTime"] ?? "expectedDeliveryTime";
+  String get userManagement => _strings["userManagement"] ?? "userManagement";
+  String get addUser => _strings["addUser"] ?? "addUser";
+  String get errorLoadingUsers => _strings["errorLoadingUsers"] ?? "errorLoadingUsers";
+  String get noUsersAvailable => _strings["noUsersAvailable"] ?? "noUsersAvailable";
+  String get tapToAddFirstUser => _strings["tapToAddFirstUser"] ?? "tapToAddFirstUser";
+  String get employeeId => _strings["employeeId"] ?? "employeeId";
+  String get editUser => _strings["editUser"] ?? "editUser";
+  String get invalidEmailFormat => _strings["invalidEmailFormat"] ?? "invalidEmailFormat";
+  String get name => _strings["name"] ?? "name";
+  String get role => _strings["role"] ?? "role";
+  String get password => _strings["password"] ?? "password";
+  String get passwordTooShort => _strings["passwordTooShort"] ?? "passwordTooShort";
+  String get userUpdatedSuccessfully => _strings["userUpdatedSuccessfully"] ?? "userUpdatedSuccessfully";
+  String get userAddedSuccessfully => _strings["userAddedSuccessfully"] ?? "userAddedSuccessfully";
+  String get errorSavingUser => _strings["errorSavingUser"] ?? "errorSavingUser";
+  String get confirmDeleteUser => _strings["confirmDeleteUser"] ?? "confirmDeleteUser";
+  String get userDeletedSuccessfully => _strings["userDeletedSuccessfully"] ?? "userDeletedSuccessfully";
+  String get errorDeletingUser => _strings["errorDeletingUser"] ?? "errorDeletingUser";
   String get unknown => _strings["unknown"] ?? "unknown";
 
 }

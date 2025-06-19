@@ -341,7 +341,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                           prefixIcon: const Icon(Icons.account_circle_outlined),
                         ),
                         items: UserRole.values
-                            .where((r) => r != UserRole.unknown && r != UserRole.user) // Exclude 'unknown' and 'user' if not meant for assignment
+                            .where((r) => r != UserRole.unknown) // Exclude 'unknown'
                             .map((r) => DropdownMenuItem(
                           value: r,
                           child: Text(r.toArabicString(), textDirection: TextDirection.rtl),

@@ -343,5 +343,23 @@
               "unknown": "مجهول",
               "warehouseManager": "أمين المخزن",
                "expectedDeliveryTime": "وقت التسليم المتوقع"
+              "userManagement": "إدارة المستخدمين",
+              "addUser": "إضافة مستخدم",
+              "errorLoadingUsers": "خطأ في تحميل المستخدمين",
+              "noUsersAvailable": "لا يوجد مستخدمون.",
+              "tapToAddFirstUser": "اضغط على زر '+' لإضافة أول مستخدم.",
+              "employeeId": "رقم الموظف",
+              "editUser": "تعديل مستخدم",
+              "invalidEmailFormat": "تنسيق البريد الإلكتروني غير صالح.",
+              "name": "الاسم",
+              "role": "الدور",
+              "password": "كلمة المرور",
+              "passwordTooShort": "كلمة المرور قصيرة جداً.",
+              "userUpdatedSuccessfully": "تم تحديث المستخدم بنجاح.",
+              "userAddedSuccessfully": "تمت إضافة المستخدم بنجاح.",
+              "errorSavingUser": "خطأ في حفظ المستخدم",
+              "confirmDeleteUser": "تأكيد حذف المستخدم",
+              "userDeletedSuccessfully": "تم حذف المستخدم بنجاح.",
+              "errorDeletingUser": "خطأ في حذف المستخدم"
 
 }
