@@ -84,6 +84,11 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       _selectedStatusFilter = value;
                     });
                   }),
+                  _buildFilterChip(appLocalizations.inProduction, SalesOrderStatus.inProduction.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
                   _buildFilterChip(appLocalizations.fulfilled, SalesOrderStatus.fulfilled.toFirestoreString(), _selectedStatusFilter, (value) {
                     setState(() {
                       _selectedStatusFilter = value;
@@ -250,16 +255,6 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         tooltip: appLocalizations.warehouseDocumentation,
       );
     }
-    if ((currentUser.userRoleEnum == UserRole.productionManager ||
-            currentUser.userRoleEnum == UserRole.productionOrderPreparer) &&
-        order.status == SalesOrderStatus.pendingProductionApproval) {
-      return IconButton(
-        icon: const Icon(Icons.check_circle, color: Colors.green),
-        onPressed: () => _showProductionApprovalDialog(
-            context, useCases, appLocalizations, order, currentUser),
-        tooltip: appLocalizations.approveSupply,
-      );
-    }
     if (isManager && order.status == SalesOrderStatus.pendingFulfillment) {
       return IconButton(
         icon: const Icon(Icons.check_circle, color: Colors.green),
@@ -296,7 +291,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         return Colors.orange;
       case SalesOrderStatus.warehouseProcessing:
         return Colors.blue;
-      case SalesOrderStatus.pendingProductionApproval:
+      case SalesOrderStatus.inProduction:
         return Colors.deepPurple;
       case SalesOrderStatus.fulfilled:
         return Colors.green;
@@ -367,6 +362,9 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       child: Image.network(e, width: 60, height: 60, fit: BoxFit.cover),
                     )).toList(),
                   ),
+                if (order.deliveryTime != null)
+                  _buildDetailRow(appLocalizations.selectDeliveryTime,
+                      intl.DateFormat('yyyy-MM-dd HH:mm').format(order.deliveryTime!.toDate())),
                 if (order.moldInstallationNotes != null && order.moldInstallationNotes!.isNotEmpty)
                   _buildDetailRow(appLocalizations.moldInstallationNotes, order.moldInstallationNotes!),
                 if (order.moldInstallationImages.isNotEmpty)
@@ -798,6 +796,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     final TextEditingController notesController = TextEditingController(text: order.warehouseNotes);
     List<XFile> pickedImages = [];
     final ImagePicker picker = ImagePicker();
+    DateTime? selectedDeliveryTime;
 
     Future<void> pickImages() async {
       final images = await picker.pickMultiImage();
@@ -842,6 +841,37 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(const Duration(days: 365)),
+                    );
+                    if (date != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (time != null) {
+                        selectedDeliveryTime = DateTime(
+                          date.year,
+                          date.month,
+                          date.day,
+                          time.hour,
+                          time.minute,
+                        );
+                        setState(() {});
+                      }
+                    }
+                  },
+                  child: Text(selectedDeliveryTime == null
+                      ? appLocalizations.selectDeliveryTime
+                      : intl.DateFormat('yyyy-MM-dd HH:mm')
+                          .format(selectedDeliveryTime!)),
+                ),
                 Wrap(
                   children: pickedImages.map((e) => Padding(
                     padding: const EdgeInsets.all(4.0),
@@ -861,12 +891,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 try {
-                  await useCases.documentWarehouseSupply(
-                    order: order,
-                    storekeeper: storekeeper,
-                    notes: notesController.text.trim(),
-                    attachments: pickedImages.map((e) => File(e.path)).toList(),
-                  );
+                await useCases.documentWarehouseSupply(
+                  order: order,
+                  storekeeper: storekeeper,
+                  notes: notesController.text.trim(),
+                  attachments: pickedImages.map((e) => File(e.path)).toList(),
+                  deliveryTime: selectedDeliveryTime,
+                );
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(appLocalizations.supplySaved)),
                   );
@@ -883,64 +914,4 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showProductionApprovalDialog(BuildContext context, SalesUseCases useCases,
-      AppLocalizations appLocalizations, SalesOrderModel order, UserModel approver) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(appLocalizations.approveSupply),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (order.warehouseNotes != null && order.warehouseNotes!.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text('${appLocalizations.warehouseNotes}: ${order.warehouseNotes!}', textDirection: TextDirection.rtl),
-                ),
-              if (order.warehouseImages.isNotEmpty)
-                Wrap(
-                  children: order.warehouseImages
-                      .map((img) => Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.network(img, width: 60, height: 60, fit: BoxFit.cover),
-                          ))
-                      .toList(),
-                ),
-              if (order.moldInstallationNotes != null && order.moldInstallationNotes!.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                  child: Text('${appLocalizations.moldInstallationNotes}: ${order.moldInstallationNotes!}', textDirection: TextDirection.rtl),
-                ),
-              if (order.moldInstallationImages.isNotEmpty)
-                Wrap(
-                  children: order.moldInstallationImages
-                      .map((img) => Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.network(img, width: 60, height: 60, fit: BoxFit.cover),
-                          ))
-                      .toList(),
-                ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            child: Text(appLocalizations.cancel),
-            onPressed: () => Navigator.of(ctx).pop(),
-          ),
-          ElevatedButton(
-            child: Text(appLocalizations.approve),
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await useCases.approveSupply(order, approver);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(appLocalizations.approveSupply)),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
 }

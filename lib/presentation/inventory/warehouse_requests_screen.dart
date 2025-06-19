@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
@@ -24,6 +25,7 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
         TextEditingController(text: order.warehouseNotes);
     List<XFile> pickedImages = [];
     final ImagePicker picker = ImagePicker();
+    DateTime? selectedDeliveryTime;
 
     Future<void> pickImages() async {
       final images = await picker.pickMultiImage();
@@ -75,6 +77,37 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(const Duration(days: 365)),
+                    );
+                    if (date != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (time != null) {
+                        selectedDeliveryTime = DateTime(
+                          date.year,
+                          date.month,
+                          date.day,
+                          time.hour,
+                          time.minute,
+                        );
+                        setState(() {});
+                      }
+                    }
+                  },
+                  child: Text(selectedDeliveryTime == null
+                      ? appLocalizations.selectDeliveryTime
+                      : intl.DateFormat('yyyy-MM-dd HH:mm')
+                          .format(selectedDeliveryTime!)),
+                ),
                 Wrap(
                   children: pickedImages
                       .map((e) => Padding(
@@ -106,6 +139,7 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
                     storekeeper: storekeeper,
                     notes: notesController.text.trim(),
                     attachments: pickedImages.map((e) => File(e.path)).toList(),
+                    deliveryTime: selectedDeliveryTime,
                   );
                   await productionUseCases.createProductionOrdersFromSalesOrder(
                       order, storekeeper);
@@ -162,8 +196,7 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
 
           final orders = snapshot.data!
               .where((o) =>
-                  (o.status == SalesOrderStatus.warehouseProcessing ||
-                      o.status == SalesOrderStatus.pendingProductionApproval) &&
+                  o.status == SalesOrderStatus.warehouseProcessing &&
                   o.warehouseManagerUid == currentUser?.uid)
               .toList();
 
@@ -218,7 +251,7 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
                               order,
                               currentUser!),
                         )
-                      : Text(appLocalizations.pendingProductionApproval),
+                      : Text(appLocalizations.inProduction),
                 ),
               );
             },
