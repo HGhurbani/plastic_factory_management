@@ -807,7 +807,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ],
       ),
-      drawer: _currentUser == null ? null : _buildDrawer(appLocalizations),
+      // drawer: _currentUser == null ? null : _buildDrawer(appLocalizations),
       body: _isLoading
           ? const Center(
         child: Column(
