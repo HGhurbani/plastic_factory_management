@@ -9,6 +9,7 @@ import 'package:plastic_factory_management/presentation/inventory/raw_materials_
 import 'package:plastic_factory_management/presentation/inventory/product_catalog_screen.dart'; // يمكن إعادة استخدامها
 import 'package:plastic_factory_management/presentation/machinery/machine_profiles_screen.dart';
 import 'package:plastic_factory_management/presentation/machinery/operator_profiles_screen.dart';
+import 'package:plastic_factory_management/presentation/machinery/mold_installation_tasks_screen.dart';
 import 'package:plastic_factory_management/presentation/maintenance/maintenance_program_screen.dart';
 import 'package:plastic_factory_management/presentation/sales/customer_management_screen.dart'; // استيراد جديد
 import 'package:plastic_factory_management/presentation/sales/create_sales_order_screen.dart'; // استيراد جديد
@@ -30,6 +31,7 @@ class AppRouter {
   static const String productCatalogRoute = '/inventory/product_catalog';
   static const String machineProfilesRoute = '/machinery/machines';
   static const String operatorProfilesRoute = '/machinery/operators';
+  static const String moldInstallationTasksRoute = '/machinery/mold_tasks';
   static const String maintenanceProgramRoute = '/maintenance/program';
   static const String customerManagementRoute = '/sales/customers'; // مسار جديد
   static const String createSalesOrderRoute = '/sales/orders/create'; // مسار جديد
@@ -59,6 +61,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => MachineProfilesScreen());
       case operatorProfilesRoute:
         return MaterialPageRoute(builder: (_) => OperatorProfilesScreen());
+      case moldInstallationTasksRoute:
+        return MaterialPageRoute(builder: (_) => MoldInstallationTasksScreen());
       case maintenanceProgramRoute:
         return MaterialPageRoute(builder: (_) => MaintenanceProgramScreen());
       case customerManagementRoute: // إضافة المسار الجديد

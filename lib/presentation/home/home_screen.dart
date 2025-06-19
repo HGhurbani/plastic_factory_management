@@ -451,12 +451,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (role == UserRole.moldInstallationSupervisor) {
       modules.add(_buildModuleButton(
         context: context,
-        title: "مهام تركيب القوالب",
+        title: appLocalizations.moldInstallationTasks,
         subtitle: "تركيب وصيانة القوالب",
         icon: Icons.extension,
         color: moduleColors['machinery']!,
-        onPressed: () {},
-        isComingSoon: true,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.moldInstallationTasksRoute),
       ));
     }
 

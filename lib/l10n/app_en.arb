@@ -307,4 +307,6 @@
   ,"orderFlowDetails": "Approval Details"
   ,"approvedBy": "Approved By"
   ,"approvalTime": "Approval Time"
+  ,"moldInstallationTasks": "Mold Installation Tasks"
+  ,"noMoldInstallationOrders": "No orders awaiting mold installation"
 }
