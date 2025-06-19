@@ -85,7 +85,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             IconButton(
               icon: const Icon(Icons.add_shopping_cart_outlined), // More specific icon
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CreateSalesOrderScreen()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) =>  CreateSalesOrderScreen()));
               },
               tooltip: appLocalizations.createSalesOrder,
             ),
@@ -209,7 +209,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                           if (isSalesRepresentative)
                             ElevatedButton.icon(
                               onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CreateSalesOrderScreen()));
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) =>  CreateSalesOrderScreen()));
                               },
                               icon: const Icon(Icons.add),
                               label: Text(appLocalizations.createSalesOrder),
@@ -265,7 +265,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     final order = filteredOrders[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      elevation: 6, // More prominent card
+                      elevation: 0, // More prominent card
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: InkWell( // Use InkWell for better visual feedback on tap
                         onTap: () {
@@ -356,7 +356,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           color: selectedValue == value ? AppColors.primary : Colors.black87,
           fontWeight: selectedValue == value ? FontWeight.bold : FontWeight.normal,
         ),
-        elevation: selectedValue == value ? 4 : 1, // Add elevation when selected
+        elevation: selectedValue == value ? 0 : 1, // Add elevation when selected
       ),
     );
   }
@@ -1586,8 +1586,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 try {
                   await useCases.deleteSalesOrder(orderId);
                   Navigator.of(context).pop(); // Pop loading
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(appLocalizations.orderDeletedSuccessfully)));
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //     SnackBar(content: Text(appLocalizations.orderDeletedSuccessfully)));
                 } catch (e) {
                   Navigator.of(context).pop(); // Pop loading
                   ScaffoldMessenger.of(context).showSnackBar(

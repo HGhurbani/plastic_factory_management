@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
-import 'package:intl/intl.dart' as intl;
-import 'package:plastic_factory_management/theme/app_colors.dart';
+import 'package:intl/intl.dart' as intl; // Alias for clarity
+import 'package:plastic_factory_management/theme/app_colors.dart'; // Ensure this defines your app's color scheme
 
 class MachineProfilesScreen extends StatefulWidget {
+  const MachineProfilesScreen({super.key});
+
   @override
   _MachineProfilesScreenState createState() => _MachineProfilesScreenState();
 }
@@ -24,13 +26,16 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
       appBar: AppBar(
         title: Text(appLocalizations.machineProfiles),
         centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor, // Consistent theme color
+        foregroundColor: Colors.white, // White text for better contrast
+        elevation: 0, // No shadow for a cleaner look
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add_box_outlined), // More specific icon for adding a machine
             onPressed: () {
               _showAddEditMachineDialog(context, machineryOperatorUseCases, appLocalizations);
             },
-            tooltip: appLocalizations.addMachine, // أضف هذا النص في ARB
+            tooltip: appLocalizations.addMachine,
           ),
         ],
       ),
@@ -38,81 +43,167 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
         stream: machineryOperatorUseCases.getMachines(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('خطأ في تحميل بيانات الآلات: ${snapshot.error}'));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red, size: 60),
+                    const SizedBox(height: 16),
+                    Text(
+                      appLocalizations.errorLoadingMachines, // New localization key
+                      style: const TextStyle(fontSize: 18, color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${appLocalizations.technicalDetails}: ${snapshot.error}',
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('لا توجد آلات لعرضها. يرجى إضافة آلة جديدة.'));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.precision_manufacturing_outlined, color: Colors.grey[400], size: 80), // Specific icon
+                    const SizedBox(height: 16),
+                    Text(
+                      appLocalizations.noMachinesAvailable, // New localization key
+                      style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      appLocalizations.tapToAddFirstMachine, // New localization key
+                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        _showAddEditMachineDialog(context, machineryOperatorUseCases, appLocalizations);
+                      },
+                      icon: const Icon(Icons.add),
+                      label: Text(appLocalizations.addMachine),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        textStyle: const TextStyle(fontSize: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           return ListView.builder(
             itemCount: snapshot.data!.length,
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             itemBuilder: (context, index) {
               final machine = snapshot.data![index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 3,
-                child: ListTile(
-                  title: Text(
-                    machine.name,
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.right,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '${appLocalizations.machineID}: ${machine.machineId}',
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right,
-                      ),
-                      if (machine.details != null && machine.details!.isNotEmpty)
-                        Text(
-                          '${appLocalizations.machineDetails}: ${machine.details}',
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
+                elevation: 6, // Increased elevation for prominence
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
+                child: InkWell( // Added InkWell for tap feedback
+                  onTap: () {
+                    // Optionally, show a detailed view of the machine
+                    // _showMachineDetailsDialog(context, appLocalizations, machine);
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0), // Inner padding
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end, // Align all content to the right
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Status badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: _getMachineStatusColor(machine.status).withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                machine.status.toArabicString(),
+                                style: TextStyle(
+                                  color: _getMachineStatusColor(machine.status),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            // Machine Name with icon
+                            Row(
+                              children: [
+                                Text(
+                                  machine.name,
+                                  textDirection: TextDirection.rtl,
+                                  textAlign: TextAlign.right,
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(Icons.precision_manufacturing, color: AppColors.primary, size: 28),
+                              ],
+                            ),
+                          ],
                         ),
-                      Text(
-                        '${appLocalizations.costPerHour}: \$${machine.costPerHour.toStringAsFixed(2)}',
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right,
-                      ),
-                      Text(
-                        '${appLocalizations.machineStatus}: ${machine.status.toArabicString()}',
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right,
-                        style: TextStyle(color: _getMachineStatusColor(machine.status)),
-                      ),
-                      if (machine.lastMaintenance != null)
-                        Text(
-                          'آخر صيانة: ${machine.lastMaintenance != null ? _formatDate(machine.lastMaintenance!) : ''}', // تحتاج لتنسيق التاريخ
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        const Divider(height: 16), // Separator
+                        _buildInfoRow(appLocalizations.machineID, machine.machineId, icon: Icons.qr_code_2),
+                        if (machine.details != null && machine.details!.isNotEmpty)
+                          _buildInfoRow(appLocalizations.machineDetails, machine.details!, icon: Icons.info_outline),
+                        _buildInfoRow(appLocalizations.costPerHour, '\$${machine.costPerHour.toStringAsFixed(2)}', icon: Icons.attach_money),
+                        if (machine.lastMaintenance != null)
+                          _buildInfoRow(
+                            appLocalizations.lastMaintenance,
+                            _formatDate(machine.lastMaintenance!),
+                            icon: Icons.calendar_today_outlined,
+                            textColor: Colors.grey[700],
+                          ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.bottomLeft, // Align actions to bottom left for RTL
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 22, color: AppColors.secondary),
+                                onPressed: () {
+                                  _showAddEditMachineDialog(context, machineryOperatorUseCases, appLocalizations, machine: machine);
+                                },
+                                tooltip: appLocalizations.edit,
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline, size: 22, color: Colors.redAccent),
+                                onPressed: () {
+                                  _showDeleteConfirmationDialog(context, machineryOperatorUseCases, appLocalizations, machine.id, machine.name);
+                                },
+                                tooltip: appLocalizations.delete,
+                              ),
+                            ],
+                          ),
                         ),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit, color: AppColors.primary),
-                        onPressed: () {
-                          _showAddEditMachineDialog(context, machineryOperatorUseCases, appLocalizations, machine: machine);
-                        },
-                        tooltip: appLocalizations.edit,
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          _showDeleteConfirmationDialog(context, machineryOperatorUseCases, appLocalizations, machine.id, machine.name);
-                        },
-                        tooltip: appLocalizations.delete,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -120,28 +211,75 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showAddEditMachineDialog(context, machineryOperatorUseCases, appLocalizations);
+        },
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        tooltip: appLocalizations.addMachine,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
   Color _getMachineStatusColor(MachineStatus status) {
     switch (status) {
       case MachineStatus.ready:
-        return Colors.green;
+        return Colors.green.shade700;
       case MachineStatus.inOperation:
-        return Colors.blue;
+        return Colors.blue.shade700;
       case MachineStatus.underMaintenance:
-        return Colors.orange;
+        return Colors.orange.shade700;
       case MachineStatus.outOfService:
-        return Colors.red;
+        return Colors.red.shade700;
       default:
-        return Colors.grey;
+        return Colors.grey.shade600;
     }
   }
 
   String _formatDate(Timestamp timestamp) {
     final DateTime date = timestamp.toDate();
-    final formatter = intl.DateFormat('yyyy-MM-dd HH:mm'); // قم باستيراد intl في الأعلى
+    final formatter = intl.DateFormat('yyyy-MM-dd HH:mm');
     return formatter.format(date);
+  }
+
+  Widget _buildInfoRow(String label, String value, {Color? textColor, bool isBold = false, IconData? icon}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 15,
+                color: textColor ?? Colors.black87,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
+              textAlign: TextAlign.right,
+              textDirection: TextDirection.rtl,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '$label:',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.right,
+            textDirection: TextDirection.rtl,
+          ),
+          if (icon != null) ...[
+            const SizedBox(width: 8),
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+          ]
+        ],
+      ),
+    );
   }
 
   void _showAddEditMachineDialog(
@@ -164,7 +302,12 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text(isEditing ? appLocalizations.editMachine : appLocalizations.addMachine), // أضف هذا النص في ARB
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                isEditing ? appLocalizations.editMachine : appLocalizations.addMachine,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
               content: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
@@ -173,45 +316,76 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
                     children: [
                       TextFormField(
                         controller: _nameController,
-                        decoration: InputDecoration(labelText: appLocalizations.machineName, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.machineName,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.precision_manufacturing_outlined), // Icon for name
+                        ),
                         validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
                         textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       TextFormField(
                         controller: _machineIdController,
-                        decoration: InputDecoration(labelText: appLocalizations.machineID, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.machineID,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.qr_code_2), // Icon for machine ID
+                        ),
                         validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
                         textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       TextFormField(
                         controller: _detailsController,
-                        decoration: InputDecoration(labelText: appLocalizations.machineDetails, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.machineDetails,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.info_outline), // Icon for details
+                        ),
                         maxLines: 3,
                         textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       TextFormField(
                         controller: _costPerHourController,
-                        decoration: InputDecoration(labelText: appLocalizations.costPerHour, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.costPerHour,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.money), // Icon for cost
+                        ),
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value!.isEmpty) return appLocalizations.fieldRequired;
-                          if (double.tryParse(value) == null || double.parse(value)! < 0) return appLocalizations.invalidNumber;
+                          if (double.tryParse(value) == null || double.parse(value)! < 0) return appLocalizations.invalidNumberPositive; // New localization
                           return null;
                         },
                         textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       // Machine Status Dropdown
                       DropdownButtonFormField<MachineStatus>(
                         value: _selectedStatus,
-                        decoration: InputDecoration(labelText: appLocalizations.machineStatus, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.machineStatus,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: Icon(_getMachineStatusIcon(_selectedStatus)), // Icon changes with status
+                        ),
                         items: MachineStatus.values.map((status) {
                           return DropdownMenuItem(
                             value: status,
-                            child: Text(status.toArabicString(), textDirection: TextDirection.rtl),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  status.toArabicString(),
+                                  textDirection: TextDirection.rtl,
+                                  style: TextStyle(color: _getMachineStatusColor(status)),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(_getMachineStatusIcon(status), size: 18, color: _getMachineStatusColor(status)),
+                              ],
+                            ),
                           );
                         }).toList(),
                         onChanged: (MachineStatus? newValue) {
@@ -228,11 +402,21 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
                 TextButton(
                   child: Text(appLocalizations.cancel),
                   onPressed: () => Navigator.of(dialogContext).pop(),
+                  style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
                 ),
-                ElevatedButton(
-                  child: Text(isEditing ? appLocalizations.save : appLocalizations.add),
+                ElevatedButton.icon(
+                  icon: Icon(isEditing ? Icons.save : Icons.add),
+                  label: Text(isEditing ? appLocalizations.save : appLocalizations.add),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      // Show loading indicator
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext loadingContext) {
+                          return const Center(child: CircularProgressIndicator());
+                        },
+                      );
                       try {
                         if (isEditing) {
                           await useCases.updateMachine(
@@ -242,9 +426,9 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
                             details: _detailsController.text.isEmpty ? null : _detailsController.text,
                             costPerHour: double.parse(_costPerHourController.text),
                             status: _selectedStatus,
-                            lastMaintenance: machine.lastMaintenance, // Keep existing maintenance date
+                            lastMaintenance: machine.lastMaintenance,
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.machineUpdatedSuccessfully))); // أضف هذا النص
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.machineUpdatedSuccessfully)));
                         } else {
                           await useCases.addMachine(
                             name: _nameController.text,
@@ -253,14 +437,24 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
                             costPerHour: double.parse(_costPerHourController.text),
                             status: _selectedStatus,
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.machineAddedSuccessfully))); // أضف هذا النص
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.machineAddedSuccessfully)));
                         }
-                        Navigator.of(dialogContext).pop();
+                        Navigator.of(context).pop(); // Pop the loading indicator
+                        Navigator.of(dialogContext).pop(); // Pop the dialog
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorSavingMachine}: $e'))); // أضف هذا النص
+                        Navigator.of(context).pop(); // Pop the loading indicator
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorSavingMachine}: ${e.toString()}')));
+                        print('Error saving machine: $e'); // For debugging
                       }
                     }
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
               ],
             );
@@ -268,6 +462,22 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
         );
       },
     );
+  }
+
+  // Helper to get an icon based on machine status
+  IconData _getMachineStatusIcon(MachineStatus status) {
+    switch (status) {
+      case MachineStatus.ready:
+        return Icons.check_circle_outline;
+      case MachineStatus.inOperation:
+        return Icons.play_circle_outline;
+      case MachineStatus.underMaintenance:
+        return Icons.build_outlined;
+      case MachineStatus.outOfService:
+        return Icons.error_outline;
+      default:
+        return Icons.help_outline;
+    }
   }
 
   void _showDeleteConfirmationDialog(
@@ -281,24 +491,49 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text(appLocalizations.confirmDeletion),
-          content: Text('${appLocalizations.confirmDeleteMachine}: "$machineName"؟'), // أضف هذا النص
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.confirmDeletion, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text(
+            '${appLocalizations.confirmDeleteMachine}: "$machineName"؟\n\n${appLocalizations.thisActionCannotBeUndone}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
           actions: <Widget>[
             TextButton(
               child: Text(appLocalizations.cancel),
               onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.delete),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.delete_forever),
+              label: Text(appLocalizations.delete),
               onPressed: () async {
+                Navigator.of(dialogContext).pop(); // Pop confirmation dialog
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
                 try {
                   await useCases.deleteMachine(machineId);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.machineDeletedSuccessfully))); // أضف هذا النص
-                  Navigator.of(dialogContext).pop();
+                  Navigator.of(context).pop(); // Pop loading
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.machineDeletedSuccessfully)));
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorDeletingMachine}: $e'))); // أضف هذا النص
+                  Navigator.of(context).pop(); // Pop loading
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorDeletingMachine}: ${e.toString()}')));
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ],
         );
