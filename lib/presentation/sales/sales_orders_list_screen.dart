@@ -237,7 +237,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     if (currentUser.userRoleEnum == UserRole.productionOrderPreparer &&
         order.status == SalesOrderStatus.pendingFulfillment) {
       return IconButton(
-        icon: const Icon(Icons.local_shipping, color: Colors.blue),
+        icon: const Icon(Icons.local_shipping, color: AppColors.primary),
         onPressed: () => _showInitiateSupplyDialog(
             context, useCases, appLocalizations, order, currentUser),
         tooltip: appLocalizations.initiateSupply,

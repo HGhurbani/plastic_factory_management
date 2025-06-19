@@ -198,6 +198,10 @@ class MyApp extends StatelessWidget {
         ],
         theme: ThemeData(
           primarySwatch: AppColors.primarySwatch,
+          primaryColor: AppColors.primary,
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: AppColors.primarySwatch,
+          ).copyWith(secondary: AppColors.dark),
           appBarTheme: const AppBarTheme(
             backgroundColor: AppColors.dark,
             foregroundColor: Colors.white,
@@ -213,11 +217,17 @@ class MyApp extends StatelessWidget {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Tajawal',
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           ),
-          fontFamily: GoogleFonts.tajawal().fontFamily,
+          fontFamily: 'Tajawal',
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         debugShowCheckedModeBanner: false,

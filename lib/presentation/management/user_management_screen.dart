@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
+import 'package:plastic_factory_management/theme/app_colors.dart';
 
 class UserManagementScreen extends StatefulWidget {
   @override
@@ -66,7 +67,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        icon: const Icon(Icons.edit, color: AppColors.primary),
                         onPressed: () {
                           _showAddEditUserDialog(context, userUseCases, appLocalizations, user: user);
                         },

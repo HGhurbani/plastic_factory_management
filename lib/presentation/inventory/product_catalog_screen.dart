@@ -8,6 +8,7 @@ import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:plastic_factory_management/theme/app_colors.dart';
 
 class ProductCatalogScreen extends StatefulWidget {
   @override
@@ -111,7 +112,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   IconButton(
-                                    icon: Icon(Icons.edit, size: 20, color: Colors.blue),
+                                    icon: Icon(Icons.edit, size: 20, color: AppColors.primary),
                                     onPressed: () {
                                       _showAddEditProductDialog(context, inventoryUseCases, appLocalizations, product: product);
                                     },

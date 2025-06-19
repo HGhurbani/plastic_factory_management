@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/customer_model.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:plastic_factory_management/theme/app_colors.dart';
 
 class CustomerManagementScreen extends StatefulWidget {
   @override
@@ -96,7 +97,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.edit, color: Colors.blue),
+                        icon: Icon(Icons.edit, color: AppColors.primary),
                         onPressed: () {
                           _showAddEditCustomerDialog(context, salesUseCases, appLocalizations, customer: customer);
                         },
