@@ -915,7 +915,6 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               maxLines: 3,
               textAlign: TextAlign.right,
               textDirection: TextDirection.rtl,
-              validator: (value) => value!.trim().isEmpty ? appLocalizations.fieldRequired : null, // Added validation
             ),
           ],
         ),

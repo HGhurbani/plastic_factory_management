@@ -9,6 +9,12 @@ class AppColors {
   /// Secondary brand color used for gradients and dark elements.
   static const Color dark = Color(0xFF848484);
 
+  /// Secondary color used for highlights and accents.
+  static const Color secondary = Color(0xFF2196F3);
+
+  /// Accent orange color used for pending statuses.
+  static const Color accentOrange = Color(0xFFFFA726);
+
   /// Convenient list of gradient colors following the brand scheme.
   static const List<Color> gradient = [primary, dark];
 
