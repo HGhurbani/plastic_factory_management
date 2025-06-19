@@ -14,6 +14,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'create_sales_order_screen.dart';
+import '../../theme/app_colors.dart';
 
 class SalesOrdersListScreen extends StatefulWidget {
   @override
@@ -277,7 +278,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         );
       } else {
         return IconButton(
-          icon: const Icon(Icons.camera_alt, color: Colors.blueGrey),
+          icon: const Icon(Icons.camera_alt, color: AppColors.dark),
           onPressed: () => _showMoldDocDialog(context, useCases, appLocalizations, order),
           tooltip: appLocalizations.moldInstallationDocumentation,
         );
@@ -289,7 +290,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
   Color _getSalesOrderStatusColor(SalesOrderStatus status) {
     switch (status) {
       case SalesOrderStatus.pendingApproval:
-        return Colors.blueGrey;
+        return AppColors.dark;
       case SalesOrderStatus.pendingFulfillment:
         return Colors.orange;
       case SalesOrderStatus.warehouseProcessing:

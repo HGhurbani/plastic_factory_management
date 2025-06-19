@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:plastic_factory_management/theme/app_colors.dart';
+
 import 'package:plastic_factory_management/firebase_options.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 
@@ -195,23 +197,23 @@ class MyApp extends StatelessWidget {
           Locale('en', ''),
         ],
         theme: ThemeData(
-          primarySwatch: Colors.blueGrey,
-          appBarTheme: AppBarTheme(
-            backgroundColor: Colors.blueGrey[800],
+          primarySwatch: AppColors.primarySwatch,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: AppColors.dark,
             foregroundColor: Colors.white,
             elevation: 0,
           ),
-          inputDecorationTheme: InputDecorationTheme(
+          inputDecorationTheme: const InputDecorationTheme(
             border: OutlineInputBorder(),
-            labelStyle: TextStyle(color: Colors.blueGrey[700]),
-            floatingLabelStyle: TextStyle(color: Colors.blueGrey[900]),
+            labelStyle: TextStyle(color: AppColors.dark),
+            floatingLabelStyle: TextStyle(color: AppColors.dark),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueGrey,
+              backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
