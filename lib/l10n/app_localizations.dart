@@ -329,6 +329,38 @@ class AppLocalizations {
   String get selectMachineForOrder => _strings["selectMachineForOrder"] ?? "selectMachineForOrder";
   String get machineRequired => _strings["machineRequired"] ?? "machineRequired";
   String get enterActualTimeRequired => _strings["enterActualTimeRequired"] ?? "enterActualTimeRequired";
+  String get loginRequiredToViewOrders => _strings["loginRequiredToViewOrders"] ?? "loginRequiredToViewOrders";
+  String get awaitingMoldApproval => _strings["awaitingMoldApproval"] ?? "awaitingMoldApproval";
+  String get tapToAddFirstOrder => _strings["tapToAddFirstOrder"] ?? "tapToAddFirstOrder";
+  String get tryDifferentFilter => _strings["tryDifferentFilter"] ?? "tryDifferentFilter";
+  String get approveMoldTasks => _strings["approveMoldTasks"] ?? "approveMoldTasks";
+  String get confirmApproveMoldTasks => _strings["confirmApproveMoldTasks"] ?? "confirmApproveMoldTasks";
+  String get thisActionWillCreateProductionOrder => _strings["thisActionWillCreateProductionOrder"] ?? "thisActionWillCreateProductionOrder";
+  String get moldTasksApprovedSuccessfully => _strings["moldTasksApprovedSuccessfully"] ?? "moldTasksApprovedSuccessfully";
+  String get errorApprovingMoldTasks => _strings["errorApprovingMoldTasks"] ?? "errorApprovingMoldTasks";
+  String get addImages => _strings["addImages"] ?? "addImages";
+  String get noImagesSelected => _strings["noImagesSelected"] ?? "noImagesSelected";
+  String get documentationSavedSuccessfully => _strings["documentationSavedSuccessfully"] ?? "documentationSavedSuccessfully";
+  String get selectDeliveryDateAndTime => _strings["selectDeliveryDateAndTime"] ?? "selectDeliveryDateAndTime";
+  String get warehouseSupplyDocumentedSuccessfully => _strings["warehouseSupplyDocumentedSuccessfully"] ?? "warehouseSupplyDocumentedSuccessfully";
+  String get errorDocumentingWarehouseSupply => _strings["errorDocumentingWarehouseSupply"] ?? "errorDocumentingWarehouseSupply";
+  String get confirmDeleteOrder => _strings["confirmDeleteOrder"] ?? "confirmDeleteOrder";
+  String get errorDeletingOrder => _strings["errorDeletingOrder"] ?? "errorDeletingOrder";
+  String get confirmApproveOrderQuestion => _strings["confirmApproveOrderQuestion"] ?? "confirmApproveOrderQuestion";
+  String get confirmRejectOrderQuestion => _strings["confirmRejectOrderQuestion"] ?? "confirmRejectOrderQuestion";
+  String get enterRejectionReason => _strings["enterRejectionReason"] ?? "enterRejectionReason";
+  String get noStorekeepersFound => _strings["noStorekeepersFound"] ?? "noStorekeepersFound";
+  String get assignOrderToStorekeeper => _strings["assignOrderToStorekeeper"] ?? "assignOrderToStorekeeper";
+  String get storekeeper => _strings["storekeeper"] ?? "storekeeper";
+  String get selectStorekeeperError => _strings["selectStorekeeperError"] ?? "selectStorekeeperError";
+  String get supplyInitiatedSuccessfully => _strings["supplyInitiatedSuccessfully"] ?? "supplyInitiatedSuccessfully";
+  String get errorInitiatingSupply => _strings["errorInitiatingSupply"] ?? "errorInitiatingSupply";
+  String get units => _strings["units"] ?? "units";
+  String get imageLoadError => _strings["imageLoadError"] ?? "imageLoadError";
+  String get reviewOrderDetails => _strings["reviewOrderDetails"] ?? "reviewOrderDetails";
+  String get warehouseManager => _strings["warehouseManager"] ?? "warehouseManager";
+  String get expectedDeliveryTime => _strings["expectedDeliveryTime"] ?? "expectedDeliveryTime";
+  String get unknown => _strings["unknown"] ?? "unknown";
 
 }
 

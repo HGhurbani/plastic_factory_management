@@ -540,7 +540,11 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                             fit: BoxFit.contain,
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
-                              return Center(child: CircularProgressIndicator(value: loadingProgress.progress));
+                              final expected = loadingProgress.expectedTotalBytes;
+                              final value = expected != null
+                                  ? loadingProgress.cumulativeBytesLoaded / expected
+                                  : null;
+                              return Center(child: CircularProgressIndicator(value: value));
                             },
                             errorBuilder: (context, error, stackTrace) =>
                                 Container(
@@ -585,8 +589,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 if (order.deliveryTime != null)
                   _buildInfoRow(appLocalizations.expectedDeliveryTime,
                       intl.DateFormat('yyyy-MM-dd HH:mm').format(order.deliveryTime!.toDate()), icon: Icons.delivery_dining),
-                if (order.moldInstallationSupervisorName != null && order.moldInstallationSupervisorName!.isNotEmpty)
-                  _buildInfoRow(appLocalizations.moldInstallationSupervisor, order.moldInstallationSupervisorName!, icon: Icons.person_pin),
+                if (order.moldSupervisorName != null && order.moldSupervisorName!.isNotEmpty)
+                  _buildInfoRow(appLocalizations.moldInstallationSupervisor, order.moldSupervisorName!, icon: Icons.person_pin),
                 if (order.moldInstallationNotes != null && order.moldInstallationNotes!.isNotEmpty)
                   _buildInfoRow(appLocalizations.moldInstallationNotes, order.moldInstallationNotes!, icon: Icons.notes),
                 if (order.moldInstallationImages.isNotEmpty) ...[
@@ -682,9 +686,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   fit: BoxFit.contain,
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
+                    final expected = loadingProgress.expectedTotalBytes;
+                    final value = expected != null
+                        ? loadingProgress.cumulativeBytesLoaded / expected
+                        : null;
                     return Center(
                       child: CircularProgressIndicator(
-                        value: loadingProgress.progress,
+                        value: value,
                         color: Colors.white,
                       ),
                     );
@@ -827,7 +835,11 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                           fit: BoxFit.contain,
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
-                            return Center(child: CircularProgressIndicator(value: loadingProgress.progress));
+                            final expected = loadingProgress.expectedTotalBytes;
+                            final value = expected != null
+                                ? loadingProgress.cumulativeBytesLoaded / expected
+                                : null;
+                            return Center(child: CircularProgressIndicator(value: value));
                           },
                           errorBuilder: (context, error, stackTrace) =>
                               Container(

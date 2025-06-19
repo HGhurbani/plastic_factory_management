@@ -29,7 +29,7 @@
               "machineRequired": "Machine is required.",
               "enterActualTimeRequired": "Please enter the actual time spent.",
               "approvedBy": "by",
-              "unknown": "Unknown"
+              "unknown": "Unknown",
   "loginTitle": "تسجيل الدخول",
   "emailHint": "البريد الإلكتروني",
   "passwordHint": "كلمة المرور",
@@ -343,4 +343,36 @@
   ,"approvalTime": "Approval Time"
   ,"moldInstallationTasks": "Mold Installation Tasks"
   ,"noMoldInstallationOrders": "No orders awaiting mold installation"
+  ,"loginRequiredToViewOrders": "Login required to view orders."
+  ,"awaitingMoldApproval": "Awaiting Mold Approval"
+  ,"tapToAddFirstOrder": "Tap the '+' button to add your first order."
+  ,"tryDifferentFilter": "Try a different filter."
+  ,"approveMoldTasks": "Approve Mold Tasks"
+  ,"confirmApproveMoldTasks": "Are you sure you want to approve mold tasks for"
+  ,"thisActionWillCreateProductionOrder": "This action will create a production order."
+  ,"moldTasksApprovedSuccessfully": "Mold tasks approved successfully."
+  ,"errorApprovingMoldTasks": "Error approving mold tasks"
+  ,"addImages": "Add Images"
+  ,"noImagesSelected": "No images selected"
+  ,"documentationSavedSuccessfully": "Documentation saved successfully"
+  ,"selectDeliveryDateAndTime": "Select delivery date and time"
+  ,"warehouseSupplyDocumentedSuccessfully": "Warehouse supply documented successfully"
+  ,"errorDocumentingWarehouseSupply": "Error documenting warehouse supply"
+  ,"confirmDeleteOrder": "Are you sure you want to delete this order"
+  ,"errorDeletingOrder": "Error deleting order"
+  ,"confirmApproveOrderQuestion": "Confirm approving order for"
+  ,"confirmRejectOrderQuestion": "Confirm rejecting order for"
+  ,"enterRejectionReason": "Enter rejection reason"
+  ,"noStorekeepersFound": "No storekeepers found"
+  ,"assignOrderToStorekeeper": "Assign order to storekeeper"
+  ,"storekeeper": "Storekeeper"
+  ,"selectStorekeeperError": "Please select a storekeeper"
+  ,"supplyInitiatedSuccessfully": "Supply initiated successfully"
+  ,"errorInitiatingSupply": "Error initiating supply"
+  ,"units": "units"
+  ,"imageLoadError": "Failed to load image"
+  ,"reviewOrderDetails": "Review order details"
+  ,"warehouseManager": "Warehouse Manager"
+  ,"expectedDeliveryTime": "Expected Delivery Time"
+  ,"unknown": "Unknown"
 }
