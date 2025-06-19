@@ -96,6 +96,9 @@ class SalesOrderModel {
   final Timestamp? approvedAt; // وقت الاعتماد
   final String? rejectionReason; // سبب الرفض إن وجد
   final bool moldTasksEnabled; // هل تم تفعيل مهام تركيب القوالب
+  final String? moldSupervisorUid; // UID مشرف التركيب الذي اعتمد الطلب
+  final String? moldSupervisorName; // اسم مشرف التركيب
+  final Timestamp? moldSupervisorApprovedAt; // وقت اعتماد المشرف
   final String? moldInstallationNotes; // ملاحظات عملية التركيب
   final List<String> moldInstallationImages; // صور توثيقية للتركيب
   final String? warehouseNotes; // ملاحظات أمين المخزن
@@ -121,6 +124,9 @@ class SalesOrderModel {
     this.approvedAt,
     this.rejectionReason,
     this.moldTasksEnabled = false,
+    this.moldSupervisorUid,
+    this.moldSupervisorName,
+    this.moldSupervisorApprovedAt,
     this.moldInstallationNotes,
     this.moldInstallationImages = const [],
     this.warehouseNotes,
@@ -152,6 +158,9 @@ class SalesOrderModel {
       approvedAt: data['approvedAt'],
       rejectionReason: data['rejectionReason'],
       moldTasksEnabled: data['moldTasksEnabled'] ?? false,
+      moldSupervisorUid: data['moldSupervisorUid'],
+      moldSupervisorName: data['moldSupervisorName'],
+      moldSupervisorApprovedAt: data['moldSupervisorApprovedAt'],
       moldInstallationNotes: data['moldInstallationNotes'],
       moldInstallationImages: List<String>.from(data['moldInstallationImages'] ?? []),
       warehouseNotes: data['warehouseNotes'],
@@ -179,6 +188,9 @@ class SalesOrderModel {
       'approvedAt': approvedAt,
       'rejectionReason': rejectionReason,
       'moldTasksEnabled': moldTasksEnabled,
+      'moldSupervisorUid': moldSupervisorUid,
+      'moldSupervisorName': moldSupervisorName,
+      'moldSupervisorApprovedAt': moldSupervisorApprovedAt,
       'moldInstallationNotes': moldInstallationNotes,
       'moldInstallationImages': moldInstallationImages,
       'warehouseNotes': warehouseNotes,
@@ -206,6 +218,9 @@ class SalesOrderModel {
     Timestamp? approvedAt,
     String? rejectionReason,
     bool? moldTasksEnabled,
+    String? moldSupervisorUid,
+    String? moldSupervisorName,
+    Timestamp? moldSupervisorApprovedAt,
     String? moldInstallationNotes,
     List<String>? moldInstallationImages,
     String? warehouseNotes,
@@ -231,6 +246,9 @@ class SalesOrderModel {
       approvedAt: approvedAt ?? this.approvedAt,
       rejectionReason: rejectionReason ?? this.rejectionReason,
       moldTasksEnabled: moldTasksEnabled ?? this.moldTasksEnabled,
+      moldSupervisorUid: moldSupervisorUid ?? this.moldSupervisorUid,
+      moldSupervisorName: moldSupervisorName ?? this.moldSupervisorName,
+      moldSupervisorApprovedAt: moldSupervisorApprovedAt ?? this.moldSupervisorApprovedAt,
       moldInstallationNotes: moldInstallationNotes ?? this.moldInstallationNotes,
       moldInstallationImages: moldInstallationImages ?? this.moldInstallationImages,
       warehouseNotes: warehouseNotes ?? this.warehouseNotes,
