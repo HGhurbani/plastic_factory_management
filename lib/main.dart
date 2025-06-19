@@ -196,6 +196,12 @@ class MyApp extends StatelessWidget {
           Locale('ar', ''),
           Locale('en', ''),
         ],
+        builder: (context, child) {
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: child!,
+          );
+        },
         theme: ThemeData(
           primarySwatch: AppColors.primarySwatch,
           primaryColor: AppColors.primary,
