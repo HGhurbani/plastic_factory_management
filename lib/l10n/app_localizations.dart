@@ -200,6 +200,10 @@ class AppLocalizations {
   String get confirmDeleteMachine => _strings["confirmDeleteMachine"] ?? "confirmDeleteMachine";
   String get machineDeletedSuccessfully => _strings["machineDeletedSuccessfully"] ?? "machineDeletedSuccessfully";
   String get errorDeletingMachine => _strings["errorDeletingMachine"] ?? "errorDeletingMachine";
+  String get errorLoadingMachines => _strings["errorLoadingMachines"] ?? "errorLoadingMachines";
+  String get noMachinesAvailable => _strings["noMachinesAvailable"] ?? "noMachinesAvailable";
+  String get tapToAddFirstMachine => _strings["tapToAddFirstMachine"] ?? "tapToAddFirstMachine";
+  String get lastMaintenance => _strings["lastMaintenance"] ?? "lastMaintenance";
   String get addOperator => _strings["addOperator"] ?? "addOperator";
   String get editOperator => _strings["editOperator"] ?? "editOperator";
   String get operatorUpdatedSuccessfully => _strings["operatorUpdatedSuccessfully"] ?? "operatorUpdatedSuccessfully";
