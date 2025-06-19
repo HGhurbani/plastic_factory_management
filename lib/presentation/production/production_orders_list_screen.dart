@@ -8,6 +8,8 @@ import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 import 'create_production_order_screen.dart'; // تأكد من الاستيراد
 import 'production_order_detail_screen.dart'; // تأكد من الاستيراد
@@ -251,37 +253,104 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
   }
 
   void _showApproveDialog(BuildContext context, ProductionOrderModel order, UserModel approver, AppLocalizations appLocalizations) {
+    final TextEditingController notesController = TextEditingController();
+    List<XFile> pickedImages = [];
+    final ImagePicker picker = ImagePicker();
+
+    Future<void> pickImages() async {
+      final images = await picker.pickMultiImage();
+      if (images != null) {
+        pickedImages.addAll(images);
+      }
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(appLocalizations.approveOrderConfirmation),
-          content: Text('${appLocalizations.confirmApproveOrder} "${order.productName}"؟'),
-          actions: <Widget>[
-            TextButton(
-              child: Text(appLocalizations.cancel),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: Text(appLocalizations.approveOrderConfirmation),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('${appLocalizations.confirmApproveOrder} "${order.productName}"؟'),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: notesController,
+                    decoration: InputDecoration(labelText: appLocalizations.addNotes),
+                    maxLines: 3,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final img = await picker.pickImage(source: ImageSource.camera);
+                          if (img != null) setState(() => pickedImages.add(img));
+                        },
+                        icon: const Icon(Icons.camera_alt),
+                        label: Text(appLocalizations.camera),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          await pickImages();
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.photo_library),
+                        label: Text(appLocalizations.gallery),
+                      ),
+                    ],
+                  ),
+                  if (pickedImages.isNotEmpty)
+                    Wrap(
+                      children: pickedImages
+                          .map((e) => Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Image.file(
+                                  File(e.path),
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                ],
+              ),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.approve),
-              onPressed: () async {
-                Navigator.of(dialogContext).pop();
-                try {
-                  await Provider.of<ProductionOrderUseCases>(context, listen: false).approveProductionOrder(order, approver);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(appLocalizations.orderApprovedSuccessfully)),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${appLocalizations.errorApprovingOrder}: $e')),
-                  );
-                  print('Error approving order: $e');
-                }
-              },
-            ),
-          ],
+            actions: <Widget>[
+              TextButton(
+                child: Text(appLocalizations.cancel),
+                onPressed: () => Navigator.of(dialogContext).pop(),
+              ),
+              ElevatedButton(
+                child: Text(appLocalizations.approve),
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop();
+                  try {
+                    await Provider.of<ProductionOrderUseCases>(context, listen: false).approveProductionOrder(
+                      order,
+                      approver,
+                      notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+                      attachments: pickedImages.map((e) => File(e.path)).toList(),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(appLocalizations.orderApprovedSuccessfully)),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${appLocalizations.errorApprovingOrder}: $e')),
+                    );
+                    print('Error approving order: $e');
+                  }
+                },
+              ),
+            ],
+          ),
         );
       },
     );
