@@ -198,12 +198,13 @@ class SalesUseCases {
     );
   }
 
-  // Warehouse manager documents supply and sends to production manager
+  // Warehouse manager documents supply and sets delivery time
   Future<void> documentWarehouseSupply({
     required SalesOrderModel order,
     required UserModel storekeeper,
     String? notes,
     List<File>? attachments,
+    DateTime? deliveryTime,
   }) async {
     List<String> uploaded = List<String>.from(order.warehouseImages);
     if (attachments != null && attachments.isNotEmpty) {
@@ -220,18 +221,10 @@ class SalesUseCases {
       warehouseImages: uploaded,
       warehouseManagerUid: storekeeper.uid,
       warehouseManagerName: storekeeper.name,
-      status: SalesOrderStatus.pendingProductionApproval,
+      deliveryTime: deliveryTime != null ? Timestamp.fromDate(deliveryTime) : order.deliveryTime,
+      status: SalesOrderStatus.inProduction,
     );
     await repository.updateSalesOrder(updated);
-
-    final managers = await userUseCases.getUsersByRole(UserRole.productionManager);
-    for (final m in managers) {
-      await notificationUseCases.sendNotification(
-        userId: m.uid,
-        title: 'طلب توريد جاهز',
-        message: 'تم تجهيز طلب العميل ${order.customerName} وبانتظار اعتمادكم',
-      );
-    }
   }
 
   // Production manager approves supply

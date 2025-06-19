@@ -5,9 +5,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // Enum for Sales Order Status
 enum SalesOrderStatus {
   pendingApproval,    // بانتظار اعتماد المحاسب
-  pendingFulfillment, // بانتظار التوريد من المصنع
+  pendingFulfillment, // بانتظار قرار منسق طلبات الإنتاج
   warehouseProcessing, // لدى أمين المخزن للتجهيز
-  pendingProductionApproval, // بانتظار اعتماد مسؤول الإنتاج
+  inProduction,       // قيد الإنتاج بعد تحديد موعد التسليم
   fulfilled,          // تم التوريد
   canceled,           // ملغي
   rejected,           // مرفوض من المحاسب
@@ -19,11 +19,11 @@ extension SalesOrderStatusExtension on SalesOrderStatus {
       case SalesOrderStatus.pendingApproval:
         return 'بانتظار الاعتماد';
       case SalesOrderStatus.pendingFulfillment:
-        return 'بانتظار التوريد';
+        return 'بانتظار منسق الطلبات';
       case SalesOrderStatus.warehouseProcessing:
         return 'قيد التحضير بالمخزن';
-      case SalesOrderStatus.pendingProductionApproval:
-        return 'بانتظار اعتماد الإنتاج';
+      case SalesOrderStatus.inProduction:
+        return 'قيد الإنتاج';
       case SalesOrderStatus.fulfilled:
         return 'تم التوريد';
       case SalesOrderStatus.canceled:
@@ -105,6 +105,7 @@ class SalesOrderModel {
   final List<String> warehouseImages; // صور توثيق المخزن
   final String? warehouseManagerUid; // UID أمين المخزن المسؤول
   final String? warehouseManagerName; // اسم أمين المخزن المسؤول
+  final Timestamp? deliveryTime; // موعد التسليم المحدد من أمين المخزن
   final String? productionManagerUid; // UID مسؤول الإنتاج
   final String? productionManagerName; // اسم مسؤول الإنتاج
   final String? productionRejectionReason; // سبب رفض الإنتاج
@@ -133,6 +134,7 @@ class SalesOrderModel {
     this.warehouseImages = const [],
     this.warehouseManagerUid,
     this.warehouseManagerName,
+    this.deliveryTime,
     this.productionManagerUid,
     this.productionManagerName,
     this.productionRejectionReason,
@@ -167,6 +169,7 @@ class SalesOrderModel {
       warehouseImages: List<String>.from(data['warehouseImages'] ?? []),
       warehouseManagerUid: data['warehouseManagerUid'],
       warehouseManagerName: data['warehouseManagerName'],
+      deliveryTime: data['deliveryTime'],
       productionManagerUid: data['productionManagerUid'],
       productionManagerName: data['productionManagerName'],
       productionRejectionReason: data['productionRejectionReason'],
@@ -197,6 +200,7 @@ class SalesOrderModel {
       'warehouseImages': warehouseImages,
       'warehouseManagerUid': warehouseManagerUid,
       'warehouseManagerName': warehouseManagerName,
+      'deliveryTime': deliveryTime,
       'productionManagerUid': productionManagerUid,
       'productionManagerName': productionManagerName,
       'productionRejectionReason': productionRejectionReason,
@@ -227,6 +231,7 @@ class SalesOrderModel {
     List<String>? warehouseImages,
     String? warehouseManagerUid,
     String? warehouseManagerName,
+    Timestamp? deliveryTime,
     String? productionManagerUid,
     String? productionManagerName,
     String? productionRejectionReason,
@@ -255,6 +260,7 @@ class SalesOrderModel {
       warehouseImages: warehouseImages ?? this.warehouseImages,
       warehouseManagerUid: warehouseManagerUid ?? this.warehouseManagerUid,
       warehouseManagerName: warehouseManagerName ?? this.warehouseManagerName,
+      deliveryTime: deliveryTime ?? this.deliveryTime,
       productionManagerUid: productionManagerUid ?? this.productionManagerUid,
       productionManagerName: productionManagerName ?? this.productionManagerName,
       productionRejectionReason: productionRejectionReason ?? this.productionRejectionReason,
