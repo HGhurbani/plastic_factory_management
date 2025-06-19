@@ -234,7 +234,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         ],
       );
     }
-    if (isAccountant && order.status == SalesOrderStatus.pendingFulfillment) {
+    if (currentUser.userRoleEnum == UserRole.productionOrderPreparer &&
+        order.status == SalesOrderStatus.pendingFulfillment) {
       return IconButton(
         icon: const Icon(Icons.local_shipping, color: Colors.blue),
         onPressed: () => _showInitiateSupplyDialog(
@@ -623,7 +624,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showInitiateSupplyDialog(BuildContext context, SalesUseCases salesUseCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel accountant) async {
+  void _showInitiateSupplyDialog(BuildContext context, SalesUseCases salesUseCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel preparer) async {
     final userUseCases = Provider.of<UserUseCases>(context, listen: false);
     final storekeepers = await userUseCases.getUsersByRole(UserRole.inventoryManager);
     if (storekeepers.isEmpty) return;
@@ -652,7 +653,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               child: Text(appLocalizations.initiateSupply),
               onPressed: () async {
                 Navigator.of(context).pop();
-                await salesUseCases.initiateSupply(order, accountant, selected);
+                await salesUseCases.initiateSupply(order, preparer, selected);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(appLocalizations.initiateSupply)),
                 );

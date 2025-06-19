@@ -137,6 +137,17 @@ class SalesUseCases {
       );
     }
 
+    // Notify production order preparers to assign warehouse
+    final preparers =
+        await userUseCases.getUsersByRole(UserRole.productionOrderPreparer);
+    for (final p in preparers) {
+      await notificationUseCases.sendNotification(
+        userId: p.uid,
+        title: 'طلب مبيعات بانتظار التوجيه للمخزن',
+        message: 'يرجى تحديد أمين المخزن لطلب العميل ${order.customerName}',
+      );
+    }
+
     // Notify mold installation supervisors to start their tasks
     final moldSupervisors =
         await userUseCases.getUsersByRole(UserRole.moldInstallationSupervisor);
@@ -170,9 +181,9 @@ class SalesUseCases {
     }
   }
 
-  // Accountant initiates supply to warehouse
+  // Production order preparer initiates supply to warehouse
   Future<void> initiateSupply(
-      SalesOrderModel order, UserModel accountant, UserModel storekeeper) async {
+      SalesOrderModel order, UserModel preparer, UserModel storekeeper) async {
     final updated = order.copyWith(
       status: SalesOrderStatus.warehouseProcessing,
       warehouseManagerUid: storekeeper.uid,
