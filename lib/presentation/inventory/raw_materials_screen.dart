@@ -179,7 +179,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit, color: AppColors.secondary), // Use secondary color for edit
+                          icon: const Icon(Icons.edit, color: AppColors.primary), // Use secondary color for edit
                           onPressed: () {
                             _showAddEditMaterialDialog(context, inventoryUseCases, appLocalizations, material: material);
                           },

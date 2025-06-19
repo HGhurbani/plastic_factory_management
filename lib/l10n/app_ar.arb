@@ -306,5 +306,17 @@
   ,"approvedBy": "اعتمد بواسطة"
   ,"approvalTime": "وقت الاعتماد"
   ,"moldInstallationTasks": "مهام تركيب القوالب"
-  ,"noMoldInstallationOrders": "لا توجد طلبات بانتظار تركيب القوالب"
+  ,"noMoldInstallationOrders": "لا توجد طلبات بانتظار تركيب القوالب",
+  "errorLoadingMaterials": "خطأ في تحميل المواد",
+      "technicalDetails": "تفاصيل فنية",
+      "noRawMaterialsAvailable": "لا توجد مواد أولية متاحة.",
+      "tapToAddFirstMaterial": "اضغط على زر '+' لإضافة أول مادة.",
+      "quantityCannotBeNegative": "الكمية لا يمكن أن تكون سالبة.",
+      "minStockCannotBeNegative": "الحد الأدنى للمخزون لا يمكن أن يكون سالباً.",
+      "thisActionCannotBeUndone": "لا يمكن التراجع عن هذا الإجراء.",
+      "notificationMarkedAsRead": "تم وضع الإشعار كـ مقروء.",
+      "checkBackLaterForUpdates": "تحقق لاحقاً من وجود تحديثات!",
+      "noNotificationsYet": "لا توجد إشعارات حتى الآن.",
+      "loginRequiredForNotifications": "تسجيل الدخول مطلوب لعرض الإشعارات.",
+      "somethingWentWrong": "حدث خطأ ما!"
 }

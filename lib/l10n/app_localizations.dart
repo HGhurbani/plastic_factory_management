@@ -13,7 +13,7 @@ class AppLocalizations {
 
   /// A convenience [LocalizationsDelegate] for this class.
   static const LocalizationsDelegate<AppLocalizations> delegate =
-      AppLocalizationsDelegate();
+  AppLocalizationsDelegate();
 
   String get loginTitle => _strings["loginTitle"] ?? "loginTitle";
   String get emailHint => _strings["emailHint"] ?? "emailHint";
@@ -297,6 +297,20 @@ class AppLocalizations {
   String get quickAccessModules => _strings["quickAccessModules"] ?? "quickAccessModules";
   String get statusConnected => _strings["statusConnected"] ?? "statusConnected";
   String get version => _strings["version"] ?? "version";
+
+  // Newly added getters to fix the reported errors
+  String get errorLoadingMaterials => _strings["errorLoadingMaterials"] ?? "errorLoadingMaterials";
+  String get technicalDetails => _strings["technicalDetails"] ?? "technicalDetails";
+  String get noRawMaterialsAvailable => _strings["noRawMaterialsAvailable"] ?? "noRawMaterialsAvailable";
+  String get tapToAddFirstMaterial => _strings["tapToAddFirstMaterial"] ?? "tapToAddFirstMaterial";
+  String get quantityCannotBeNegative => _strings["quantityCannotBeNegative"] ?? "quantityCannotBeNegative";
+  String get minStockCannotBeNegative => _strings["minStockCannotBeNegative"] ?? "minStockCannotBeNegative";
+  String get thisActionCannotBeUndone => _strings["thisActionCannotBeUndone"] ?? "thisActionCannotBeUndone";
+  String get notificationMarkedAsRead => _strings["notificationMarkedAsRead"] ?? "notificationMarkedAsRead";
+  String get checkBackLaterForUpdates => _strings["checkBackLaterForUpdates"] ?? "checkBackLaterForUpdates";
+  String get noNotificationsYet => _strings["noNotificationsYet"] ?? "noNotificationsYet";
+  String get loginRequiredForNotifications => _strings["loginRequiredForNotifications"] ?? "loginRequiredForNotifications";
+  String get somethingWentWrong => _strings["somethingWentWrong"] ?? "somethingWentWrong";
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

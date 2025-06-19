@@ -160,7 +160,7 @@ class NotificationsScreen extends StatelessWidget {
             ? null
             : IconButton( // Changed to IconButton for better visual cue
           icon: Icon(Icons.mark_email_unread_outlined, color: Theme.of(context).primaryColor),
-          tooltip: appLocalizations.markAsRead, // Tooltip for accessibility
+          // tooltip: appLocalizations.markAsRead, // Tooltip for accessibility
           onPressed: () {
             notificationUseCases.markAsRead(notif.id);
             ScaffoldMessenger.of(context).showSnackBar( // Show a snackbar on action
