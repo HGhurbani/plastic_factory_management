@@ -137,8 +137,25 @@ class ProductionOrderUseCases {
   }
 
   // Use case to approve a production order
-  Future<void> approveProductionOrder(ProductionOrderModel order, UserModel approver) async {
+  Future<void> approveProductionOrder(
+    ProductionOrderModel order,
+    UserModel approver, {
+    String? notes,
+    List<File>? attachments,
+  }) async {
     final updatedWorkflow = List<ProductionWorkflowStage>.from(order.workflowStages);
+
+    // Upload attachments if provided
+    List<String> uploaded = [];
+    if (attachments != null && attachments.isNotEmpty) {
+      for (final file in attachments) {
+        final url = await _uploadService.uploadFile(
+          file,
+          'production_approval/${order.id}_${DateTime.now().microsecondsSinceEpoch}.jpg',
+        );
+        if (url != null) uploaded.add(url);
+      }
+    }
 
     // 1. Update the 'pending_approval' stage to 'completed'
     final pendingApprovalIndex = updatedWorkflow.indexWhere(
@@ -146,10 +163,14 @@ class ProductionOrderUseCases {
     );
 
     if (pendingApprovalIndex != -1) {
-      updatedWorkflow[pendingApprovalIndex] = updatedWorkflow[pendingApprovalIndex].copyWith(
+      final currentStage = updatedWorkflow[pendingApprovalIndex];
+      updatedWorkflow[pendingApprovalIndex] = currentStage.copyWith(
         status: 'completed',
         completedAt: Timestamp.now(),
-        notes: 'تمت الموافقة على الطلب بواسطة ${approver.name}.',
+        notes: notes?.isNotEmpty == true
+            ? notes
+            : 'تمت الموافقة على الطلب بواسطة ${approver.name}.',
+        attachments: [...currentStage.attachments, ...uploaded],
       );
     } else {
       // Handle case where 'pending_approval' stage isn't found or not pending
