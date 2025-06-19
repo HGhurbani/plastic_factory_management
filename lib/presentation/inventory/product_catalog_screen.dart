@@ -171,7 +171,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
         _showProductDetailsDialog(context, appLocalizations, product);
       },
       child: Card(
-        elevation: 6, // Increased elevation for a more prominent card
+        elevation: 1, // Increased elevation for a more prominent card
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), // More rounded corners
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -217,6 +217,46 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                       ),
                     ),
                   ),
+                  // New: Three-dot menu for edit and delete
+                  Positioned(
+                    top: 8,
+                    left: 8, // Position on the left side
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.white, size: 24), // Three dots icon
+                      onSelected: (String result) {
+                        if (result == 'edit') {
+                          _showAddEditProductDialog(context, inventoryUseCases, appLocalizations, product: product);
+                        } else if (result == 'delete') {
+                          _showDeleteProductConfirmationDialog(context, inventoryUseCases, appLocalizations, product.id, product.name);
+                        }
+                      },
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              const Icon(Icons.edit, color: AppColors.primary),
+                              const SizedBox(width: 8),
+                              Text(appLocalizations.edit),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              const Icon(Icons.delete_outline, color: Colors.redAccent),
+                              const SizedBox(width: 8),
+                              Text(appLocalizations.delete),
+                            ],
+                          ),
+                        ),
+                      ],
+                      color: Colors.white, // Background color of the dropdown menu
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      elevation: 4,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -246,25 +286,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                       textAlign: TextAlign.right,
                     ),
                     const Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, size: 22, color: AppColors.primary),
-                          onPressed: () {
-                            _showAddEditProductDialog(context, inventoryUseCases, appLocalizations, product: product);
-                          },
-                          tooltip: appLocalizations.edit,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline, size: 22, color: Colors.redAccent), // Outline icon
-                          onPressed: () {
-                            _showDeleteProductConfirmationDialog(context, inventoryUseCases, appLocalizations, product.id, product.name);
-                          },
-                          tooltip: appLocalizations.delete,
-                        ),
-                      ],
-                    ),
+                    // Removed individual IconButton for edit and delete
                   ],
                 ),
               ),
@@ -949,65 +971,65 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
 
 }
 
-  void _showDeleteProductConfirmationDialog(
-      BuildContext context,
-      InventoryUseCases useCases,
-      AppLocalizations appLocalizations,
-      String productId,
-      String productName,
-      ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(appLocalizations.confirmDeletion, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-          content: Text(
-            '${appLocalizations.confirmDeleteProduct}: "$productName"?\n\n${appLocalizations.thisActionCannotBeUndone}',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16),
+void _showDeleteProductConfirmationDialog(
+    BuildContext context,
+    InventoryUseCases useCases,
+    AppLocalizations appLocalizations,
+    String productId,
+    String productName,
+    ) {
+  showDialog(
+    context: context,
+    builder: (BuildContext dialogContext) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(appLocalizations.confirmDeletion, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+        content: Text(
+          '${appLocalizations.confirmDeleteProduct}: "$productName"?\n\n${appLocalizations.thisActionCannotBeUndone}',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 16),
+        ),
+        actionsAlignment: MainAxisAlignment.spaceAround,
+        actions: <Widget>[
+          TextButton(
+            child: Text(appLocalizations.cancel),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
           ),
-          actionsAlignment: MainAxisAlignment.spaceAround,
-          actions: <Widget>[
-            TextButton(
-              child: Text(appLocalizations.cancel),
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
-            ),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.delete_forever),
-              label: Text(appLocalizations.delete),
-              onPressed: () async {
-                try {
-                  // Show loading indicator
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext loadingContext) {
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                  );
-                  await useCases.deleteProduct(productId);
-                  Navigator.of(context).pop(); // Pop the loading indicator
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.productDeletedSuccessfully)));
-                  Navigator.of(dialogContext).pop();
-                } catch (e) {
-                  Navigator.of(context).pop(); // Pop the loading indicator
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${appLocalizations.errorDeletingProduct}: ${e.toString()}')),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.delete_forever),
+            label: Text(appLocalizations.delete),
+            onPressed: () async {
+              try {
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
+                await useCases.deleteProduct(productId);
+                Navigator.of(context).pop(); // Pop the loading indicator
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.productDeletedSuccessfully)));
+                Navigator.of(dialogContext).pop();
+              } catch (e) {
+                Navigator.of(context).pop(); // Pop the loading indicator
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('${appLocalizations.errorDeletingProduct}: ${e.toString()}')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
-          ],
-        );
-      },
-    );
-  }
+          ),
+        ],
+      );
+    },
+  );
+}

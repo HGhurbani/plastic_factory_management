@@ -342,7 +342,7 @@
               "approvedBy": "بواسطة",
               "unknown": "مجهول",
               "warehouseManager": "أمين المخزن",
-               "expectedDeliveryTime": "وقت التسليم المتوقع"
+               "expectedDeliveryTime": "وقت التسليم المتوقع",
               "userManagement": "إدارة المستخدمين",
               "addUser": "إضافة مستخدم",
               "errorLoadingUsers": "خطأ في تحميل المستخدمين",

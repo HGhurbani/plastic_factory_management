@@ -1,7 +1,7 @@
 // plastic_factory_management/lib/presentation/management/user_management_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider';
+import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';

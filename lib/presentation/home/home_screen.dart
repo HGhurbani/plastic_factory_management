@@ -286,15 +286,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     // Modules for Factory Manager (مدير المصنع) - Full Access
     if (role == UserRole.factoryManager) {
-      modules.add(_buildModuleButton(
-        isComingSoon: true,
-        context: context,
-        title: appLocalizations.productionOrderManagement,
-        subtitle: "إدارة وتتبع الطلبات",
-        icon: Icons.factory,
-        color: moduleColors['production']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
-      ));
 
       modules.add(_buildModuleButton(
         context: context,
@@ -303,6 +294,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         icon: Icons.warehouse,
         color: moduleColors['inventory']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.rawMaterialsRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.salesOrders,
+        subtitle: "إدارة المبيعات",
+        icon: Icons.shopping_cart,
+        color: moduleColors['sales']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
       ));
 
       modules.add(_buildModuleButton(
@@ -326,6 +326,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       modules.add(_buildModuleButton(
         isComingSoon: true,
         context: context,
+        title: appLocalizations.productionOrderManagement,
+        subtitle: "إدارة وتتبع الطلبات",
+        icon: Icons.factory,
+        color: moduleColors['production']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        isComingSoon: true,
+        context: context,
         title: appLocalizations.operatorProfiles,
         subtitle: "ملفات المشغلين",
         icon: Icons.people,
@@ -343,14 +353,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.maintenanceProgramRoute),
       ));
 
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.salesOrders,
-        subtitle: "إدارة المبيعات",
-        icon: Icons.shopping_cart,
-        color: moduleColors['sales']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
-      ));
+
 
       modules.add(_buildModuleButton(
         context: context,
