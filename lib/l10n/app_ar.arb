@@ -340,5 +340,8 @@
               "machineRequired": "الآلة مطلوبة.",
               "enterActualTimeRequired": "الرجاء إدخال الوقت الفعلي المستغرق.",
               "approvedBy": "بواسطة",
-              "unknown": "مجهول"
+              "unknown": "مجهول",
+              "warehouseManager": "أمين المخزن",
+               "expectedDeliveryTime": "وقت التسليم المتوقع"
+
 }

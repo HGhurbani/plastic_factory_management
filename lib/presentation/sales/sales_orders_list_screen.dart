@@ -265,7 +265,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     final order = filteredOrders[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      elevation: 0, // More prominent card
+                      elevation: 1, // More prominent card
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: InkWell( // Use InkWell for better visual feedback on tap
                         onTap: () {

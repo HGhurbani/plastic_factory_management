@@ -120,7 +120,7 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
               final machine = snapshot.data![index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 6, // Increased elevation for prominence
+                elevation: 1, // Increased elevation for prominence
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
                 child: InkWell( // Added InkWell for tap feedback
                   onTap: () {
