@@ -301,4 +301,6 @@
   ,"orderFlowDetails": "تفاصيل الإعتمادات"
   ,"approvedBy": "اعتمد بواسطة"
   ,"approvalTime": "وقت الاعتماد"
+  ,"moldInstallationTasks": "مهام تركيب القوالب"
+  ,"noMoldInstallationOrders": "لا توجد طلبات بانتظار تركيب القوالب"
 }

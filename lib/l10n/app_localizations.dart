@@ -284,6 +284,15 @@ class AppLocalizations {
   String get orderFlowDetails => _strings["orderFlowDetails"] ?? "orderFlowDetails";
   String get approvedBy => _strings["approvedBy"] ?? "approvedBy";
   String get approvalTime => _strings["approvalTime"] ?? "approvalTime";
+  String get moldInstallationTasks => _strings["moldInstallationTasks"] ?? "moldInstallationTasks";
+  String get noMoldInstallationOrders => _strings["noMoldInstallationOrders"] ?? "noMoldInstallationOrders";
+  String get loadingData => _strings["loadingData"] ?? "loadingData";
+  String get errorLoadingUserData => _strings["errorLoadingUserData"] ?? "errorLoadingUserData";
+  String get pleaseReauthenticate => _strings["pleaseReauthenticate"] ?? "pleaseReauthenticate";
+  String get reauthenticate => _strings["reauthenticate"] ?? "reauthenticate";
+  String get quickAccessModules => _strings["quickAccessModules"] ?? "quickAccessModules";
+  String get statusConnected => _strings["statusConnected"] ?? "statusConnected";
+  String get version => _strings["version"] ?? "version";
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

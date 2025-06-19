@@ -52,6 +52,15 @@ class ProductionOrderUseCases {
     });
   }
 
+  // Orders awaiting mold installation supervisor receipt
+  Stream<List<ProductionOrderModel>> getOrdersAwaitingMoldInstallation() {
+    return repository.getProductionOrders().map((orders) {
+      return orders.where((order) =>
+          order.currentStage == 'استلام مشرف تركيب القوالب' &&
+          order.status == ProductionOrderStatus.approved).toList();
+    });
+  }
+
   Future<ProductionOrderModel?> getProductionOrderById(String orderId) {
     return repository.getProductionOrderById(orderId);
   }
