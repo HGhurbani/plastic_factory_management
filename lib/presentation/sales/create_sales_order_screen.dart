@@ -8,6 +8,7 @@ import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
+import 'package:plastic_factory_management/theme/app_colors.dart';
 import 'package:signature/signature.dart'; // للتوقيع الرقمي
 import 'dart:io'; // لاستخدام File
 import 'dart:typed_data'; // لاستخدام Uint8List
@@ -317,7 +318,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.edit, color: Colors.blue),
+                            icon: Icon(Icons.edit, color: AppColors.primary),
                             onPressed: () => _addOrUpdateOrderItem(appLocalizations, salesUseCases, existingItem: item, index: index),
                           ),
                           IconButton(

@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/core/services/auth_service.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/presentation/routes/app_router.dart';
+import 'package:plastic_factory_management/theme/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -264,7 +265,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           child: const Icon(
             Icons.factory,
             size: 40,
-            color: Colors.blue,
+            color: AppColors.primary,
           ),
         ),
         const SizedBox(height: 16),
@@ -348,7 +349,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       style: const TextStyle(fontSize: 16),
       decoration: InputDecoration(
         labelText: appLocalizations.emailHint,
-        prefixIcon: const Icon(Icons.email_outlined, color: Colors.blue),
+        prefixIcon: const Icon(Icons.email_outlined, color: AppColors.primary),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -359,7 +360,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blue, width: 2),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         filled: true,
         fillColor: Colors.grey.shade50,
@@ -387,7 +388,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       obscureText: _obscurePassword,
       decoration: InputDecoration(
         labelText: appLocalizations.passwordHint,
-        prefixIcon: const Icon(Icons.lock_outline, color: Colors.blue),
+        prefixIcon: const Icon(Icons.lock_outline, color: AppColors.primary),
         suffixIcon: IconButton(
           icon: Icon(
             _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -409,7 +410,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blue, width: 2),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
         filled: true,
         fillColor: Colors.grey.shade50,
@@ -460,11 +461,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(
-          colors: [Colors.blue, Colors.blueAccent],
+          colors: AppColors.gradient,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
+            color: AppColors.primary.withOpacity(0.3),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -494,6 +495,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontFamily: 'Tajawal',
           ),
         ),
       ),
@@ -529,7 +531,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               children: [
                 Icon(
                   _showQuickLogin ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                  color: Colors.blue,
+                  color: AppColors.primary,
                 ),
                 const SizedBox(width: 8),
                 const Text(
@@ -537,13 +539,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.blue,
+                    color: AppColors.primary,
                   ),
                 ),
                 const SizedBox(width: 8),
                 const Icon(
                   Icons.speed,
-                  color: Colors.blue,
+                  color: AppColors.primary,
                   size: 20,
                 ),
               ],

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFFE68A75);
-  static const Color dark = Color(0xFF423839);
+  /// Main brand color used across the app (gradient start).
+  static const Color primary = Color(0xFFDE6D4D);
+
+  /// Secondary brand color used for gradients and dark elements.
+  static const Color dark = Color(0xFF848484);
+
+  /// Convenient list of gradient colors following the brand scheme.
+  static const List<Color> gradient = [primary, dark];
 
   static MaterialColor get primarySwatch => _createMaterialColor(primary);
 
