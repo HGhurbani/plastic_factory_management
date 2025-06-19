@@ -284,6 +284,8 @@ class AppLocalizations {
   String get orderFlowDetails => _strings["orderFlowDetails"] ?? "orderFlowDetails";
   String get approvedBy => _strings["approvedBy"] ?? "approvedBy";
   String get approvalTime => _strings["approvalTime"] ?? "approvalTime";
+  String get moldInstallationTasks => _strings["moldInstallationTasks"] ?? "moldInstallationTasks";
+  String get noMoldInstallationOrders => _strings["noMoldInstallationOrders"] ?? "noMoldInstallationOrders";
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
