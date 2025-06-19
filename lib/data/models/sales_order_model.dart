@@ -7,6 +7,7 @@ enum SalesOrderStatus {
   pendingApproval,    // بانتظار اعتماد المحاسب
   pendingFulfillment, // بانتظار قرار منسق طلبات الإنتاج
   warehouseProcessing, // لدى أمين المخزن للتجهيز
+  awaitingMoldApproval, // بانتظار اعتماد مشرف القوالب
   inProduction,       // قيد الإنتاج بعد تحديد موعد التسليم
   fulfilled,          // تم التوريد
   canceled,           // ملغي
@@ -22,6 +23,8 @@ extension SalesOrderStatusExtension on SalesOrderStatus {
         return 'بانتظار منسق الطلبات';
       case SalesOrderStatus.warehouseProcessing:
         return 'قيد التحضير بالمخزن';
+      case SalesOrderStatus.awaitingMoldApproval:
+        return 'بانتظار اعتماد القوالب';
       case SalesOrderStatus.inProduction:
         return 'قيد الإنتاج';
       case SalesOrderStatus.fulfilled:
@@ -54,12 +57,14 @@ class SalesOrderItem {
   final String productName; // اسم المنتج
   final int quantity; // الكمية المطلوبة
   final double unitPrice; // سعر الوحدة (يمكن أن يتغير مع الزمن)
+  final String? quantityUnit; // وحدة القياس للكمية
 
   SalesOrderItem({
     required this.productId,
     required this.productName,
     required this.quantity,
     required this.unitPrice,
+    this.quantityUnit,
   });
 
   factory SalesOrderItem.fromMap(Map<String, dynamic> map) {
@@ -68,6 +73,7 @@ class SalesOrderItem {
       productName: map['productName'] ?? '',
       quantity: map['quantity'] ?? 0,
       unitPrice: (map['unitPrice'] as num?)?.toDouble() ?? 0.0,
+      quantityUnit: map['quantityUnit'],
     );
   }
 
@@ -77,6 +83,7 @@ class SalesOrderItem {
       'productName': productName,
       'quantity': quantity,
       'unitPrice': unitPrice,
+      'quantityUnit': quantityUnit,
     };
   }
 }
