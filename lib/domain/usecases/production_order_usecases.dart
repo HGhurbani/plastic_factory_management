@@ -312,6 +312,44 @@ class ProductionOrderUseCases {
     await repository.updateProductionOrder(updatedOrder);
   }
 
+  // Use case for a supervisor to reject a pending stage
+  Future<void> rejectStage({
+    required ProductionOrderModel order,
+    required String stageName,
+    required UserModel responsibleUser,
+    required String reason,
+  }) async {
+    final updatedWorkflow = List<ProductionWorkflowStage>.from(order.workflowStages);
+
+    // Find the stage to update
+    final stageIndex = updatedWorkflow.indexWhere(
+      (stage) => stage.stageName == stageName && stage.status == 'pending',
+    );
+    if (stageIndex == -1) {
+      throw Exception('Stage "$stageName" not found or not pending for rejection.');
+    }
+
+    updatedWorkflow[stageIndex] = updatedWorkflow[stageIndex].copyWith(
+      status: 'failed',
+      completedAt: Timestamp.now(),
+      notes: 'تم الرفض بواسطة ${responsibleUser.name}. السبب: $reason',
+    );
+
+    final updatedOrder = order.copyWith(
+      status: ProductionOrderStatus.rejected,
+      rejectionReason: reason,
+      workflowStages: updatedWorkflow,
+      currentStage: stageName,
+    );
+    await repository.updateProductionOrder(updatedOrder);
+
+    await notificationUseCases.sendNotification(
+      userId: order.orderPreparerUid,
+      title: 'تم رفض مرحلة في الطلب',
+      message: 'تم رفض مرحلة $stageName للطلب رقم ${order.batchNumber}. السبب: $reason',
+    );
+  }
+
   // Use case to mark a stage as started (e.g., machine operator starts work)
   Future<void> startProductionStage({
     required ProductionOrderModel order,

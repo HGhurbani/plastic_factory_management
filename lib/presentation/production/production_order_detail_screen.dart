@@ -105,9 +105,20 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
 
     // Mold Installation Supervisor actions
     if (currentUser.userRoleEnum == UserRole.moldInstallationSupervisor && currentActiveStage.stageName == 'استلام مشرف تركيب القوالب' && currentActiveStage.status == 'pending') {
-      return ElevatedButton(
-        onPressed: () => _showAcceptResponsibilityDialog(context, order, 'استلام مشرف تركيب القوالب', currentUser, useCases, true),
-        child: Text(appLocalizations.acceptResponsibility),
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            onPressed: () => _showAcceptResponsibilityDialog(context, order, 'استلام مشرف تركيب القوالب', currentUser, useCases, true),
+            child: Text(appLocalizations.acceptResponsibility),
+          ),
+          const SizedBox(width: 16),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => _showRejectStageDialog(context, order, 'استلام مشرف تركيب القوالب', currentUser, useCases),
+            child: Text(appLocalizations.reject),
+          ),
+        ],
       );
     }
     if (currentUser.userRoleEnum == UserRole.moldInstallationSupervisor && currentActiveStage.stageName == 'استلام مشرف تركيب القوالب' && currentActiveStage.status == 'accepted') {
@@ -559,6 +570,77 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
               ],
             );
           },
+        );
+      },
+    );
+  }
+
+  Future<void> _showRejectStageDialog(
+      BuildContext context,
+      ProductionOrderModel order,
+      String stageName,
+      UserModel currentUser,
+      ProductionOrderUseCases useCases,) async {
+    final TextEditingController reasonController = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final appLocalizations = AppLocalizations.of(context)!;
+        return AlertDialog(
+          title: Text(appLocalizations.rejectStageConfirmation),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('${appLocalizations.confirmRejectStage} "$stageName"؟'),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: reasonController,
+                decoration: InputDecoration(
+                  labelText: appLocalizations.rejectionReason,
+                  border: const OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                textAlign: TextAlign.right,
+                textDirection: TextDirection.rtl,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(appLocalizations.cancel),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: Text(appLocalizations.reject),
+              onPressed: () async {
+                if (reasonController.text.isEmpty) {
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    SnackBar(content: Text(appLocalizations.rejectionReasonRequired)),
+                  );
+                  return;
+                }
+                Navigator.of(dialogContext).pop();
+                try {
+                  await useCases.rejectStage(
+                    order: order,
+                    stageName: stageName,
+                    responsibleUser: currentUser,
+                    reason: reasonController.text,
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${appLocalizations.stageRejectedSuccessfully}$stageName')),
+                  );
+                  setState(() {});
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${appLocalizations.errorRejectingStage}: $e')),
+                  );
+                  print('Error rejecting stage: $e');
+                }
+              },
+            ),
+          ],
         );
       },
     );

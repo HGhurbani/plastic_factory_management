@@ -147,6 +147,10 @@ class AppLocalizations {
   String get start => _strings["start"] ?? "start";
   String get productionStartedSuccessfully => _strings["productionStartedSuccessfully"] ?? "productionStartedSuccessfully";
   String get errorStartingProduction => _strings["errorStartingProduction"] ?? "errorStartingProduction";
+  String get rejectStageConfirmation => _strings["rejectStageConfirmation"] ?? "rejectStageConfirmation";
+  String get confirmRejectStage => _strings["confirmRejectStage"] ?? "confirmRejectStage";
+  String get stageRejectedSuccessfully => _strings["stageRejectedSuccessfully"] ?? "stageRejectedSuccessfully";
+  String get errorRejectingStage => _strings["errorRejectingStage"] ?? "errorRejectingStage";
   String get addRawMaterial => _strings["addRawMaterial"] ?? "addRawMaterial";
   String get editRawMaterial => _strings["editRawMaterial"] ?? "editRawMaterial";
   String get materialName => _strings["materialName"] ?? "materialName";
