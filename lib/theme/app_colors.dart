@@ -1,3 +1,5 @@
+// plastic_factory_management/lib/theme/app_colors.dart
+
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -9,6 +11,9 @@ class AppColors {
 
   /// Convenient list of gradient colors following the brand scheme.
   static const List<Color> gradient = [primary, dark];
+
+  // Newly added color
+  static const Color lightGrey = Color(0xFFF5F5F5);
 
   static MaterialColor get primarySwatch => _createMaterialColor(primary);
 

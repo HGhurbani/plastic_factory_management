@@ -1,3 +1,5 @@
+// plastic_factory_management/lib/l10n/app_localizations.dart
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -297,8 +299,6 @@ class AppLocalizations {
   String get quickAccessModules => _strings["quickAccessModules"] ?? "quickAccessModules";
   String get statusConnected => _strings["statusConnected"] ?? "statusConnected";
   String get version => _strings["version"] ?? "version";
-
-  // Newly added getters to fix the reported errors
   String get errorLoadingMaterials => _strings["errorLoadingMaterials"] ?? "errorLoadingMaterials";
   String get technicalDetails => _strings["technicalDetails"] ?? "technicalDetails";
   String get noRawMaterialsAvailable => _strings["noRawMaterialsAvailable"] ?? "noRawMaterialsAvailable";
@@ -311,6 +311,25 @@ class AppLocalizations {
   String get noNotificationsYet => _strings["noNotificationsYet"] ?? "noNotificationsYet";
   String get loginRequiredForNotifications => _strings["loginRequiredForNotifications"] ?? "loginRequiredForNotifications";
   String get somethingWentWrong => _strings["somethingWentWrong"] ?? "somethingWentWrong";
+
+  // Newly added getters for product catalog screen
+  String get errorLoadingProducts => _strings["errorLoadingProducts"] ?? "errorLoadingProducts";
+  String get noProductsAvailable => _strings["noProductsAvailable"] ?? "noProductsAvailable";
+  String get tapToAddFirstProduct => _strings["tapToAddFirstProduct"] ?? "tapToAddFirstProduct";
+  String get unknownMaterial => _strings["unknownMaterial"] ?? "unknownMaterial";
+  String get invalidNumberPositive => _strings["invalidNumberPositive"] ?? "invalidNumberPositive";
+  String get errorLoadingSalesOrders => _strings["errorLoadingSalesOrders"] ?? "errorLoadingSalesOrders";
+  String get noSalesOrdersAvailable => _strings["noSalesOrdersAvailable"] ?? "noSalesOrdersAvailable";
+  String get noSalesOrdersWithFilter => _strings["noSalesOrdersWithFilter"] ?? "noSalesOrdersWithFilter";
+  String get orderDate => _strings["orderDate"] ?? "orderDate";
+  String get approvalDate => _strings["approvalDate"] ?? "approvalDate";
+  String get signatureColon => _strings["signatureColon"] ?? "signatureColon";
+  String get attachmentsColon => _strings["attachmentsColon"] ?? "attachmentsColon";
+  String get selectStorekeeper => _strings["selectStorekeeper"] ?? "selectStorekeeper";
+  String get selectMachineForOrder => _strings["selectMachineForOrder"] ?? "selectMachineForOrder";
+  String get machineRequired => _strings["machineRequired"] ?? "machineRequired";
+  String get enterActualTimeRequired => _strings["enterActualTimeRequired"] ?? "enterActualTimeRequired";
+
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

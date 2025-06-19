@@ -14,9 +14,11 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'create_sales_order_screen.dart';
-import '../../theme/app_colors.dart';
+import '../../theme/app_colors.dart'; // Ensure this defines your app's color scheme
 
 class SalesOrdersListScreen extends StatefulWidget {
+  const SalesOrdersListScreen({super.key});
+
   @override
   _SalesOrdersListScreenState createState() => _SalesOrdersListScreenState();
 }
@@ -33,8 +35,32 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
 
     if (currentUser == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(appLocalizations.salesOrders)),
-        body: Center(child: Text('لا يمكن عرض الطلبات بدون بيانات المستخدم.')),
+        appBar: AppBar(
+          title: Text(appLocalizations.salesOrders),
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.person_off_outlined, // More descriptive icon
+                  size: 80,
+                  color: Colors.grey[400],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  appLocalizations.loginRequiredToViewOrders, // New localization key
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 
@@ -43,17 +69,23 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         currentUser.userRoleEnum == UserRole.productionManager ||
         currentUser.userRoleEnum == UserRole.accountant;
     final bool isAccountant = currentUser.userRoleEnum == UserRole.accountant;
+    final bool isProductionOrderPreparer = currentUser.userRoleEnum == UserRole.productionOrderPreparer;
+    final bool isInventoryManager = currentUser.userRoleEnum == UserRole.inventoryManager;
+    final bool isMoldInstallationSupervisor = currentUser.userRoleEnum == UserRole.moldInstallationSupervisor;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(appLocalizations.salesOrders),
         centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           if (isSalesRepresentative)
             IconButton(
-              icon: Icon(Icons.add),
+              icon: const Icon(Icons.add_shopping_cart_outlined), // More specific icon
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreateSalesOrderScreen()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CreateSalesOrderScreen()));
               },
               tooltip: appLocalizations.createSalesOrder,
             ),
@@ -61,9 +93,9 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       ),
       body: Column(
         children: [
-          // Filter buttons (visible for managers and sales reps)
+          // Filter chips
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -104,6 +136,16 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       _selectedStatusFilter = value;
                     });
                   }),
+                  _buildFilterChip(appLocalizations.warehouseProcessing, SalesOrderStatus.warehouseProcessing.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                  _buildFilterChip(appLocalizations.awaitingMoldApproval, SalesOrderStatus.awaitingMoldApproval.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
                 ],
               ),
             ),
@@ -111,26 +153,110 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           Expanded(
             child: StreamBuilder<List<SalesOrderModel>>(
               stream: isSalesRepresentative
-                  ? salesUseCases.getSalesOrders(salesRepUid: currentUser.uid) // Only show own orders
-                  : salesUseCases.getSalesOrders(), // Managers see all orders
+                  ? salesUseCases.getSalesOrders(salesRepUid: currentUser.uid)
+                  : salesUseCases.getSalesOrders(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text('خطأ في تحميل طلبات المبيعات: ${snapshot.error}'));
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error_outline, color: Colors.red, size: 60),
+                          const SizedBox(height: 16),
+                          Text(
+                            appLocalizations.errorLoadingSalesOrders,
+                            style: const TextStyle(fontSize: 18, color: Colors.red),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${appLocalizations.technicalDetails}: ${snapshot.error}',
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 }
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('لا توجد طلبات مبيعات لعرضها.'));
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.assignment_outlined, color: Colors.grey[400], size: 80),
+                          const SizedBox(height: 16),
+                          Text(
+                            appLocalizations.noSalesOrdersAvailable,
+                            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          if (isSalesRepresentative)
+                            Text(
+                              appLocalizations.tapToAddFirstOrder, // New localization key
+                              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                              textAlign: TextAlign.center,
+                            ),
+                          if (isSalesRepresentative) const SizedBox(height: 24),
+                          if (isSalesRepresentative)
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CreateSalesOrderScreen()));
+                              },
+                              icon: const Icon(Icons.add),
+                              label: Text(appLocalizations.createSalesOrder),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                textStyle: const TextStyle(fontSize: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
                 }
 
-                // Apply status filter
                 final List<SalesOrderModel> filteredOrders = _selectedStatusFilter == 'all'
                     ? snapshot.data!
                     : snapshot.data!.where((order) => order.status.toFirestoreString() == _selectedStatusFilter).toList();
 
                 if (filteredOrders.isEmpty) {
-                  return Center(child: Text('لا توجد طلبات مبيعات بهذا الفلتر.'));
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.filter_alt_off, color: Colors.grey[400], size: 80),
+                          const SizedBox(height: 16),
+                          Text(
+                            appLocalizations.noSalesOrdersWithFilter,
+                            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            appLocalizations.tryDifferentFilter, // New localization key
+                            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 }
 
                 return ListView.builder(
@@ -139,48 +265,69 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     final order = filteredOrders[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      elevation: 3,
-                      child: ListTile(
+                      elevation: 6, // More prominent card
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: InkWell( // Use InkWell for better visual feedback on tap
                         onTap: () {
                           _showSalesOrderDetailDialog(context, appLocalizations, order);
                         },
-                        title: Text(
-                          'طلب العميل: ${order.customerName}',
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${appLocalizations.totalAmount}: \$${order.totalAmount.toStringAsFixed(2)}',
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                            ),
-                            Text(
-                              '${appLocalizations.salesRepresentative}: ${order.salesRepresentativeName}',
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                            ),
-                            Text(
-                              '${appLocalizations.status}: ${order.status.toArabicString()}',
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                color: _getSalesOrderStatusColor(order.status),
-                                fontWeight: FontWeight.bold,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0), // Padding inside the card
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Order ID and Status at top
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: _getSalesOrderStatusColor(order.status).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      order.status.toArabicString(),
+                                      style: TextStyle(
+                                        color: _getSalesOrderStatusColor(order.status),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    '#${order.id.substring(0, 6)}', // Short ID for card
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+                                    textDirection: TextDirection.rtl,
+                                  ),
+                                ],
                               ),
-                            ),
-                            Text(
-                              'تاريخ الطلب: ${intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate())}',
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                            ),
-                          ],
+                              const Divider(height: 16), // Separator
+                              _buildInfoRow(appLocalizations.customerName, order.customerName, icon: Icons.person_outline),
+                              _buildInfoRow(appLocalizations.salesRepresentative, order.salesRepresentativeName, icon: Icons.badge_outlined),
+                              _buildInfoRow(appLocalizations.totalAmount, '\$${order.totalAmount.toStringAsFixed(2)}', icon: Icons.attach_money, isBold: true),
+                              _buildInfoRow(appLocalizations.orderDate, intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate()), icon: Icons.calendar_today_outlined),
+                              const SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.bottomLeft, // Align actions to bottom left for RTL
+                                child: _buildTrailingActions(
+                                  context,
+                                  order,
+                                  currentUser,
+                                  salesUseCases,
+                                  productionUseCases,
+                                  appLocalizations,
+                                  isManager,
+                                  isAccountant,
+                                  isProductionOrderPreparer,
+                                  isInventoryManager,
+                                  isMoldInstallationSupervisor,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        trailing: _buildTrailingActions(context, order, currentUser, salesUseCases, productionUseCases, appLocalizations, isManager, isAccountant),
                       ),
                     );
                   },
@@ -204,11 +351,12 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             onSelected(value);
           }
         },
-        selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+        selectedColor: AppColors.primary.withOpacity(0.2), // Use AppColors
         labelStyle: TextStyle(
-          color: selectedValue == value ? Theme.of(context).primaryColor : Colors.black87,
+          color: selectedValue == value ? AppColors.primary : Colors.black87,
           fontWeight: selectedValue == value ? FontWeight.bold : FontWeight.normal,
         ),
+        elevation: selectedValue == value ? 4 : 1, // Add elevation when selected
       ),
     );
   }
@@ -221,86 +369,118 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       ProductionOrderUseCases productionUseCases,
       AppLocalizations appLocalizations,
       bool isManager,
-      bool isAccountant) {
+      bool isAccountant,
+      bool isProductionOrderPreparer,
+      bool isInventoryManager,
+      bool isMoldInstallationSupervisor) {
+    List<Widget> actions = [];
+
+    // Common actions (e.g., delete for sales representative, or maybe for managers)
+    if (currentUser.userRoleEnum == UserRole.salesRepresentative &&
+        (order.status == SalesOrderStatus.pendingApproval || order.status == SalesOrderStatus.rejected)) {
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+          onPressed: () => _showDeleteOrderConfirmationDialog(context, useCases, appLocalizations, order.id, order.customerName),
+          tooltip: appLocalizations.delete,
+        ),
+      );
+    }
+
+    // Role-specific actions
     if (isAccountant && order.status == SalesOrderStatus.pendingApproval) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.check, color: Colors.green),
-            onPressed: () => _showApproveDialog(context, useCases, appLocalizations, order),
-            tooltip: appLocalizations.approve,
-          ),
-          IconButton(
-            icon: const Icon(Icons.close, color: Colors.red),
-            onPressed: () => _showRejectDialog(context, useCases, appLocalizations, order),
-            tooltip: appLocalizations.reject,
-          ),
-        ],
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+          onPressed: () => _showApproveDialog(context, useCases, appLocalizations, order),
+          tooltip: appLocalizations.approve,
+        ),
       );
-    }
-    if (currentUser.userRoleEnum == UserRole.productionOrderPreparer &&
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.cancel_outlined, color: Colors.red),
+          onPressed: () => _showRejectDialog(context, useCases, appLocalizations, order),
+          tooltip: appLocalizations.reject,
+        ),
+      );
+    } else if (isProductionOrderPreparer &&
         order.status == SalesOrderStatus.pendingFulfillment) {
-      return IconButton(
-        icon: const Icon(Icons.local_shipping, color: AppColors.primary),
-        onPressed: () => _showInitiateSupplyDialog(
-            context, useCases, appLocalizations, order, currentUser),
-        tooltip: appLocalizations.initiateSupply,
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.local_shipping_outlined, color: AppColors.primary),
+          onPressed: () => _showInitiateSupplyDialog(
+              context, useCases, appLocalizations, order, currentUser),
+          tooltip: appLocalizations.initiateSupply,
+        ),
       );
-    }
-    if (currentUser.userRoleEnum == UserRole.inventoryManager && order.status == SalesOrderStatus.warehouseProcessing) {
-      return IconButton(
-        icon: const Icon(Icons.camera_alt, color: Colors.orange),
-        onPressed: () => _showWarehouseDocDialog(context, useCases, appLocalizations, order, currentUser),
-        tooltip: appLocalizations.warehouseDocumentation,
+    } else if (isInventoryManager && order.status == SalesOrderStatus.warehouseProcessing) {
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.receipt_long_outlined, color: AppColors.secondary),
+          onPressed: () => _showWarehouseDocDialog(context, useCases, appLocalizations, order, currentUser),
+          tooltip: appLocalizations.warehouseDocumentation,
+        ),
       );
-    }
-    if (isManager && order.status == SalesOrderStatus.pendingFulfillment) {
-      return IconButton(
-        icon: const Icon(Icons.check_circle, color: Colors.green),
-        onPressed: () {
-          _showFulfillOrderDialog(context, useCases, appLocalizations, order.id, order.customerName);
-        },
-        tooltip: appLocalizations.markAsFulfilled,
+    } else if (isManager && order.status == SalesOrderStatus.warehouseProcessing) { // Manager can also fulfill after warehouse processing
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.done_all, color: Colors.green),
+          onPressed: () {
+            _showFulfillOrderDialog(context, useCases, appLocalizations, order.id, order.customerName);
+          },
+          tooltip: appLocalizations.markAsFulfilled,
+        ),
       );
-    }
-    if (currentUser.userRoleEnum == UserRole.moldInstallationSupervisor) {
-      if (!order.moldTasksEnabled) {
-        return IconButton(
-          icon: const Icon(Icons.check_circle, color: Colors.green),
+    } else if (isMoldInstallationSupervisor &&
+        order.status == SalesOrderStatus.awaitingMoldApproval) {
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.check_circle_outline, color: Colors.green),
           onPressed: () => _showMoldApprovalDialog(
               context, useCases, productionUseCases, appLocalizations, order, currentUser),
-          tooltip: appLocalizations.approve,
-        );
-      } else {
-        return IconButton(
-          icon: const Icon(Icons.camera_alt, color: AppColors.dark),
+          tooltip: appLocalizations.approveMoldTasks, // New localization
+        ),
+      );
+    } else if (isMoldInstallationSupervisor && order.moldTasksEnabled) {
+      // This is for documenting the mold installation
+      actions.add(
+        IconButton(
+          icon: const Icon(Icons.camera_alt_outlined, color: AppColors.dark),
           onPressed: () => _showMoldDocDialog(context, useCases, appLocalizations, order),
           tooltip: appLocalizations.moldInstallationDocumentation,
-        );
-      }
+        ),
+      );
     }
-    return const SizedBox.shrink();
+
+    // If there are actions, wrap them in a Row. Otherwise, return an empty SizedBox.
+    return actions.isNotEmpty
+        ? Row(
+      mainAxisSize: MainAxisSize.min,
+      children: actions,
+    )
+        : const SizedBox.shrink();
   }
 
   Color _getSalesOrderStatusColor(SalesOrderStatus status) {
     switch (status) {
       case SalesOrderStatus.pendingApproval:
-        return AppColors.dark;
+        return AppColors.accentOrange; // Defined in AppColors if available
       case SalesOrderStatus.pendingFulfillment:
-        return Colors.orange;
+        return AppColors.secondary; // Use a distinct color for this stage
       case SalesOrderStatus.warehouseProcessing:
-        return Colors.blue;
+        return Colors.blue.shade700;
       case SalesOrderStatus.inProduction:
-        return Colors.deepPurple;
+        return Colors.deepPurple.shade700;
       case SalesOrderStatus.fulfilled:
-        return Colors.green;
+        return Colors.green.shade700;
       case SalesOrderStatus.canceled:
-        return Colors.red;
+        return Colors.red.shade700;
       case SalesOrderStatus.rejected:
-        return Colors.redAccent;
+        return Colors.red.shade900;
+      case SalesOrderStatus.awaitingMoldApproval:
+        return Colors.brown.shade600; // New status color
       default:
-        return Colors.grey;
+        return Colors.grey.shade600;
     }
   }
 
@@ -309,75 +489,126 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text('${appLocalizations.salesOrder}: ${order.id.substring(0, 6)}...', textAlign: TextAlign.right),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+          contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          title: Text(
+            '${appLocalizations.salesOrder} #${order.id.substring(0, 6)}...',
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _buildDetailRow(appLocalizations.customerName, order.customerName),
-                _buildDetailRow(appLocalizations.salesRepresentative, order.salesRepresentativeName),
-                _buildDetailRow(appLocalizations.totalAmount, '\$${order.totalAmount.toStringAsFixed(2)}'),
-                _buildDetailRow(appLocalizations.status, order.status.toArabicString(), textColor: _getSalesOrderStatusColor(order.status), isBold: true),
-                _buildDetailRow('تاريخ الطلب', intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate())),
-                SizedBox(height: 16),
-                Text(appLocalizations.orderItems, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textAlign: TextAlign.right),
+                _buildInfoRow(appLocalizations.customerName, order.customerName, icon: Icons.person),
+                _buildInfoRow(appLocalizations.salesRepresentative, order.salesRepresentativeName, icon: Icons.badge),
+                _buildInfoRow(appLocalizations.totalAmount, '\$${order.totalAmount.toStringAsFixed(2)}', icon: Icons.monetization_on, isBold: true, textColor: AppColors.primary),
+                _buildInfoRow(appLocalizations.status, order.status.toArabicString(), icon: Icons.info_outline, textColor: _getSalesOrderStatusColor(order.status), isBold: true),
+                _buildInfoRow(appLocalizations.orderDate, intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate()), icon: Icons.date_range),
+                const SizedBox(height: 16),
+                Text(appLocalizations.orderItems, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), textAlign: TextAlign.right),
+                const Divider(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: order.orderItems.map((item) => Text(
-                    '${item.productName} - ${item.quantity} ${appLocalizations.quantityUnit} @ \$${item.unitPrice.toStringAsFixed(2)}', // أضف وحدة الكمية
-                    textAlign: TextAlign.right,
-                    textDirection: TextDirection.rtl,
+                  children: order.orderItems.map((item) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      '${item.productName} - ${item.quantity} ${item.quantityUnit ?? appLocalizations.units} @ \$${item.unitPrice.toStringAsFixed(2)}', // Use item.quantityUnit if available
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                    ),
                   )).toList(),
                 ),
-                if (order.customerSignatureUrl != null)
+                if (order.customerSignatureUrl != null && order.customerSignatureUrl!.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(appLocalizations.customerSignature, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textAlign: TextAlign.right),
-                        SizedBox(height: 8),
-                        Image.network(
-                          order.customerSignatureUrl!,
-                          height: 100,
-                          width: double.infinity,
-                          fit: BoxFit.contain,
+                        Text(appLocalizations.customerSignature, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), textAlign: TextAlign.right),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            order.customerSignatureUrl!,
+                            height: 120,
+                            width: double.infinity,
+                            fit: BoxFit.contain,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(child: CircularProgressIndicator(value: loadingProgress.progress));
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                                Container(
+                                  height: 120,
+                                  color: Colors.grey[200],
+                                  child: Center(child: Icon(Icons.broken_image, size: 50, color: Colors.grey[400])),
+                                ),
+                          ),
                         ),
                       ],
                     ),
                   ),
                 const SizedBox(height: 16),
-                Text(appLocalizations.orderFlowDetails, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16), textAlign: TextAlign.right),
+                Text(appLocalizations.orderFlowDetails, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), textAlign: TextAlign.right),
+                const Divider(),
                 if (order.approvedAt != null)
-                  _buildDetailRow(appLocalizations.approvalTime, intl.DateFormat('yyyy-MM-dd HH:mm').format(order.approvedAt!.toDate())),
-                if (order.warehouseManagerName != null)
-                  _buildDetailRow(appLocalizations.warehouseDocumentation, order.warehouseManagerName!),
+                  _buildInfoRow(
+                    appLocalizations.approvalTime,
+                    '${intl.DateFormat('yyyy-MM-dd HH:mm').format(order.approvedAt!.toDate())} ${appLocalizations.approvedBy} ${order.approvedByUid ?? appLocalizations.unknown}',
+                    icon: Icons.check_circle_outline,
+                  ),
+                if (order.warehouseManagerName != null && order.warehouseManagerName!.isNotEmpty)
+                  _buildInfoRow(appLocalizations.warehouseManager, order.warehouseManagerName!, icon: Icons.warehouse),
                 if (order.warehouseNotes != null && order.warehouseNotes!.isNotEmpty)
-                  _buildDetailRow(appLocalizations.warehouseNotes, order.warehouseNotes!),
-                if (order.warehouseImages.isNotEmpty)
+                  _buildInfoRow(appLocalizations.warehouseNotes, order.warehouseNotes!, icon: Icons.notes),
+                if (order.warehouseImages.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(appLocalizations.warehouseImages, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15), textAlign: TextAlign.right),
+                  const SizedBox(height: 4),
                   Wrap(
-                    children: order.warehouseImages.map((e) => Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Image.network(e, width: 60, height: 60, fit: BoxFit.cover),
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: order.warehouseImages.map((e) => GestureDetector(
+                      onTap: () => _showImagePreviewDialog(context, e),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(e, width: 80, height: 80, fit: BoxFit.cover),
+                      ),
                     )).toList(),
                   ),
+                ],
                 if (order.deliveryTime != null)
-                  _buildDetailRow(appLocalizations.selectDeliveryTime,
-                      intl.DateFormat('yyyy-MM-dd HH:mm').format(order.deliveryTime!.toDate())),
+                  _buildInfoRow(appLocalizations.expectedDeliveryTime,
+                      intl.DateFormat('yyyy-MM-dd HH:mm').format(order.deliveryTime!.toDate()), icon: Icons.delivery_dining),
+                if (order.moldInstallationSupervisorName != null && order.moldInstallationSupervisorName!.isNotEmpty)
+                  _buildInfoRow(appLocalizations.moldInstallationSupervisor, order.moldInstallationSupervisorName!, icon: Icons.person_pin),
                 if (order.moldInstallationNotes != null && order.moldInstallationNotes!.isNotEmpty)
-                  _buildDetailRow(appLocalizations.moldInstallationNotes, order.moldInstallationNotes!),
-                if (order.moldInstallationImages.isNotEmpty)
+                  _buildInfoRow(appLocalizations.moldInstallationNotes, order.moldInstallationNotes!, icon: Icons.notes),
+                if (order.moldInstallationImages.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(appLocalizations.moldInstallationImages, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15), textAlign: TextAlign.right),
+                  const SizedBox(height: 4),
                   Wrap(
-                    children: order.moldInstallationImages.map((e) => Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Image.network(e, width: 60, height: 60, fit: BoxFit.cover),
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: order.moldInstallationImages.map((e) => GestureDetector(
+                      onTap: () => _showImagePreviewDialog(context, e),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(e, width: 80, height: 80, fit: BoxFit.cover),
+                      ),
                     )).toList(),
                   ),
-                if (order.productionManagerName != null)
-                  _buildDetailRow(appLocalizations.productionManager, order.productionManagerName!),
-                if (order.productionRejectionReason != null)
-                  _buildDetailRow(appLocalizations.rejectionReason, order.productionRejectionReason!),
+                ],
+                if (order.productionManagerName != null && order.productionManagerName!.isNotEmpty)
+                  _buildInfoRow(appLocalizations.productionManager, order.productionManagerName!, icon: Icons.engineering),
+                if (order.productionRejectionReason != null && order.productionRejectionReason!.isNotEmpty)
+                  _buildInfoRow(appLocalizations.rejectionReason, order.productionRejectionReason!, icon: Icons.cancel, textColor: Colors.red),
               ],
             ),
           ),
@@ -385,6 +616,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             TextButton(
               child: Text(appLocalizations.close),
               onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
             ),
           ],
         );
@@ -392,7 +624,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {Color? textColor, bool isBold = false}) {
+  Widget _buildInfoRow(String label, String value, {Color? textColor, bool isBold = false, IconData? icon}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -402,26 +634,80 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 14,
-                color: textColor,
+                fontSize: 15,
+                color: textColor ?? Colors.black87,
                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
               ),
               textAlign: TextAlign.right,
               textDirection: TextDirection.rtl,
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             '$label:',
-            style: TextStyle(
-              fontSize: 14,
+            style: const TextStyle(
+              fontSize: 15,
               fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
           ),
+          if (icon != null) ...[
+            const SizedBox(width: 8),
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+          ]
         ],
       ),
+    );
+  }
+
+  void _showImagePreviewDialog(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(16),
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: InteractiveViewer( // Allows zoom and pan
+              panEnabled: true,
+              minScale: 0.5,
+              maxScale: 4,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.progress,
+                        color: Colors.white,
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) =>
+                      Container(
+                        color: Colors.black,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.error, size: 50, color: Colors.red),
+                              Text(AppLocalizations.of(context)!.imageLoadError, style: TextStyle(color: Colors.white)), // New localization
+                            ],
+                          ),
+                        ),
+                      ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -430,29 +716,47 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text(appLocalizations.markAsFulfilledConfirmation), // أضف هذا النص
-          content: Text('${appLocalizations.confirmFulfillOrder}: "$customerName"؟'), // أضف هذا النص
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.markAsFulfilledConfirmation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+          content: Text('${appLocalizations.confirmFulfillOrder}: "$customerName"؟', textAlign: TextAlign.center),
           actions: <Widget>[
             TextButton(
               child: Text(appLocalizations.cancel),
               onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.fulfill), // أضف هذا النص
+            ElevatedButton.icon(
+              icon: const Icon(Icons.done_all),
+              label: Text(appLocalizations.fulfill),
               onPressed: () async {
-                Navigator.of(dialogContext).pop();
+                Navigator.of(dialogContext).pop(); // Pop the confirmation dialog
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
                 try {
                   await useCases.updateSalesOrderStatus(orderId, SalesOrderStatus.fulfilled);
+                  Navigator.of(context).pop(); // Pop the loading indicator
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(appLocalizations.orderFulfilledSuccessfully)), // أضف هذا النص
+                    SnackBar(content: Text(appLocalizations.orderFulfilledSuccessfully)),
                   );
                 } catch (e) {
+                  Navigator.of(context).pop(); // Pop the loading indicator
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${appLocalizations.errorFulfillingOrder}: $e')), // أضف هذا النص
+                    SnackBar(content: Text('${appLocalizations.errorFulfillingOrder}: ${e.toString()}')),
                   );
-                  print('Error fulfilling order: $e');
+                  print('Error fulfilling order: $e'); // For debugging
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
             ),
           ],
         );
@@ -465,37 +769,45 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(appLocalizations.approveOrderConfirmation),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(appLocalizations.approveOrderConfirmation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              _buildDetailRow(appLocalizations.customerName, order.customerName),
-              _buildDetailRow(
-                  appLocalizations.salesRepresentative, order.salesRepresentativeName),
-              _buildDetailRow(appLocalizations.totalAmount,
-                  '\$${order.totalAmount.toStringAsFixed(2)}'),
-              _buildDetailRow(appLocalizations.status, order.status.toArabicString(),
-                  textColor: _getSalesOrderStatusColor(order.status), isBold: true),
-              _buildDetailRow('تاريخ الطلب',
-                  intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate())),
+              Text('${appLocalizations.reviewOrderDetails}', style: TextStyle(color: Colors.grey[700]), textAlign: TextAlign.right), // New instruction
+              const Divider(),
+              _buildInfoRow(appLocalizations.customerName, order.customerName, icon: Icons.person_outline),
+              _buildInfoRow(
+                  appLocalizations.salesRepresentative, order.salesRepresentativeName, icon: Icons.badge_outlined),
+              _buildInfoRow(appLocalizations.totalAmount,
+                  '\$${order.totalAmount.toStringAsFixed(2)}', icon: Icons.attach_money, isBold: true, textColor: AppColors.primary),
+              _buildInfoRow(appLocalizations.status, order.status.toArabicString(),
+                  icon: Icons.info_outline, textColor: _getSalesOrderStatusColor(order.status), isBold: true),
+              _buildInfoRow(appLocalizations.orderDate,
+                  intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate()), icon: Icons.calendar_today_outlined),
               const SizedBox(height: 16),
               Text(appLocalizations.orderItems,
                   style:
-                      const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
                   textAlign: TextAlign.right),
+              const Divider(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: order.orderItems
-                    .map((item) => Text(
-                          '${item.productName} - ${item.quantity} ${appLocalizations.quantityUnit} @ \$${item.unitPrice.toStringAsFixed(2)}',
-                          textAlign: TextAlign.right,
-                          textDirection: TextDirection.rtl,
-                        ))
+                    .map((item) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Text(
+                    '${item.productName} - ${item.quantity} ${item.quantityUnit ?? appLocalizations.units} @ \$${item.unitPrice.toStringAsFixed(2)}',
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                  ),
+                ))
                     .toList(),
               ),
-              if (order.customerSignatureUrl != null)
+              if (order.customerSignatureUrl != null && order.customerSignatureUrl!.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: Column(
@@ -503,48 +815,34 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     children: [
                       Text(appLocalizations.customerSignature,
                           style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                              fontWeight: FontWeight.bold, fontSize: 17),
                           textAlign: TextAlign.right),
                       const SizedBox(height: 8),
-                      Image.network(
-                        order.customerSignatureUrl!,
-                        height: 100,
-                        width: double.infinity,
-                        fit: BoxFit.contain,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          order.customerSignatureUrl!,
+                          height: 100,
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(child: CircularProgressIndicator(value: loadingProgress.progress));
+                          },
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                height: 100,
+                                color: Colors.grey[200],
+                                child: Center(child: Icon(Icons.broken_image, size: 40, color: Colors.grey[400])),
+                              ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              if (order.warehouseNotes != null && order.warehouseNotes!.isNotEmpty)
-                _buildDetailRow(
-                    appLocalizations.warehouseNotes, order.warehouseNotes!),
-              if (order.warehouseImages.isNotEmpty)
-                Wrap(
-                  children: order.warehouseImages
-                      .map((e) => Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.network(e,
-                                width: 60, height: 60, fit: BoxFit.cover),
-                          ))
-                      .toList(),
-                ),
-              if (order.moldInstallationNotes != null &&
-                  order.moldInstallationNotes!.isNotEmpty)
-                _buildDetailRow(appLocalizations.moldInstallationNotes,
-                    order.moldInstallationNotes!),
-              if (order.moldInstallationImages.isNotEmpty)
-                Wrap(
-                  children: order.moldInstallationImages
-                      .map((e) => Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Image.network(e,
-                                width: 60, height: 60, fit: BoxFit.cover),
-                          ))
-                      .toList(),
-                ),
               const SizedBox(height: 16),
-              Text('${appLocalizations.confirmApproveOrder}: "${order.customerName}"؟',
-                  textAlign: TextAlign.right),
+              Text('${appLocalizations.confirmApproveOrderQuestion}: "${order.customerName}"؟', // More explicit question
+                  textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
           ),
         ),
@@ -552,25 +850,42 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           TextButton(
             child: Text(appLocalizations.cancel),
             onPressed: () => Navigator.of(context).pop(),
+            style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
           ),
-          ElevatedButton(
-            child: Text(appLocalizations.approve),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.check),
+            label: Text(appLocalizations.approve),
             onPressed: () async {
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Pop the confirmation dialog
+              // Show loading indicator
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext loadingContext) {
+                  return const Center(child: CircularProgressIndicator());
+                },
+              );
               try {
                 final user = Provider.of<UserModel?>(context, listen: false)!;
                 await useCases.approveSalesOrder(order, user);
+                Navigator.of(context).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                       content: Text(appLocalizations.orderApprovedSuccessfully)),
                 );
               } catch (e) {
+                Navigator.of(context).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content: Text('${appLocalizations.errorApprovingOrder}: $e')),
+                      content: Text('${appLocalizations.errorApprovingOrder}: ${e.toString()}')),
                 );
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
           ),
         ],
       ),
@@ -582,15 +897,25 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(appLocalizations.rejectOrderConfirmation),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(appLocalizations.rejectOrderConfirmation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('${appLocalizations.confirmRejectOrder}: "${order.customerName}"؟'),
-            const SizedBox(height: 12),
+            Text('${appLocalizations.confirmRejectOrderQuestion}: "${order.customerName}"؟', textAlign: TextAlign.center, style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 16),
             TextField(
               controller: reasonController,
-              decoration: InputDecoration(labelText: appLocalizations.rejectionReason),
+              decoration: InputDecoration(
+                labelText: appLocalizations.rejectionReason,
+                border: const OutlineInputBorder(),
+                hintText: appLocalizations.enterRejectionReason, // New hint text
+                prefixIcon: const Icon(Icons.feedback_outlined),
+              ),
+              maxLines: 3,
+              textAlign: TextAlign.right,
+              textDirection: TextDirection.rtl,
+              validator: (value) => value!.trim().isEmpty ? appLocalizations.fieldRequired : null, // Added validation
             ),
           ],
         ),
@@ -598,24 +923,46 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           TextButton(
             child: Text(appLocalizations.cancel),
             onPressed: () => Navigator.of(context).pop(),
+            style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
           ),
-          ElevatedButton(
-            child: Text(appLocalizations.reject),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.close),
+            label: Text(appLocalizations.reject),
             onPressed: () async {
-              if (reasonController.text.trim().isEmpty) return;
-              Navigator.of(context).pop();
+              if (reasonController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(appLocalizations.rejectionReasonRequired)), // New snackbar
+                );
+                return;
+              }
+              Navigator.of(context).pop(); // Pop the confirmation dialog
+              // Show loading indicator
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext loadingContext) {
+                  return const Center(child: CircularProgressIndicator());
+                },
+              );
               try {
                 final user = Provider.of<UserModel?>(context, listen: false)!;
                 await useCases.rejectSalesOrder(order, user, reasonController.text.trim());
+                Navigator.of(context).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(appLocalizations.orderRejectedSuccessfully)),
                 );
               } catch (e) {
+                Navigator.of(context).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${appLocalizations.errorRejectingOrder}: $e')),
+                  SnackBar(content: Text('${appLocalizations.errorRejectingOrder}: ${e.toString()}')),
                 );
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
           ),
         ],
       ),
@@ -625,37 +972,87 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
   void _showInitiateSupplyDialog(BuildContext context, SalesUseCases salesUseCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel preparer) async {
     final userUseCases = Provider.of<UserUseCases>(context, listen: false);
     final storekeepers = await userUseCases.getUsersByRole(UserRole.inventoryManager);
-    if (storekeepers.isEmpty) return;
-    UserModel selected = storekeepers.first;
+    if (storekeepers.isEmpty) {
+      // Show an error or informative message if no storekeepers are found
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(appLocalizations.noStorekeepersFound)), // New localization
+      );
+      return;
+    }
+    // Pre-select the first storekeeper if available, otherwise null
+    UserModel? _selectedStorekeeper = storekeepers.isNotEmpty ? storekeepers.first : null;
 
     await showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('اختر أمين المخزن'),
-          content: DropdownButton<UserModel>(
-            value: selected,
-            items: storekeepers
-                .map((u) => DropdownMenuItem(value: u, child: Text(u.name)))
-                .toList(),
-            onChanged: (u) => setState(() {
-              if (u != null) selected = u;
-            }),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.selectStorekeeper, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(appLocalizations.assignOrderToStorekeeper, textAlign: TextAlign.right, style: TextStyle(color: Colors.grey[700])), // New instruction
+              const SizedBox(height: 12),
+              DropdownButtonFormField<UserModel>(
+                value: _selectedStorekeeper,
+                decoration: InputDecoration(
+                  labelText: appLocalizations.storekeeper, // New localization
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.person_outline),
+                ),
+                items: storekeepers
+                    .map((u) => DropdownMenuItem(value: u, child: Text(u.name, textDirection: TextDirection.rtl)))
+                    .toList(),
+                onChanged: (u) => setState(() {
+                  _selectedStorekeeper = u;
+                }),
+                validator: (value) => value == null ? appLocalizations.fieldRequired : null, // Added validation
+              ),
+            ],
           ),
           actions: [
             TextButton(
               child: Text(appLocalizations.cancel),
               onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.initiateSupply),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.send), // Send icon
+              label: Text(appLocalizations.initiateSupply),
               onPressed: () async {
-                Navigator.of(context).pop();
-                await salesUseCases.initiateSupply(order, preparer, selected);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(appLocalizations.initiateSupply)),
+                if (_selectedStorekeeper == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(appLocalizations.selectStorekeeperError)), // New snackbar
+                  );
+                  return;
+                }
+                Navigator.of(context).pop(); // Pop the dialog
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return const Center(child: CircularProgressIndicator());
+                  },
                 );
+                try {
+                  await salesUseCases.initiateSupply(order, preparer, _selectedStorekeeper!);
+                  Navigator.of(context).pop(); // Pop the loading indicator
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(appLocalizations.supplyInitiatedSuccessfully)), // New confirmation
+                  );
+                } catch (e) {
+                  Navigator.of(context).pop(); // Pop the loading indicator
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${appLocalizations.errorInitiatingSupply}: ${e.toString()}')),
+                  );
+                }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
             ),
           ],
         ),
@@ -668,29 +1065,51 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(appLocalizations.approveOrderConfirmation),
-        content: Text('${appLocalizations.confirmApproveOrder}: "${order.customerName}"؟', textAlign: TextAlign.right),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(appLocalizations.approveMoldTasks, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(
+          '${appLocalizations.confirmApproveMoldTasks}: "${order.customerName}"؟\n\n${appLocalizations.thisActionWillCreateProductionOrder}', // Added warning
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 16),
+        ),
         actions: [
           TextButton(
             child: Text(appLocalizations.cancel),
             onPressed: () => Navigator.of(ctx).pop(),
+            style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
           ),
-          ElevatedButton(
-            child: Text(appLocalizations.approve),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.check),
+            label: Text(appLocalizations.approve),
             onPressed: () async {
-              Navigator.of(ctx).pop();
+              Navigator.of(ctx).pop(); // Pop the confirmation dialog
+              // Show loading indicator
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext loadingContext) {
+                  return const Center(child: CircularProgressIndicator());
+                },
+              );
               try {
                 await useCases.approveMoldTasks(order, supervisor);
                 await productionUseCases.createProductionOrdersFromSalesOrder(order, supervisor);
+                Navigator.of(context).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(appLocalizations.orderApprovedSuccessfully)),
+                  SnackBar(content: Text(appLocalizations.moldTasksApprovedSuccessfully)), // New confirmation
                 );
               } catch (e) {
+                Navigator.of(context).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${appLocalizations.errorApprovingOrder}: $e')),
+                  SnackBar(content: Text('${appLocalizations.errorApprovingMoldTasks}: ${e.toString()}')), // New error message
                 );
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
           ),
         ],
       ),
@@ -700,19 +1119,24 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
   void _showMoldDocDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
     final TextEditingController notesController = TextEditingController(text: order.moldInstallationNotes);
     List<XFile> pickedImages = [];
-    final ImagePicker picker = ImagePicker();
-
-    Future<void> pickImages() async {
-      final images = await picker.pickMultiImage();
-      if (images != null) {
-        pickedImages.addAll(images);
-      }
+    // Initialize with existing images
+    if (order.moldInstallationImages.isNotEmpty) {
+      pickedImages.addAll(order.moldInstallationImages.map((url) => XFile(url))); // Assuming XFile can take a URL or path for display
     }
 
-    Future<void> captureImage() async {
-      final image = await picker.pickImage(source: ImageSource.camera);
-      if (image != null) {
-        pickedImages.add(image);
+    final ImagePicker picker = ImagePicker();
+
+    Future<void> _pickImages(ImageSource source) async {
+      if (source == ImageSource.camera) {
+        final image = await picker.pickImage(source: ImageSource.camera);
+        if (image != null) {
+          pickedImages.add(image);
+        }
+      } else {
+        final images = await picker.pickMultiImage();
+        if (images != null) {
+          pickedImages.addAll(images);
+        }
       }
     }
 
@@ -720,44 +1144,101 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(appLocalizations.moldInstallationDocumentation),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.moldInstallationDocumentation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: notesController,
-                  decoration: InputDecoration(labelText: appLocalizations.enterNotes),
+                  decoration: InputDecoration(
+                    labelText: appLocalizations.enterNotes,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.notes_outlined),
+                  ),
                   maxLines: 3,
+                  textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                 ),
+                const SizedBox(height: 16),
+                Text(appLocalizations.addImages, style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.right),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        await captureImage();
-                        setState(() {});
-                      },
-                      icon: const Icon(Icons.camera_alt),
-                      label: Text(appLocalizations.camera),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          await _pickImages(ImageSource.camera);
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.camera_alt),
+                        label: Text(appLocalizations.camera),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent, foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        await pickImages();
-                        setState(() {});
-                      },
-                      icon: const Icon(Icons.photo),
-                      label: Text(appLocalizations.gallery),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          await _pickImages(ImageSource.gallery);
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.photo_library),
+                        label: Text(appLocalizations.gallery),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purpleAccent, foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                Wrap(
-                  children: pickedImages.map((e) => Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Image.file(File(e.path), width: 60, height: 60, fit: BoxFit.cover),
-                  )).toList(),
-                )
+                const SizedBox(height: 16),
+                pickedImages.isEmpty
+                    ? Text(appLocalizations.noImagesSelected, style: TextStyle(color: Colors.grey[600]), textAlign: TextAlign.center)
+                    : GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: pickedImages.length,
+                  itemBuilder: (context, index) {
+                    final imageFile = pickedImages[index];
+                    return Stack(
+                      alignment: Alignment.topRight,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: imageFile.path.startsWith('http')
+                              ? Image.network(imageFile.path, width: 100, height: 100, fit: BoxFit.cover)
+                              : Image.file(File(imageFile.path), width: 100, height: 100, fit: BoxFit.cover),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              pickedImages.removeAt(index);
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.remove_circle, color: Colors.white, size: 18),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -765,26 +1246,43 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             TextButton(
               child: Text(appLocalizations.cancel),
               onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.save),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.save),
+              label: Text(appLocalizations.save),
               onPressed: () async {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Pop the dialog
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
                 try {
                   await useCases.addMoldInstallationDocs(
                     order: order,
                     notes: notesController.text.trim(),
-                    attachments: pickedImages.map((e) => File(e.path)).toList(),
+                    attachments: pickedImages.map((e) => File(e.path)).toList(), // Convert XFile to File
                   );
+                  Navigator.of(context).pop(); // Pop loading
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(appLocalizations.documentationSaved)),
+                    SnackBar(content: Text(appLocalizations.documentationSavedSuccessfully)), // New confirmation
                   );
                 } catch (e) {
+                  Navigator.of(context).pop(); // Pop loading
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${appLocalizations.errorSavingDocumentation}: $e')),
+                    SnackBar(content: Text('${appLocalizations.errorSavingDocumentation}: ${e.toString()}')),
                   );
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
             ),
           ],
         ),
@@ -795,13 +1293,25 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
   void _showWarehouseDocDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel storekeeper) {
     final TextEditingController notesController = TextEditingController(text: order.warehouseNotes);
     List<XFile> pickedImages = [];
-    final ImagePicker picker = ImagePicker();
-    DateTime? selectedDeliveryTime;
+    // Initialize with existing images
+    if (order.warehouseImages.isNotEmpty) {
+      pickedImages.addAll(order.warehouseImages.map((url) => XFile(url)));
+    }
 
-    Future<void> pickImages() async {
-      final images = await picker.pickMultiImage();
-      if (images != null) {
-        pickedImages.addAll(images);
+    final ImagePicker picker = ImagePicker();
+    DateTime? selectedDeliveryTime = order.deliveryTime?.toDate(); // Initialize with existing delivery time
+
+    Future<void> _pickImages(ImageSource source) async {
+      if (source == ImageSource.camera) {
+        final image = await picker.pickImage(source: ImageSource.camera);
+        if (image != null) {
+          pickedImages.add(image);
+        }
+      } else {
+        final images = await picker.pickMultiImage();
+        if (images != null) {
+          pickedImages.addAll(images);
+        }
       }
     }
 
@@ -809,75 +1319,168 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(appLocalizations.warehouseDocumentation),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.warehouseDocumentation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: notesController,
-                  decoration: InputDecoration(labelText: appLocalizations.enterNotes),
+                  decoration: InputDecoration(
+                    labelText: appLocalizations.enterNotes,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.notes_outlined),
+                  ),
                   maxLines: 3,
+                  textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                 ),
+                const SizedBox(height: 16),
+                Text(appLocalizations.addImages, style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.right),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        // await captureImage();
-                        setState(() {});
-                      },
-                      icon: const Icon(Icons.camera_alt),
-                      label: Text(appLocalizations.camera),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          await _pickImages(ImageSource.camera);
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.camera_alt),
+                        label: Text(appLocalizations.camera),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent, foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
                     ),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        await pickImages();
-                        setState(() {});
-                      },
-                      icon: const Icon(Icons.photo),
-                      label: Text(appLocalizations.gallery),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          await _pickImages(ImageSource.gallery);
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.photo_library),
+                        label: Text(appLocalizations.gallery),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purpleAccent, foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                pickedImages.isEmpty
+                    ? Text(appLocalizations.noImagesSelected, style: TextStyle(color: Colors.grey[600]), textAlign: TextAlign.center)
+                    : GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: pickedImages.length,
+                  itemBuilder: (context, index) {
+                    final imageFile = pickedImages[index];
+                    return Stack(
+                      alignment: Alignment.topRight,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: imageFile.path.startsWith('http')
+                              ? Image.network(imageFile.path, width: 100, height: 100, fit: BoxFit.cover)
+                              : Image.file(File(imageFile.path), width: 100, height: 100, fit: BoxFit.cover),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              pickedImages.removeAt(index);
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(Icons.remove_circle, color: Colors.white, size: 18),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                Text(appLocalizations.selectDeliveryTime, style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.right),
                 const SizedBox(height: 8),
-                TextButton(
+                ElevatedButton.icon(
                   onPressed: () async {
                     final date = await showDatePicker(
                       context: context,
-                      initialDate: DateTime.now(),
+                      initialDate: selectedDeliveryTime ?? DateTime.now(),
                       firstDate: DateTime.now(),
                       lastDate: DateTime.now().add(const Duration(days: 365)),
+                      builder: (context, child) => Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: ColorScheme.light(
+                            primary: AppColors.primary, // dialog primary color
+                            onPrimary: Colors.white, // text color on primary
+                            onSurface: AppColors.dark, // text color on surface
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                          ),
+                        ),
+                        child: child!,
+                      ),
                     );
                     if (date != null) {
                       final time = await showTimePicker(
                         context: context,
-                        initialTime: TimeOfDay.now(),
+                        initialTime: TimeOfDay.fromDateTime(selectedDeliveryTime ?? DateTime.now()),
+                        builder: (context, child) => Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: ColorScheme.light(
+                              primary: AppColors.primary,
+                              onPrimary: Colors.white,
+                              onSurface: AppColors.dark,
+                            ),
+                            textButtonTheme: TextButtonThemeData(
+                              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                            ),
+                          ),
+                          child: child!,
+                        ),
                       );
                       if (time != null) {
-                        selectedDeliveryTime = DateTime(
-                          date.year,
-                          date.month,
-                          date.day,
-                          time.hour,
-                          time.minute,
-                        );
-                        setState(() {});
+                        setState(() {
+                          selectedDeliveryTime = DateTime(
+                            date.year,
+                            date.month,
+                            date.day,
+                            time.hour,
+                            time.minute,
+                          );
+                        });
                       }
                     }
                   },
-                  child: Text(selectedDeliveryTime == null
-                      ? appLocalizations.selectDeliveryTime
-                      : intl.DateFormat('yyyy-MM-dd HH:mm')
-                          .format(selectedDeliveryTime!)),
+                  icon: const Icon(Icons.event),
+                  label: Text(
+                    selectedDeliveryTime == null
+                        ? appLocalizations.selectDeliveryDateAndTime // New localization
+                        : intl.DateFormat('yyyy-MM-dd HH:mm').format(selectedDeliveryTime!),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[200],
+                    foregroundColor: AppColors.dark,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
                 ),
-                Wrap(
-                  children: pickedImages.map((e) => Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Image.file(File(e.path), width: 60, height: 60, fit: BoxFit.cover),
-                  )).toList(),
-                )
               ],
             ),
           ),
@@ -885,28 +1488,45 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             TextButton(
               child: Text(appLocalizations.cancel),
               onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.sendToProduction),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.send_to_mobile), // Specific icon for "send to production"
+              label: Text(appLocalizations.sendToProduction),
               onPressed: () async {
-                Navigator.of(context).pop();
-                try {
-                await useCases.documentWarehouseSupply(
-                  order: order,
-                  storekeeper: storekeeper,
-                  notes: notesController.text.trim(),
-                  attachments: pickedImages.map((e) => File(e.path)).toList(),
-                  deliveryTime: selectedDeliveryTime,
+                Navigator.of(context).pop(); // Pop the dialog
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return const Center(child: CircularProgressIndicator());
+                  },
                 );
+                try {
+                  await useCases.documentWarehouseSupply(
+                    order: order,
+                    storekeeper: storekeeper,
+                    notes: notesController.text.trim(),
+                    attachments: pickedImages.map((e) => File(e.path)).toList(),
+                    deliveryTime: selectedDeliveryTime,
+                  );
+                  Navigator.of(context).pop(); // Pop loading
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(appLocalizations.supplySaved)),
+                    SnackBar(content: Text(appLocalizations.warehouseSupplyDocumentedSuccessfully)), // New confirmation
                   );
                 } catch (e) {
+                  Navigator.of(context).pop(); // Pop loading
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${appLocalizations.errorSavingSupply}: $e')),
+                    SnackBar(content: Text('${appLocalizations.errorDocumentingWarehouseSupply}: ${e.toString()}')), // New error message
                   );
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
             ),
           ],
         ),
@@ -914,4 +1534,67 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
+  void _showDeleteOrderConfirmationDialog(
+      BuildContext context,
+      SalesUseCases useCases,
+      AppLocalizations appLocalizations,
+      String orderId,
+      String customerName,
+      ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.confirmDeletion, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text(
+            '${appLocalizations.confirmDeleteOrder}: "$customerName"?\n\n${appLocalizations.thisActionCannotBeUndone}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
+          actions: <Widget>[
+            TextButton(
+              child: Text(appLocalizations.cancel),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.delete_forever),
+              label: Text(appLocalizations.delete),
+              onPressed: () async {
+                Navigator.of(dialogContext).pop(); // Pop confirmation dialog
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
+                try {
+                  await useCases.deleteSalesOrder(orderId);
+                  Navigator.of(context).pop(); // Pop loading
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(appLocalizations.orderDeletedSuccessfully)));
+                } catch (e) {
+                  Navigator.of(context).pop(); // Pop loading
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${appLocalizations.errorDeletingOrder}: ${e.toString()}')),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

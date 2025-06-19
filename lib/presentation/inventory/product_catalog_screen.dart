@@ -190,7 +190,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                       if (loadingProgress == null) return child;
                       return Center(
                         child: CircularProgressIndicator(
-                          value: loadingProgress.progress,
+                          // value: loadingProgress.progress,
                           color: AppColors.primary,
                         ),
                       );
@@ -250,7 +250,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit, size: 22, color: AppColors.secondary),
+                          icon: const Icon(Icons.edit, size: 22, color: AppColors.primary),
                           onPressed: () {
                             _showAddEditProductDialog(context, inventoryUseCases, appLocalizations, product: product);
                           },
@@ -303,7 +303,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(
-                            child: CircularProgressIndicator(value: loadingProgress.progress),
+                            // child: CircularProgressIndicator(value: loadingProgress.progress),
                           );
                         },
                         errorBuilder: (context, error, stackTrace) =>
@@ -526,7 +526,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         decoration: InputDecoration(
                           labelText: appLocalizations.packagingType,
                           border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.packaging), // Icon for packaging
+                          prefixIcon: const Icon(Icons.backpack), // Icon for packaging
                         ),
                         validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
                         textAlign: TextAlign.right, textDirection: TextDirection.rtl,
@@ -692,11 +692,11 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: _billOfMaterials.isEmpty
                             ? [
-                          Text(
-                            appLocalizations.noMaterialsAdded, // New localization key
-                            style: TextStyle(color: Colors.grey[600]),
-                            textAlign: TextAlign.right,
-                          )
+                          // Text(
+                          //   appLocalizations.noMaterialsAdded, // New localization key
+                          //   style: TextStyle(color: Colors.grey[600]),
+                          //   textAlign: TextAlign.right,
+                          // )
                         ]
                             : _billOfMaterials.asMap().entries.map((entry) {
                           final int index = entry.key;
@@ -735,7 +735,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.secondary, // Use secondary color
+                          backgroundColor: AppColors.primary, // Use secondary color
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
@@ -869,39 +869,31 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     RawMaterialModel? _selectedMaterial;
     final _formKey = GlobalKey<FormState>();
 
-    // Fetch materials once for the dropdown to avoid flickering
-    final materialsFuture = useCases.getRawMaterials().first;
-
     return await showDialog<ProductMaterial>(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Text(appLocalizations.addMaterialToBom, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(appLocalizations.addMaterialToBom, textAlign: TextAlign.right), // أضف هذا النص
           content: Form(
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FutureBuilder<List<RawMaterialModel>>(
-                  future: materialsFuture,
+                StreamBuilder<List<RawMaterialModel>>(
+                  stream: useCases.getRawMaterials(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
+                      return CircularProgressIndicator();
                     }
                     if (snapshot.hasError) {
-                      return Text('${appLocalizations.errorLoadingMaterials}: ${snapshot.error}');
+                      return Text('خطأ في تحميل المواد: ${snapshot.error}');
                     }
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Text(appLocalizations.noRawMaterialsAvailable);
+                      return Text('لا توجد مواد أولية متاحة.');
                     }
                     return DropdownButtonFormField<RawMaterialModel>(
                       value: _selectedMaterial,
-                      decoration: InputDecoration(
-                        labelText: appLocalizations.rawMaterial,
-                        border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.recycling), // Icon for raw material
-                      ),
+                      decoration: InputDecoration(labelText: appLocalizations.rawMaterial, border: OutlineInputBorder()), // أضف هذا النص
                       items: snapshot.data!.map((material) => DropdownMenuItem(
                         value: material,
                         child: Text(material.name, textDirection: TextDirection.rtl),
@@ -912,21 +904,17 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         });
                       },
                       validator: (value) => value == null ? appLocalizations.fieldRequired : null,
-                      menuMaxHeight: MediaQuery.of(context).size.height * 0.4, // Limit dropdown height
                     );
                   },
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 TextFormField(
                   controller: _quantityController,
-                  decoration: InputDecoration(
-                    labelText: appLocalizations.quantity,
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.unfold_less_double), // Icon for quantity
-                  ),
+                  decoration: InputDecoration(labelText: appLocalizations.quantity, border: OutlineInputBorder()), // أضف هذا النص
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value!.isEmpty) return appLocalizations.fieldRequired;
+                    // Changed validator to use invalidNumberPositive
                     if (double.tryParse(value) == null || double.parse(value)! <= 0) return appLocalizations.invalidNumberPositive;
                     return null;
                   },
@@ -947,7 +935,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                   Navigator.pop(dialogContext, ProductMaterial(
                     materialId: _selectedMaterial!.id,
                     quantityPerUnit: double.parse(_quantityController.text),
-                    unit: _selectedMaterial!.unit,
+                    unit: _selectedMaterial!.unit, // استخدام وحدة المادة المختارة
                   ));
                 }
               },
@@ -957,6 +945,9 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       },
     );
   }
+
+
+}
 
   void _showDeleteProductConfirmationDialog(
       BuildContext context,
@@ -1020,4 +1011,3 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       },
     );
   }
-}
