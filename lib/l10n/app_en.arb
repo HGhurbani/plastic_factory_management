@@ -378,5 +378,23 @@
   ,"reviewOrderDetails": "Review order details"
   ,"warehouseManager": "Warehouse Manager"
   ,"expectedDeliveryTime": "Expected Delivery Time"
+  ,"userManagement": "User Management",
+  ,"addUser": "Add User",
+  ,"errorLoadingUsers": "Error loading users",
+  ,"noUsersAvailable": "No users available.",
+  ,"tapToAddFirstUser": "Tap the '+' button to add your first user.",
+  ,"employeeId": "Employee ID",
+  ,"editUser": "Edit User",
+  ,"invalidEmailFormat": "Invalid email format.",
+  ,"name": "Name",
+  ,"role": "Role",
+  ,"password": "Password",
+  ,"passwordTooShort": "Password too short.",
+  ,"userUpdatedSuccessfully": "User updated successfully",
+  ,"userAddedSuccessfully": "User added successfully",
+  ,"errorSavingUser": "Error saving user",
+  ,"confirmDeleteUser": "Confirm deleting user",
+  ,"userDeletedSuccessfully": "User deleted successfully",
+  ,"errorDeletingUser": "Error deleting user"
   ,"unknown": "Unknown"
 }
