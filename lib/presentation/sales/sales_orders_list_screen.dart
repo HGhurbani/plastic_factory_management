@@ -390,27 +390,48 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     // Role-specific actions
     if (isAccountant && order.status == SalesOrderStatus.pendingApproval) {
       actions.add(
-        IconButton(
-          icon: const Icon(Icons.check_circle_outline, color: Colors.green),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.check_circle_outline),
+          label: Text(appLocalizations.approve),
           onPressed: () => _showApproveDialog(context, useCases, appLocalizations, order),
-          tooltip: appLocalizations.approve,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            textStyle: const TextStyle(fontSize: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
         ),
       );
       actions.add(
-        IconButton(
-          icon: const Icon(Icons.cancel_outlined, color: Colors.red),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.cancel_outlined),
+          label: Text(appLocalizations.reject),
           onPressed: () => _showRejectDialog(context, useCases, appLocalizations, order),
-          tooltip: appLocalizations.reject,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            textStyle: const TextStyle(fontSize: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
         ),
       );
     } else if (isProductionOrderPreparer &&
         order.status == SalesOrderStatus.pendingFulfillment) {
       actions.add(
-        IconButton(
-          icon: const Icon(Icons.local_shipping_outlined, color: AppColors.primary),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.local_shipping_outlined),
+          label: Text(appLocalizations.initiateSupply),
           onPressed: () => _showInitiateSupplyDialog(
               context, useCases, appLocalizations, order, currentUser),
-          tooltip: appLocalizations.initiateSupply,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            textStyle: const TextStyle(fontSize: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
         ),
       );
     } else if (isInventoryManager && order.status == SalesOrderStatus.warehouseProcessing) {
