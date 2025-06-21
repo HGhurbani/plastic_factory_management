@@ -100,6 +100,7 @@ class SalesOrderModel {
   final Timestamp createdAt; // تاريخ إنشاء الطلب
   final String? customerSignatureUrl; // رابط صورة توقيع العميل
   final String? approvedByUid; // UID المحاسب الذي اعتمد الطلب
+  final String? approvedByName; // اسم المحاسب الذي اعتمد الطلب
   final Timestamp? approvedAt; // وقت الاعتماد
   final String? rejectionReason; // سبب الرفض إن وجد
   final bool moldTasksEnabled; // هل تم تفعيل مهام تركيب القوالب
@@ -129,6 +130,7 @@ class SalesOrderModel {
     required this.createdAt,
     this.customerSignatureUrl,
     this.approvedByUid,
+    this.approvedByName,
     this.approvedAt,
     this.rejectionReason,
     this.moldTasksEnabled = false,
@@ -164,6 +166,7 @@ class SalesOrderModel {
       createdAt: data['createdAt'] ?? Timestamp.now(),
       customerSignatureUrl: data['customerSignatureUrl'],
       approvedByUid: data['approvedByUid'],
+      approvedByName: data['approvedByName'],
       approvedAt: data['approvedAt'],
       rejectionReason: data['rejectionReason'],
       moldTasksEnabled: data['moldTasksEnabled'] ?? false,
@@ -195,6 +198,7 @@ class SalesOrderModel {
       'createdAt': createdAt,
       'customerSignatureUrl': customerSignatureUrl,
       'approvedByUid': approvedByUid,
+      'approvedByName': approvedByName,
       'approvedAt': approvedAt,
       'rejectionReason': rejectionReason,
       'moldTasksEnabled': moldTasksEnabled,
@@ -226,6 +230,7 @@ class SalesOrderModel {
     Timestamp? createdAt,
     String? customerSignatureUrl,
     String? approvedByUid,
+    String? approvedByName,
     Timestamp? approvedAt,
     String? rejectionReason,
     bool? moldTasksEnabled,
@@ -255,6 +260,7 @@ class SalesOrderModel {
       createdAt: createdAt ?? this.createdAt,
       customerSignatureUrl: customerSignatureUrl ?? this.customerSignatureUrl,
       approvedByUid: approvedByUid ?? this.approvedByUid,
+      approvedByName: approvedByName ?? this.approvedByName,
       approvedAt: approvedAt ?? this.approvedAt,
       rejectionReason: rejectionReason ?? this.rejectionReason,
       moldTasksEnabled: moldTasksEnabled ?? this.moldTasksEnabled,
