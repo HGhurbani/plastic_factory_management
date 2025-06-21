@@ -382,6 +382,11 @@ class AppLocalizations {
   String get confirmDeleteUser => _strings["confirmDeleteUser"] ?? "confirmDeleteUser";
   String get userDeletedSuccessfully => _strings["userDeletedSuccessfully"] ?? "userDeletedSuccessfully";
   String get errorDeletingUser => _strings["errorDeletingUser"] ?? "errorDeletingUser";
+  String get loginPrompt => _strings["loginPrompt"] ?? "loginPrompt";
+  String get login => _strings["login"] ?? "login";
+  String get tryAgain => _strings["tryAgain"] ?? "tryAgain";
+  String get clearFilter => _strings["clearFilter"] ?? "clearFilter";
+  String get orderId => _strings["orderId"] ?? "orderId";
   String get unknown => _strings["unknown"] ?? "unknown";
 
 }
