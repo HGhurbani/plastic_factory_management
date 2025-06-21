@@ -136,7 +136,20 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // Status badge
+                            // Machine Name with icon (now on the left)
+                            Row(
+                              textDirection: TextDirection.rtl,
+                              children: [
+                                Icon(Icons.precision_manufacturing, color: AppColors.primary, size: 28),
+                                const SizedBox(width: 8),
+                                Text(
+                                  machine.name,
+                                  textDirection: TextDirection.rtl,
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            // Status badge (now on the right)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
@@ -152,21 +165,9 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
                                 ),
                               ),
                             ),
-                            // Machine Name with icon
-                            Row(
-                              children: [
-                                Text(
-                                  machine.name,
-                                  textDirection: TextDirection.rtl,
-                                  textAlign: TextAlign.right,
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(width: 8),
-                                Icon(Icons.precision_manufacturing, color: AppColors.primary, size: 28),
-                              ],
-                            ),
                           ],
                         ),
+
                         const Divider(height: 16), // Separator
                         _buildInfoRow(appLocalizations.machineID, machine.machineId, icon: Icons.qr_code_2),
                         if (machine.details != null && machine.details!.isNotEmpty)
@@ -250,19 +251,10 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 15,
-                color: textColor ?? Colors.black87,
-                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              ),
-              textAlign: TextAlign.right,
-              textDirection: TextDirection.rtl,
-            ),
-          ),
-          const SizedBox(width: 8),
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+            const SizedBox(width: 8),
+          ],
           Text(
             '$label:',
             style: const TextStyle(
@@ -273,12 +265,22 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
           ),
-          if (icon != null) ...[
-            const SizedBox(width: 8),
-            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
-          ]
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 15,
+                color: textColor ?? Colors.black87,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
+              textAlign: TextAlign.left,
+              textDirection: TextDirection.rtl,
+            ),
+          ),
         ],
       ),
+
     );
   }
 

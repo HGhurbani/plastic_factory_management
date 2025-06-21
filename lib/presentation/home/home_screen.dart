@@ -434,14 +434,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.createProductionOrderRoute),
       ));
 
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.productionOrderManagement,
-        subtitle: "إدارة الطلبات",
-        icon: Icons.production_quantity_limits,
-        color: moduleColors['production']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
-      ));
+      // modules.add(_buildModuleButton(
+      //   context: context,
+      //   title: appLocalizations.productionOrderManagement,
+      //   subtitle: "إدارة الطلبات",
+      //   icon: Icons.production_quantity_limits,
+      //   color: moduleColors['production']!,
+      //   onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
+      // ));
 
       modules.add(_buildModuleButton(
         context: context,

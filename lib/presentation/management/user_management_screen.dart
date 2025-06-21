@@ -135,7 +135,21 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // User Role badge
+                            // User Name with icon (الآن على اليسار)
+                            Row(
+                              textDirection: TextDirection.rtl,
+                              children: [
+                                Icon(Icons.person_outline, color: AppColors.primary, size: 28),
+                                const SizedBox(width: 8),
+                                Text(
+                                  user.name,
+                                  textDirection: TextDirection.rtl,
+                                  textAlign: TextAlign.right,
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            // User Role badge (الآن على اليمين)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
@@ -151,21 +165,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                 ),
                               ),
                             ),
-                            // User Name with icon
-                            Row(
-                              children: [
-                                Text(
-                                  user.name,
-                                  textDirection: TextDirection.rtl,
-                                  textAlign: TextAlign.right,
-                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(width: 8),
-                                Icon(Icons.person_outline, color: AppColors.primary, size: 28), // Consistent icon
-                              ],
-                            ),
                           ],
                         ),
+
                         const Divider(height: 16), // Separator
                         _buildInfoRow(appLocalizations.email, user.email, icon: Icons.email_outlined), // Localized label
                         if (user.employeeId != null && user.employeeId!.isNotEmpty)
@@ -243,8 +245,22 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end, // Align to right for RTL
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            '$label:',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textDirection: TextDirection.rtl,
+          ),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               value,
@@ -253,27 +269,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 color: textColor ?? Colors.black87,
                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
               ),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.left,
               textDirection: TextDirection.rtl,
             ),
           ),
-          const SizedBox(width: 8),
-          Text(
-            '$label:',
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-            textAlign: TextAlign.right,
-            textDirection: TextDirection.rtl,
-          ),
-          if (icon != null) ...[
-            const SizedBox(width: 8),
-            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
-          ]
         ],
       ),
+
     );
   }
 
