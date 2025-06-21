@@ -172,7 +172,7 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
                         _buildInfoRow(appLocalizations.machineID, machine.machineId, icon: Icons.qr_code_2),
                         if (machine.details != null && machine.details!.isNotEmpty)
                           _buildInfoRow(appLocalizations.machineDetails, machine.details!, icon: Icons.info_outline),
-                        _buildInfoRow(appLocalizations.costPerHour, '\$${machine.costPerHour.toStringAsFixed(2)}', icon: Icons.attach_money),
+                          _buildInfoRow(appLocalizations.costPerHour, '﷼${machine.costPerHour.toStringAsFixed(2)}', icon: Icons.currency_exchange),
                         if (machine.lastMaintenance != null)
                           _buildInfoRow(
                             appLocalizations.lastMaintenance,
@@ -354,7 +354,7 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
                         decoration: InputDecoration(
                           labelText: appLocalizations.costPerHour,
                           border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.money), // Icon for cost
+                            prefixIcon: const Icon(Icons.currency_exchange), // Icon for cost
                         ),
                         keyboardType: TextInputType.number,
                         validator: (value) {

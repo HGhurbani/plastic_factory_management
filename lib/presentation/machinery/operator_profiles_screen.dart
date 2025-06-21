@@ -170,7 +170,7 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
                         _buildInfoRow(appLocalizations.employeeID, operator.employeeId, icon: Icons.badge_outlined),
                         if (operator.personalData != null && operator.personalData!.isNotEmpty)
                           _buildInfoRow(appLocalizations.personalData, operator.personalData!, icon: Icons.person_pin_outlined),
-                        _buildInfoRow(appLocalizations.costPerHour, '\$${operator.costPerHour.toStringAsFixed(2)}', icon: Icons.attach_money),
+                        _buildInfoRow(appLocalizations.costPerHour, '﷼${operator.costPerHour.toStringAsFixed(2)}', icon: Icons.currency_exchange),
                         if (operator.currentMachineId != null && operator.currentMachineId!.isNotEmpty)
                           _buildInfoRow(appLocalizations.currentlyOperatingMachine, operator.currentMachineId!, icon: Icons.precision_manufacturing_outlined, textColor: Colors.grey[700], isBold: true),
                         const SizedBox(height: 8),
@@ -353,7 +353,7 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
                         decoration: InputDecoration(
                           labelText: appLocalizations.costPerHour,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          prefixIcon: Icon(Icons.money, color: AppColors.dark),
+                          prefixIcon: Icon(Icons.currency_exchange, color: AppColors.dark),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: const BorderSide(color: AppColors.primary, width: 2),

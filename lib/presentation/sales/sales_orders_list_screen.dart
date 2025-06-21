@@ -306,7 +306,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                               const Divider(height: 16), // Separator
                               _buildInfoRow(appLocalizations.customerName, order.customerName, icon: Icons.person_outline),
                               _buildInfoRow(appLocalizations.salesRepresentative, order.salesRepresentativeName, icon: Icons.badge_outlined),
-                              _buildInfoRow(appLocalizations.totalAmount, '\$${order.totalAmount.toStringAsFixed(2)}', icon: Icons.attach_money, isBold: true),
+                              _buildInfoRow(appLocalizations.totalAmount, '﷼${order.totalAmount.toStringAsFixed(2)}', icon: Icons.currency_exchange, isBold: true),
                               _buildInfoRow(appLocalizations.orderDate, intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate()), icon: Icons.calendar_today_outlined),
                               const SizedBox(height: 8),
                               Align(
@@ -526,7 +526,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               children: [
                 _buildInfoRow(appLocalizations.customerName, order.customerName, icon: Icons.person),
                 _buildInfoRow(appLocalizations.salesRepresentative, order.salesRepresentativeName, icon: Icons.badge),
-                _buildInfoRow(appLocalizations.totalAmount, '\$${order.totalAmount.toStringAsFixed(2)}', icon: Icons.monetization_on, isBold: true, textColor: AppColors.primary),
+                _buildInfoRow(appLocalizations.totalAmount, '﷼${order.totalAmount.toStringAsFixed(2)}', icon: Icons.currency_exchange, isBold: true, textColor: AppColors.primary),
                 _buildInfoRow(appLocalizations.status, order.status.toArabicString(), icon: Icons.info_outline, textColor: _getSalesOrderStatusColor(order.status), isBold: true),
                 _buildInfoRow(appLocalizations.orderDate, intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate()), icon: Icons.date_range),
                 const SizedBox(height: 16),
@@ -537,7 +537,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   children: order.orderItems.map((item) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Text(
-                      '${item.productName} - ${item.quantity} ${item.quantityUnit ?? appLocalizations.units} @ \$${item.unitPrice.toStringAsFixed(2)}', // Use item.quantityUnit if available
+                      '${item.productName} - ${item.quantity} ${item.quantityUnit ?? appLocalizations.units} @ ﷼${item.unitPrice.toStringAsFixed(2)}', // Use item.quantityUnit if available
                       textAlign: TextAlign.right,
                       textDirection: TextDirection.rtl,
                       style: TextStyle(fontSize: 15, color: Colors.grey[800]),
@@ -814,8 +814,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               _buildInfoRow(appLocalizations.customerName, order.customerName, icon: Icons.person_outline),
               _buildInfoRow(
                   appLocalizations.salesRepresentative, order.salesRepresentativeName, icon: Icons.badge_outlined),
-              _buildInfoRow(appLocalizations.totalAmount,
-                  '\$${order.totalAmount.toStringAsFixed(2)}', icon: Icons.attach_money, isBold: true, textColor: AppColors.primary),
+                _buildInfoRow(appLocalizations.totalAmount,
+                    '﷼${order.totalAmount.toStringAsFixed(2)}', icon: Icons.currency_exchange, isBold: true, textColor: AppColors.primary),
               _buildInfoRow(appLocalizations.status, order.status.toArabicString(),
                   icon: Icons.info_outline, textColor: _getSalesOrderStatusColor(order.status), isBold: true),
               _buildInfoRow(appLocalizations.orderDate,
@@ -832,7 +832,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     .map((item) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0),
                   child: Text(
-                    '${item.productName} - ${item.quantity} ${item.quantityUnit ?? appLocalizations.units} @ \$${item.unitPrice.toStringAsFixed(2)}',
+                      '${item.productName} - ${item.quantity} ${item.quantityUnit ?? appLocalizations.units} @ ﷼${item.unitPrice.toStringAsFixed(2)}',
                     textAlign: TextAlign.right,
                     textDirection: TextDirection.rtl,
                     style: TextStyle(fontSize: 15, color: Colors.grey[800]),
