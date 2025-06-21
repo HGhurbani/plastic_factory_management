@@ -25,13 +25,16 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
       appBar: AppBar(
         title: Text(appLocalizations.operatorProfiles),
         centerTitle: true,
+        backgroundColor: AppColors.primary, // Apply primary color
+        foregroundColor: Colors.white, // White text for AppBar title
+        elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.person_add_alt_1_outlined, color: Colors.white), // Specific icon, white color
             onPressed: () {
               _showAddEditOperatorDialog(context, machineryOperatorUseCases, appLocalizations);
             },
-            tooltip: appLocalizations.addOperator, // أضف هذا النص في ARB
+            tooltip: appLocalizations.addOperator,
           ),
         ],
       ),
@@ -39,81 +42,162 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
         stream: machineryOperatorUseCases.getOperators(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator(color: AppColors.primary));
           }
           if (snapshot.hasError) {
-            return Center(child: Text('خطأ في تحميل بيانات المشغلين: ${snapshot.error}'));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red, size: 60),
+                    const SizedBox(height: 16),
+                    Text(
+                      'خطأ في تحميل بيانات المشغلين: ${snapshot.error}', // Original error message for technical details
+                      style: const TextStyle(fontSize: 18, color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${appLocalizations.technicalDetails}: ${snapshot.error}', // Reused localization
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('لا يوجد مشغلون لعرضهم. يرجى إضافة مشغل جديد.'));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.people_outline, color: Colors.grey[400], size: 80), // Specific icon
+                    const SizedBox(height: 16),
+                    Text(
+                      'لا يوجد مشغلون لعرضهم. يرجى إضافة مشغل جديد.', // Default message for no data
+                      style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      appLocalizations.tapToAddFirstUser, // Reused localization for adding first item
+                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        _showAddEditOperatorDialog(context, machineryOperatorUseCases, appLocalizations);
+                      },
+                      icon: const Icon(Icons.add),
+                      label: Text(appLocalizations.addOperator),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        textStyle: const TextStyle(fontSize: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           return ListView.builder(
             itemCount: snapshot.data!.length,
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             itemBuilder: (context, index) {
               final operator = snapshot.data![index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 3,
-                child: ListTile(
-                  title: Text(
-                    operator.name,
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.right,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '${appLocalizations.employeeID}: ${operator.employeeId}',
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right,
-                      ),
-                      if (operator.personalData != null && operator.personalData!.isNotEmpty)
-                        Text(
-                          '${appLocalizations.personalData}: ${operator.personalData}',
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
+                elevation: 4, // Increased elevation for prominence
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
+                child: InkWell( // Added InkWell for tap feedback
+                  onTap: () {
+                    // Optional: Show operator details dialog
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0), // Inner padding
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end, // Align all content to the right
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Operator Name with icon
+                            Row(
+                              textDirection: TextDirection.rtl,
+                              children: [
+                                Icon(Icons.person_outline, color: AppColors.primary, size: 28),
+                                const SizedBox(width: 8),
+                                Text(
+                                  operator.name,
+                                  textDirection: TextDirection.rtl,
+                                  textAlign: TextAlign.right,
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            // Status badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: _getOperatorStatusColor(operator.status).withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                operator.status.toArabicString(),
+                                style: TextStyle(
+                                  color: _getOperatorStatusColor(operator.status),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      Text(
-                        '${appLocalizations.costPerHour}: \$${operator.costPerHour.toStringAsFixed(2)}',
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right,
-                      ),
-                      Text(
-                        '${appLocalizations.status}: ${operator.status.toArabicString()}',
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right,
-                        style: TextStyle(color: _getOperatorStatusColor(operator.status)),
-                      ),
-                      if (operator.currentMachineId != null && operator.currentMachineId!.isNotEmpty)
-                        Text(
-                          '${appLocalizations.currentlyOperatingMachine}: ${operator.currentMachineId}', // يمكنك جلب اسم الآلة هنا
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        const Divider(height: 16), // Separator
+                        _buildInfoRow(appLocalizations.employeeID, operator.employeeId, icon: Icons.badge_outlined),
+                        if (operator.personalData != null && operator.personalData!.isNotEmpty)
+                          _buildInfoRow(appLocalizations.personalData, operator.personalData!, icon: Icons.person_pin_outlined),
+                        _buildInfoRow(appLocalizations.costPerHour, '\$${operator.costPerHour.toStringAsFixed(2)}', icon: Icons.attach_money),
+                        if (operator.currentMachineId != null && operator.currentMachineId!.isNotEmpty)
+                          _buildInfoRow(appLocalizations.currentlyOperatingMachine, operator.currentMachineId!, icon: Icons.precision_manufacturing_outlined, textColor: Colors.grey[700], isBold: true),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.bottomLeft, // Align actions to bottom left for RTL
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 22, color: AppColors.secondary),
+                                onPressed: () {
+                                  _showAddEditOperatorDialog(context, machineryOperatorUseCases, appLocalizations, operator: operator);
+                                },
+                                tooltip: appLocalizations.edit,
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline, size: 22, color: Colors.redAccent),
+                                onPressed: () {
+                                  _showDeleteConfirmationDialog(context, machineryOperatorUseCases, appLocalizations, operator.id, operator.name);
+                                },
+                                tooltip: appLocalizations.delete,
+                              ),
+                            ],
+                          ),
                         ),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit, color: AppColors.primary),
-                        onPressed: () {
-                          _showAddEditOperatorDialog(context, machineryOperatorUseCases, appLocalizations, operator: operator);
-                        },
-                        tooltip: appLocalizations.edit,
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          _showDeleteConfirmationDialog(context, machineryOperatorUseCases, appLocalizations, operator.id, operator.name);
-                        },
-                        tooltip: appLocalizations.delete,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -121,22 +205,69 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showAddEditOperatorDialog(context, machineryOperatorUseCases, appLocalizations);
+        },
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        tooltip: appLocalizations.addOperator,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
   Color _getOperatorStatusColor(OperatorStatus status) {
     switch (status) {
       case OperatorStatus.available:
-        return Colors.green;
+        return Colors.green.shade700;
       case OperatorStatus.busy:
-        return Colors.blue;
+        return Colors.blue.shade700;
       case OperatorStatus.onBreak:
-        return Colors.orange;
+        return AppColors.accentOrange; // Using predefined accent orange
       case OperatorStatus.absent:
-        return Colors.red;
+        return Colors.red.shade700;
       default:
-        return Colors.grey;
+        return Colors.grey.shade600;
     }
+  }
+
+  Widget _buildInfoRow(String label, String value, {Color? textColor, bool isBold = false, IconData? icon}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            '$label:',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.right,
+            textDirection: TextDirection.rtl,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 15,
+                color: textColor ?? Colors.black87,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
+              textAlign: TextAlign.left,
+              textDirection: TextDirection.rtl,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showAddEditOperatorDialog(
@@ -152,7 +283,7 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
     final _personalDataController = TextEditingController(text: operator?.personalData);
     final _costPerHourController = TextEditingController(text: operator?.costPerHour.toStringAsFixed(2));
     OperatorStatus _selectedStatus = operator?.status ?? OperatorStatus.available;
-    String? _currentMachineId = operator?.currentMachineId; // Optional: for busy operators
+    String? _currentMachineId = operator?.currentMachineId;
 
     showDialog(
       context: context,
@@ -160,7 +291,12 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text(isEditing ? appLocalizations.editOperator : appLocalizations.addOperator), // أضف هذا النص في ARB
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                isEditing ? appLocalizations.editOperator : appLocalizations.addOperator,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
               content: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
@@ -169,28 +305,60 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
                     children: [
                       TextFormField(
                         controller: _nameController,
-                        decoration: InputDecoration(labelText: appLocalizations.employeeName, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.employeeName,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          prefixIcon: Icon(Icons.person_outline, color: AppColors.dark),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                          ),
+                        ),
                         validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
                         textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                       ),
                       SizedBox(height: 12),
                       TextFormField(
                         controller: _employeeIdController,
-                        decoration: InputDecoration(labelText: appLocalizations.employeeID, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.employeeID,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          prefixIcon: Icon(Icons.badge_outlined, color: AppColors.dark),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                          ),
+                        ),
                         validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
                         textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                       ),
                       SizedBox(height: 12),
                       TextFormField(
                         controller: _personalDataController,
-                        decoration: InputDecoration(labelText: appLocalizations.personalData, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.personalData,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          prefixIcon: Icon(Icons.assignment_ind_outlined, color: AppColors.dark),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                          ),
+                        ),
                         maxLines: 3,
                         textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                       ),
                       SizedBox(height: 12),
                       TextFormField(
                         controller: _costPerHourController,
-                        decoration: InputDecoration(labelText: appLocalizations.costPerHour, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.costPerHour,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          prefixIcon: Icon(Icons.money, color: AppColors.dark),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                          ),
+                        ),
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value!.isEmpty) return appLocalizations.fieldRequired;
@@ -203,11 +371,30 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
                       // Operator Status Dropdown
                       DropdownButtonFormField<OperatorStatus>(
                         value: _selectedStatus,
-                        decoration: InputDecoration(labelText: appLocalizations.status, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.status,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          prefixIcon: Icon(Icons.info_outline, color: AppColors.dark),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                          ),
+                        ),
                         items: OperatorStatus.values.map((status) {
                           return DropdownMenuItem(
                             value: status,
-                            child: Text(status.toArabicString(), textDirection: TextDirection.rtl),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  status.toArabicString(),
+                                  textDirection: TextDirection.rtl,
+                                  style: TextStyle(color: _getOperatorStatusColor(status)),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(_getOperatorStatusIcon(status), size: 18, color: _getOperatorStatusColor(status)),
+                              ],
+                            ),
                           );
                         }).toList(),
                         onChanged: (OperatorStatus? newValue) {
@@ -218,23 +405,30 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
                       ),
                       SizedBox(height: 12),
                       if (_selectedStatus == OperatorStatus.busy)
-                      // Optional: dropdown to select current machine if busy
                         StreamBuilder<List<MachineModel>>(
-                          stream: useCases.getMachines(), // Get all machines
+                          stream: useCases.getMachines(),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return CircularProgressIndicator(color: AppColors.primary);
                             }
                             if (snapshot.hasError) {
-                              return Text('خطأ في تحميل الآلات: ${snapshot.error}');
+                              return Text('خطأ في تحميل الآلات: ${snapshot.error}', style: TextStyle(color: Colors.red));
                             }
                             final machines = snapshot.data ?? [];
                             return DropdownButtonFormField<String>(
                               value: _currentMachineId,
-                              decoration: InputDecoration(labelText: appLocalizations.currentlyOperatingMachine, border: OutlineInputBorder()),
+                              decoration: InputDecoration(
+                                labelText: appLocalizations.currentlyOperatingMachine,
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                prefixIcon: Icon(Icons.precision_manufacturing_outlined, color: AppColors.dark),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                                ),
+                              ),
                               items: machines.map((machine) {
                                 return DropdownMenuItem(
-                                  value: machine.id, // Use machine ID
+                                  value: machine.id,
                                   child: Text('${machine.name} (${machine.machineId})', textDirection: TextDirection.rtl),
                                 );
                               }).toList(),
@@ -255,11 +449,21 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
                 TextButton(
                   child: Text(appLocalizations.cancel),
                   onPressed: () => Navigator.of(dialogContext).pop(),
+                  style: TextButton.styleFrom(foregroundColor: AppColors.dark),
                 ),
-                ElevatedButton(
-                  child: Text(isEditing ? appLocalizations.save : appLocalizations.add),
+                ElevatedButton.icon(
+                  icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white),
+                  label: Text(isEditing ? appLocalizations.save : appLocalizations.add, style: TextStyle(color: Colors.white)),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      // Show loading indicator
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext loadingContext) {
+                          return Center(child: CircularProgressIndicator(color: AppColors.primary));
+                        },
+                      );
                       try {
                         if (isEditing) {
                           await useCases.updateOperator(
@@ -268,10 +472,10 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
                             employeeId: _employeeIdController.text,
                             personalData: _personalDataController.text.isEmpty ? null : _personalDataController.text,
                             costPerHour: double.parse(_costPerHourController.text),
-                            currentMachineId: _selectedStatus == OperatorStatus.busy ? _currentMachineId : null, // Clear if not busy
+                            currentMachineId: _selectedStatus == OperatorStatus.busy ? _currentMachineId : null,
                             status: _selectedStatus,
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.operatorUpdatedSuccessfully))); // أضف هذا النص
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.operatorUpdatedSuccessfully)));
                         } else {
                           await useCases.addOperator(
                             name: _nameController.text,
@@ -280,14 +484,24 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
                             costPerHour: double.parse(_costPerHourController.text),
                             status: _selectedStatus,
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.operatorAddedSuccessfully))); // أضف هذا النص
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.operatorAddedSuccessfully)));
                         }
+                        Navigator.of(context).pop(); // Pop loading
                         Navigator.of(dialogContext).pop();
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorSavingOperator}: $e'))); // أضف هذا النص
+                        Navigator.of(context).pop(); // Pop loading
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorSavingOperator}: $e')));
+                        print('Error saving operator: $e'); // For debugging
                       }
                     }
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
               ],
             );
@@ -295,6 +509,21 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
         );
       },
     );
+  }
+
+  IconData _getOperatorStatusIcon(OperatorStatus status) {
+    switch (status) {
+      case OperatorStatus.available:
+        return Icons.check_circle_outline;
+      case OperatorStatus.busy:
+        return Icons.play_circle_outline;
+      case OperatorStatus.onBreak:
+        return Icons.timer_outlined;
+      case OperatorStatus.absent:
+        return Icons.person_off_outlined;
+      default:
+        return Icons.help_outline;
+    }
   }
 
   void _showDeleteConfirmationDialog(
@@ -308,24 +537,49 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text(appLocalizations.confirmDeletion),
-          content: Text('${appLocalizations.confirmDeleteOperator}: "$operatorName"؟'), // أضف هذا النص
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.confirmDeletion, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text(
+            '${appLocalizations.confirmDeleteOperator}: "$operatorName"؟\n\n${appLocalizations.thisActionCannotBeUndone}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
           actions: <Widget>[
             TextButton(
               child: Text(appLocalizations.cancel),
               onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(foregroundColor: AppColors.dark),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.delete),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.delete_forever, color: Colors.white),
+              label: Text(appLocalizations.delete, style: TextStyle(color: Colors.white)),
               onPressed: () async {
+                Navigator.of(dialogContext).pop(); // Pop confirmation dialog
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  },
+                );
                 try {
                   await useCases.deleteOperator(operatorId);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.operatorDeletedSuccessfully))); // أضف هذا النص
-                  Navigator.of(dialogContext).pop();
+                  Navigator.of(context).pop(); // Pop loading
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.operatorDeletedSuccessfully)));
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorDeletingOperator}: $e'))); // أضف هذا النص
+                  Navigator.of(context).pop(); // Pop loading
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorDeletingOperator}: $e')));
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ],
         );

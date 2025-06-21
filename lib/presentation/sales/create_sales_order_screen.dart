@@ -57,7 +57,12 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text(existingItem != null ? appLocalizations.editItem : appLocalizations.addItem), // أضف هذا النص في ARB
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                existingItem != null ? appLocalizations.editItem : appLocalizations.addItem,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -66,13 +71,13 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                       stream: useCases.getProductCatalogForSales(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return Center(child: CircularProgressIndicator(color: AppColors.primary));
                         }
                         if (snapshot.hasError) {
-                          return Text('خطأ في تحميل المنتجات: ${snapshot.error}');
+                          return Text('خطأ في تحميل المنتجات: ${snapshot.error}', style: TextStyle(color: Colors.red));
                         }
                         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return Text('لا توجد منتجات متاحة لإضافتها.');
+                          return Text('لا توجد منتجات متاحة لإضافتها.', style: TextStyle(color: Colors.grey));
                         }
                         // Pre-select product if editing
                         if (existingItem != null && selectedProduct == null) {
@@ -81,7 +86,14 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
 
                         return DropdownButtonFormField<ProductModel>(
                           value: selectedProduct,
-                          decoration: InputDecoration(labelText: appLocalizations.product, border: OutlineInputBorder()),
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.product,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                            ),
+                          ),
                           items: snapshot.data!.map((product) {
                             return DropdownMenuItem(
                               value: product,
@@ -100,7 +112,14 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                     SizedBox(height: 12),
                     TextFormField(
                       initialValue: quantity.toString(),
-                      decoration: InputDecoration(labelText: appLocalizations.quantity, border: OutlineInputBorder()),
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.quantity,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                      ),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         quantity = int.tryParse(value) ?? 1;
@@ -115,7 +134,14 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                     SizedBox(height: 12),
                     TextFormField(
                       initialValue: unitPrice.toStringAsFixed(2),
-                      decoration: InputDecoration(labelText: appLocalizations.unitPrice, border: OutlineInputBorder()), // أضف هذا النص في ARB
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.unitPrice,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                      ),
                       keyboardType: TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         unitPrice = double.tryParse(value) ?? 0.0;
@@ -133,6 +159,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
+                  style: TextButton.styleFrom(foregroundColor: AppColors.dark),
                   child: Text(appLocalizations.cancel),
                 ),
                 ElevatedButton(
@@ -158,6 +185,11 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                     );
                     Navigator.of(dialogContext).pop(newItem);
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
                   child: Text(existingItem != null ? appLocalizations.save : appLocalizations.add),
                 ),
               ],
@@ -183,13 +215,13 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
     if (_formKey.currentState!.validate() && _orderItems.isNotEmpty) {
       if (_selectedCustomer == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.customerRequired)), // أضف هذا النص
+          SnackBar(content: Text(AppLocalizations.of(context)!.customerRequired)),
         );
         return;
       }
       if (_orderItems.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.atLeastOneItemRequired)), // أضف هذا النص
+          SnackBar(content: Text(AppLocalizations.of(context)!.atLeastOneItemRequired)),
         );
         return;
       }
@@ -221,12 +253,12 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
           customerSignatureFile: signatureFile,
         );
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.salesOrderCreatedSuccessfully)), // أضف هذا النص
+          SnackBar(content: Text(AppLocalizations.of(context)!.salesOrderCreatedSuccessfully)),
         );
         Navigator.of(context).pop(); // Go back after successful submission
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppLocalizations.of(context)!.errorCreatingSalesOrder}: $e')), // أضف هذا النص
+          SnackBar(content: Text('${AppLocalizations.of(context)!.errorCreatingSalesOrder}: $e')),
         );
         print(e);
       } finally {
@@ -252,8 +284,10 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(appLocalizations.createSalesOrder), // أضف هذا النص
+        title: Text(appLocalizations.createSalesOrder),
         centerTitle: true,
+        backgroundColor: AppColors.primary, // Apply primary color to AppBar
+        foregroundColor: Colors.white, // White text for AppBar title
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -266,20 +300,24 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                 stream: salesUseCases.getCustomers(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(child: CircularProgressIndicator(color: AppColors.primary));
                   }
                   if (snapshot.hasError) {
-                    return Text('خطأ في تحميل العملاء: ${snapshot.error}');
+                    return Text('خطأ في تحميل العملاء: ${snapshot.error}', style: TextStyle(color: Colors.red));
                   }
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Text('لا توجد عملاء متاحون. يرجى إضافة عميل أولاً.');
+                    return Text('لا توجد عملاء متاحون. يرجى إضافة عميل أولاً.', style: TextStyle(color: Colors.grey));
                   }
 
                   return DropdownButtonFormField<CustomerModel>(
                     value: _selectedCustomer,
                     decoration: InputDecoration(
-                      labelText: appLocalizations.customer, // أضف هذا النص
-                      border: OutlineInputBorder(),
+                      labelText: appLocalizations.customer,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                      ),
                     ),
                     items: snapshot.data!.map((customer) {
                       return DropdownMenuItem(
@@ -299,10 +337,10 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
               ),
               SizedBox(height: 24),
               // Order Items
-              Text(appLocalizations.orderItems, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.right), // أضف هذا النص
+              Text(appLocalizations.orderItems, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.dark), textAlign: TextAlign.right),
               SizedBox(height: 12),
               _orderItems.isEmpty
-                  ? Text(appLocalizations.noItemsAdded, textAlign: TextAlign.right, style: TextStyle(color: Colors.grey[700])) // أضف هذا النص
+                  ? Text(appLocalizations.noItemsAdded, textAlign: TextAlign.right, style: TextStyle(color: Colors.grey[700]))
                   : ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -311,9 +349,11 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                   final item = _orderItems[index];
                   return Card(
                     margin: EdgeInsets.symmetric(vertical: 4),
+                    elevation: 1,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     child: ListTile(
-                      title: Text(item.productName, textDirection: TextDirection.rtl),
-                      subtitle: Text('${appLocalizations.quantity}: ${item.quantity} | ${appLocalizations.unitPrice}: \$${item.unitPrice.toStringAsFixed(2)}', textDirection: TextDirection.rtl),
+                      title: Text(item.productName, textDirection: TextDirection.rtl, style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text('${appLocalizations.quantity}: ${item.quantity} | ${appLocalizations.unitPrice}: \$${item.unitPrice.toStringAsFixed(2)}', textDirection: TextDirection.rtl, style: TextStyle(color: Colors.grey[700])),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -322,7 +362,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                             onPressed: () => _addOrUpdateOrderItem(appLocalizations, salesUseCases, existingItem: item, index: index),
                           ),
                           IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
+                            icon: Icon(Icons.delete, color: Colors.redAccent),
                             onPressed: () {
                               setState(() {
                                 _orderItems.removeAt(index);
@@ -338,49 +378,59 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
               ),
               SizedBox(height: 12),
               ElevatedButton.icon(
-                icon: Icon(Icons.add),
-                label: Text(appLocalizations.addOrderItem), // أضف هذا النص
+                icon: Icon(Icons.add_shopping_cart_outlined, color: Colors.white),
+                label: Text(appLocalizations.addOrderItem, style: TextStyle(color: Colors.white)),
                 onPressed: () => _addOrUpdateOrderItem(appLocalizations, salesUseCases),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
               ),
               SizedBox(height: 24),
               // Total Amount
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  '${appLocalizations.totalAmount}: \$${_totalAmount.toStringAsFixed(2)}', // أضف هذا النص
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  '${appLocalizations.totalAmount}: \$${_totalAmount.toStringAsFixed(2)}',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary),
                   textDirection: TextDirection.rtl,
                 ),
               ),
               SizedBox(height: 24),
               // Customer Signature
-              Text(appLocalizations.customerSignature, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.right),
+              Text(appLocalizations.customerSignature, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.dark), textAlign: TextAlign.right),
               SizedBox(height: 12),
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300, width: 2),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Signature(
                   controller: _signatureController,
                   height: 200,
-                  backgroundColor: Colors.grey[100]!,
+                  backgroundColor: Colors.grey[50]!,
                 ),
               ),
               SizedBox(height: 8),
               Align(
                 alignment: Alignment.centerLeft,
-                child: TextButton(
+                child: TextButton.icon(
+                  icon: Icon(Icons.clear_outlined, color: AppColors.dark),
                   onPressed: () => _signatureController.clear(),
-                  child: Text(appLocalizations.clearSignature),
+                  label: Text(appLocalizations.clearSignature, style: TextStyle(color: AppColors.dark)),
                 ),
               ),
               SizedBox(height: 24),
-              ElevatedButton(
+              ElevatedButton.icon(
+                icon: Icon(Icons.send, color: Colors.white),
+                label: Text(appLocalizations.submitOrder, style: TextStyle(color: Colors.white)),
                 onPressed: () => _submitOrder(salesUseCases, currentUser),
-                child: Text(appLocalizations.submitOrder),
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
                   minimumSize: Size(double.infinity, 55),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 5,
                 ),
               ),
             ],

@@ -11,8 +11,9 @@ import 'package:intl/intl.dart' as intl;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-import 'create_production_order_screen.dart'; // تأكد من الاستيراد
-import 'production_order_detail_screen.dart'; // تأكد من الاستيراد
+import 'create_production_order_screen.dart';
+import 'production_order_detail_screen.dart';
+import '../../theme/app_colors.dart'; // Import AppColors
 
 // شاشة عرض طلبات الإنتاج
 class ProductionOrdersListScreen extends StatefulWidget {
@@ -31,8 +32,32 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
 
     if (currentUser == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(appLocalizations.productionOrderManagement)),
-        body: Center(child: Text('لا يمكن عرض الطلبات بدون بيانات المستخدم.')),
+        appBar: AppBar(
+          title: Text(appLocalizations.productionOrderManagement),
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.person_off_outlined,
+                  size: 80,
+                  color: Colors.grey[400],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  appLocalizations.loginRequiredToViewOrders, // Reusing existing localization
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 
@@ -44,10 +69,13 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
       appBar: AppBar(
         title: Text(appLocalizations.productionOrderManagement),
         centerTitle: true,
+        backgroundColor: AppColors.primary, // Apply primary color
+        foregroundColor: Colors.white, // White text for AppBar title
+        elevation: 0,
         actions: [
           if (isPreparer)
             IconButton(
-              icon: Icon(Icons.add),
+              icon: Icon(Icons.add, color: Colors.white), // White icon
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreateProductionOrderScreen()));
               },
@@ -113,13 +141,76 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
               }),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator(color: AppColors.primary));
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text('خطأ في تحميل طلبات الإنتاج: ${snapshot.error}'));
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error_outline, color: Colors.red, size: 60),
+                          const SizedBox(height: 16),
+                          Text(
+                            'خطأ في تحميل طلبات الإنتاج: ${snapshot.error}', // Original error message
+                            style: const TextStyle(fontSize: 18, color: Colors.red),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${appLocalizations.technicalDetails}: ${snapshot.error}', // Reused localization
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 }
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('لا توجد طلبات إنتاج لعرضها.'));
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.assignment_outlined, color: Colors.grey[400], size: 80), // Specific icon
+                          const SizedBox(height: 16),
+                          Text(
+                            'لا توجد طلبات إنتاج لعرضها.', // Default no data message
+                            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          if (isPreparer)
+                            Text(
+                              appLocalizations.tapToAddFirstOrder, // Reused localization
+                              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                              textAlign: TextAlign.center,
+                            ),
+                          if (isPreparer) const SizedBox(height: 24),
+                          if (isPreparer)
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreateProductionOrderScreen()));
+                              },
+                              icon: const Icon(Icons.add),
+                              label: Text(appLocalizations.createOrder),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                textStyle: const TextStyle(fontSize: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
                 }
 
                 final List<ProductionOrderModel> filteredOrders = isPreparer
@@ -127,7 +218,29 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                     : snapshot.data!;
 
                 if (filteredOrders.isEmpty) {
-                  return Center(child: Text('لا توجد طلبات إنتاج بهذا الفلتر.'));
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.filter_alt_off, color: Colors.grey[400], size: 80),
+                          const SizedBox(height: 16),
+                          Text(
+                            'لا توجد طلبات إنتاج بهذا الفلتر.', // Specific message for no results with filter
+                            style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            appLocalizations.tryDifferentFilter, // Reused localization
+                            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 }
 
                 return ListView.builder(
@@ -136,72 +249,89 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                     final order = filteredOrders[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      elevation: 3,
-                      child: ListTile(
+                      elevation: 4, // Increased elevation for prominence
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
+                      child: InkWell( // Added InkWell for tap feedback
                         onTap: () {
                           // Navigate to order details screen
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => ProductionOrderDetailScreen(order: order),
                           ));
                         },
-                        title: Text(
-                          '${appLocalizations.product}: ${order.productName}',
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${appLocalizations.requiredQuantity}: ${order.requiredQuantity}',
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                            ),
-                            Text(
-                              '${appLocalizations.batchNumber}: ${order.batchNumber}',
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                            ),
-                            Text(
-                              '${appLocalizations.orderPreparer}: ${order.orderPreparerName}',
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                            ),
-                            Text(
-                              '${appLocalizations.status}: ${order.status.toArabicString()}',
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                color: _getStatusColor(order.status),
-                                fontWeight: FontWeight.bold,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0), // Inner padding
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Product Name
+                                  Row(
+                                    textDirection: TextDirection.rtl,
+                                    children: [
+                                      Icon(Icons.category_outlined, color: AppColors.primary, size: 28),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '${appLocalizations.product}: ${order.productName}',
+                                        textDirection: TextDirection.rtl,
+                                        textAlign: TextAlign.right,
+                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  // Status badge
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: _getStatusColor(order.status).withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      order.status.toArabicString(),
+                                      style: TextStyle(
+                                        color: _getStatusColor(order.status),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Text(
-                              'تاريخ الإنشاء: ${intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate())}',
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                            ),
-                          ],
+                              const Divider(height: 16), // Separator
+                              _buildInfoRow(appLocalizations.requiredQuantity, order.requiredQuantity.toString(), icon: Icons.production_quantity_limits_outlined),
+                              _buildInfoRow(appLocalizations.batchNumber, order.batchNumber, icon: Icons.batch_prediction_outlined),
+                              _buildInfoRow(appLocalizations.orderPreparer, order.orderPreparerName, icon: Icons.person_outline),
+                              _buildInfoRow(
+                                'تاريخ الإنشاء',
+                                intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate()),
+                                icon: Icons.calendar_today_outlined,
+                                textColor: Colors.grey[700],
+                              ),
+                              const SizedBox(height: 8),
+                              if (isManager && order.status == ProductionOrderStatus.pending)
+                                Align(
+                                  alignment: Alignment.bottomLeft, // Align actions to bottom left for RTL
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.check_circle_outline, color: Colors.green.shade700, size: 22),
+                                        onPressed: () => _showApproveDialog(context, order, currentUser, appLocalizations),
+                                        tooltip: appLocalizations.approve,
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.cancel_outlined, color: Colors.red.shade700, size: 22),
+                                        onPressed: () => _showRejectDialog(context, order, currentUser, appLocalizations),
+                                        tooltip: appLocalizations.reject,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                        trailing: (isManager && order.status == ProductionOrderStatus.pending)
-                            ? Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.check_circle, color: Colors.green),
-                              onPressed: () => _showApproveDialog(context, order, currentUser, appLocalizations),
-                              tooltip: appLocalizations.approve,
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.cancel, color: Colors.red),
-                              onPressed: () => _showRejectDialog(context, order, currentUser, appLocalizations),
-                              tooltip: appLocalizations.reject,
-                            ),
-                          ],
-                        )
-                            : null,
                       ),
                     );
                   },
@@ -225,11 +355,12 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
             onSelected(value);
           }
         },
-        selectedColor: Theme.of(context).primaryColor.withOpacity(0.2),
+        selectedColor: AppColors.primary.withOpacity(0.2), // Use AppColors for selected color
         labelStyle: TextStyle(
-          color: selectedValue == value ? Theme.of(context).primaryColor : Colors.black87,
+          color: selectedValue == value ? AppColors.primary : Colors.black87,
           fontWeight: selectedValue == value ? FontWeight.bold : FontWeight.normal,
         ),
+        elevation: selectedValue == value ? 0 : 1, // Add elevation when selected
       ),
     );
   }
@@ -237,20 +368,59 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
   Color _getStatusColor(ProductionOrderStatus status) {
     switch (status) {
       case ProductionOrderStatus.pending:
-        return Colors.orange;
+        return AppColors.accentOrange; // Using predefined accent orange
       case ProductionOrderStatus.approved:
-        return Colors.blue;
+        return Colors.blue.shade700;
       case ProductionOrderStatus.inProduction:
-        return Colors.purple;
+        return Colors.purple.shade700;
       case ProductionOrderStatus.completed:
-        return Colors.green;
+        return Colors.green.shade700;
       case ProductionOrderStatus.canceled:
       case ProductionOrderStatus.rejected:
-        return Colors.red;
+        return Colors.red.shade700;
       default:
-        return Colors.grey;
+        return Colors.grey.shade600;
     }
   }
+
+  Widget _buildInfoRow(String label, String value, {Color? textColor, bool isBold = false, IconData? icon}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            '$label:',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.right,
+            textDirection: TextDirection.rtl,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 15,
+                color: textColor ?? Colors.black87,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
+              textAlign: TextAlign.left,
+              textDirection: TextDirection.rtl,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   void _showApproveDialog(BuildContext context, ProductionOrderModel order, UserModel approver, AppLocalizations appLocalizations) {
     final TextEditingController notesController = TextEditingController();
@@ -269,16 +439,25 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
       builder: (BuildContext dialogContext) {
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
-            title: Text(appLocalizations.approveOrderConfirmation),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(appLocalizations.approveOrderConfirmation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('${appLocalizations.confirmApproveOrder} "${order.productName}"؟'),
+                  Text('${appLocalizations.confirmApproveOrder} "${order.productName}"؟', textAlign: TextAlign.center, style: TextStyle(color: AppColors.dark)),
                   const SizedBox(height: 16),
-                  TextField(
+                  TextFormField(
                     controller: notesController,
-                    decoration: InputDecoration(labelText: appLocalizations.addNotes),
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.addNotes,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      prefixIcon: Icon(Icons.notes_outlined, color: AppColors.dark),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                      ),
+                    ),
                     maxLines: 3,
                     textAlign: TextAlign.right,
                     textDirection: TextDirection.rtl,
@@ -287,37 +466,55 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final img = await picker.pickImage(source: ImageSource.camera);
-                          if (img != null) setState(() => pickedImages.add(img));
-                        },
-                        icon: const Icon(Icons.camera_alt),
-                        label: Text(appLocalizations.camera),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            final img = await picker.pickImage(source: ImageSource.camera);
+                            if (img != null) setState(() => pickedImages.add(img));
+                          },
+                          icon: const Icon(Icons.camera_alt),
+                          label: Text(appLocalizations.camera),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent, foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
                       ),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          await pickImages();
-                          setState(() {});
-                        },
-                        icon: const Icon(Icons.photo_library),
-                        label: Text(appLocalizations.gallery),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            await pickImages();
+                            setState(() {});
+                          },
+                          icon: const Icon(Icons.photo_library),
+                          label: Text(appLocalizations.gallery),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purpleAccent, foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                   if (pickedImages.isNotEmpty)
-                    Wrap(
-                      children: pickedImages
-                          .map((e) => Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Image.file(
-                                  File(e.path),
-                                  width: 60,
-                                  height: 60,
-                                  fit: BoxFit.cover,
-                                ),
-                              ))
-                          .toList(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: pickedImages
+                            .map((e) => ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            File(e.path),
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          ),
+                        ))
+                            .toList(),
+                      ),
                     ),
                 ],
               ),
@@ -326,11 +523,21 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
               TextButton(
                 child: Text(appLocalizations.cancel),
                 onPressed: () => Navigator.of(dialogContext).pop(),
+                style: TextButton.styleFrom(foregroundColor: AppColors.dark),
               ),
-              ElevatedButton(
-                child: Text(appLocalizations.approve),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.check, color: Colors.white),
+                label: Text(appLocalizations.approve, style: TextStyle(color: Colors.white)),
                 onPressed: () async {
                   Navigator.of(dialogContext).pop();
+                  // Show loading indicator
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext loadingContext) {
+                      return Center(child: CircularProgressIndicator(color: AppColors.primary));
+                    },
+                  );
                   try {
                     await Provider.of<ProductionOrderUseCases>(context, listen: false).approveProductionOrder(
                       order,
@@ -338,16 +545,23 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                       notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
                       attachments: pickedImages.map((e) => File(e.path)).toList(),
                     );
+                    Navigator.of(context).pop(); // Pop the loading indicator
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(appLocalizations.orderApprovedSuccessfully)),
                     );
                   } catch (e) {
+                    Navigator.of(context).pop(); // Pop the loading indicator
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('${appLocalizations.errorApprovingOrder}: $e')),
                     );
                     print('Error approving order: $e');
                   }
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
               ),
             ],
           ),
@@ -362,17 +576,23 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text(appLocalizations.rejectOrderConfirmation),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.rejectOrderConfirmation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${appLocalizations.confirmRejectOrder} "${order.productName}"؟'),
+              Text('${appLocalizations.confirmRejectOrder} "${order.productName}"؟', textAlign: TextAlign.center, style: TextStyle(color: AppColors.dark)),
               SizedBox(height: 16),
               TextFormField(
                 controller: reasonController,
                 decoration: InputDecoration(
                   labelText: appLocalizations.rejectionReason,
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  prefixIcon: Icon(Icons.feedback_outlined, color: AppColors.dark),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                  ),
                 ),
                 maxLines: 3,
                 textAlign: TextAlign.right,
@@ -386,9 +606,11 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
               onPressed: () {
                 Navigator.of(dialogContext).pop();
               },
+              style: TextButton.styleFrom(foregroundColor: AppColors.dark),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.reject),
+            ElevatedButton.icon(
+              icon: Icon(Icons.close, color: Colors.white),
+              label: Text(appLocalizations.reject, style: TextStyle(color: Colors.white)),
               onPressed: () async {
                 if (reasonController.text.isEmpty) {
                   ScaffoldMessenger.of(dialogContext).showSnackBar(
@@ -397,18 +619,33 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                   return;
                 }
                 Navigator.of(dialogContext).pop();
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  },
+                );
                 try {
                   await Provider.of<ProductionOrderUseCases>(context, listen: false).rejectProductionOrder(order, approver, reasonController.text);
+                  Navigator.of(context).pop(); // Pop loading
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(appLocalizations.orderRejectedSuccessfully)),
                   );
                 } catch (e) {
+                  Navigator.of(context).pop(); // Pop loading
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('${appLocalizations.errorRejectingOrder}: $e')),
                   );
                   print('Error rejecting order: $e');
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
             ),
           ],
         );

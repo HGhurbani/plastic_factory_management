@@ -9,8 +9,10 @@ import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/maintenance_usecases.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart'; // Import for custom font
 
-import '../../core/constants/app_enums.dart'; // لاستخدام Timestamp
+import '../../core/constants/app_enums.dart';
+import '../../theme/app_colors.dart'; // Import AppColors
 
 class MaintenanceProgramScreen extends StatefulWidget {
   @override
@@ -41,7 +43,11 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
 
     if (currentUser == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(appLocalizations.maintenanceProgram)),
+        appBar: AppBar(
+          title: Text(appLocalizations.maintenanceProgram),
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+        ),
         body: Center(child: Text('لا يمكن عرض برنامج الصيانة بدون بيانات المستخدم.')),
       );
     }
@@ -50,26 +56,29 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
       appBar: AppBar(
         title: Text(appLocalizations.maintenanceProgram),
         centerTitle: true,
+        backgroundColor: AppColors.primary, // Apply primary color
+        foregroundColor: Colors.white, // White text for AppBar title
+        elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.add, color: Colors.white), // White icon
             onPressed: () {
               _showScheduleMaintenanceDialog(context, maintenanceUseCases, appLocalizations, currentUser);
             },
-            tooltip: appLocalizations.scheduleMaintenance, // أضف هذا النص في ARB
+            tooltip: appLocalizations.scheduleMaintenance,
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: appLocalizations.scheduledMaintenance), // أضف هذا النص في ARB
-            Tab(text: appLocalizations.completedMaintenance), // أضف هذا النص في ARB
+            Tab(text: appLocalizations.scheduledMaintenance),
+            Tab(text: appLocalizations.completedMaintenance),
           ],
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
           indicatorColor: Colors.white,
-          labelStyle: TextStyle(fontWeight: FontWeight.bold),
-          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+          labelStyle: GoogleFonts.tajawal(fontWeight: FontWeight.bold), // Set Tajawal font
+          unselectedLabelStyle: GoogleFonts.tajawal(fontWeight: FontWeight.normal), // Set Tajawal font
         ),
       ),
       body: TabBarView(
@@ -80,20 +89,81 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
             stream: maintenanceUseCases.getScheduledMaintenance(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(color: AppColors.primary));
               }
               if (snapshot.hasError) {
-                return Center(child: Text('خطأ في تحميل الصيانة المجدولة: ${snapshot.error}'));
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error_outline, color: Colors.red, size: 60),
+                        const SizedBox(height: 16),
+                        Text(
+                          'خطأ في تحميل الصيانة المجدولة: ${snapshot.error}', // Original error message for technical details
+                          style: const TextStyle(fontSize: 18, color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${appLocalizations.technicalDetails}: ${snapshot.error}', // Reused localization
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               }
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('لا توجد مهام صيانة مجدولة.'));
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.calendar_today_outlined, color: Colors.grey[400], size: 80),
+                        const SizedBox(height: 16),
+                        Text(
+                          'لا توجد مهام صيانة مجدولة.', // Default message for no data
+                          style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          appLocalizations.tapToAddFirstMachine, // Reused for adding first item
+                          style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            _showScheduleMaintenanceDialog(context, maintenanceUseCases, appLocalizations, currentUser);
+                          },
+                          icon: const Icon(Icons.add),
+                          label: Text(appLocalizations.scheduleMaintenance),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            textStyle: const TextStyle(fontSize: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               }
 
               // Filter by date if needed, or by assigned user if applicable
               // For a Maintenance Manager, show all. For operator, show assigned to them.
               final List<MaintenanceLogModel> filteredLogs = snapshot.data!
                   .where((log) => log.status == 'scheduled' || log.status == 'in_progress')
-                  .toList(); // Or filter based on user role/assignment
+                  .toList();
 
               return ListView.builder(
                 padding: const EdgeInsets.all(16.0),
@@ -110,13 +180,13 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
             stream: maintenanceUseCases.getCompletedMaintenance(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(color: AppColors.primary));
               }
               if (snapshot.hasError) {
-                return Center(child: Text('خطأ في تحميل الصيانة المكتملة: ${snapshot.error}'));
+                return Center(child: Text('خطأ في تحميل الصيانة المكتملة: ${snapshot.error}', style: TextStyle(color: Colors.red)));
               }
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('لا توجد مهام صيانة مكتملة.'));
+                return Center(child: Text('لا توجد مهام صيانة مكتملة.', style: TextStyle(color: Colors.grey)));
               }
 
               return ListView.builder(
@@ -140,9 +210,14 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 3,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ExpansionTile(
         tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: CircleAvatar(
+          backgroundColor: _getMaintenanceStatusColor(log.status),
+          child: Icon(Icons.build, color: Colors.white),
+        ),
         title: Text(
           'صيانة ${log.machineName} - ${log.type.toArabicString()}',
           textDirection: TextDirection.rtl,
@@ -163,10 +238,10 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
               textAlign: TextAlign.right,
             ),
             Text(
-              '${appLocalizations.status}: ${log.status == 'scheduled' ? appLocalizations.scheduled : (log.status == 'in_progress' ? 'قيد التنفيذ' : appLocalizations.completed)}', // أضف 'قيد التنفيذ' و 'مجدولة' في ARB
+              '${appLocalizations.status}: ${log.status == 'scheduled' ? appLocalizations.scheduled : (log.status == 'in_progress' ? 'قيد التنفيذ' : appLocalizations.completed)}',
               textDirection: TextDirection.rtl,
               textAlign: TextAlign.right,
-              style: TextStyle(color: _getMaintenanceStatusColor(log.status)),
+              style: TextStyle(color: _getMaintenanceStatusColor(log.status), fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -205,13 +280,14 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                             // Update the log in Firestore
                             await useCases.completeMaintenanceTask(
                               log: log,
-                              completer: currentUser, // This assumes current user is the one completing
+                              completer: currentUser,
                               updatedChecklist: updatedChecklist,
                             );
                           }
                         }
-                            : null, // Disable if not completable or already completed
-                        controlAffinity: ListTileControlAffinity.leading, // Checkbox on the right for RTL
+                            : null,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        activeColor: AppColors.primary,
                       ),
                     );
                   }).toList(),
@@ -221,25 +297,29 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                     alignment: Alignment.center,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Check if all items are completed
                         final allItemsCompleted = log.checklist.every((item) => item.completed);
                         if (!allItemsCompleted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(appLocalizations.completeAllChecklistItems)), // أضف هذا النص
+                            SnackBar(content: Text(appLocalizations.completeAllChecklistItems)),
                           );
                           return;
                         }
                         _showCompleteMaintenanceDialog(context, log, useCases, currentUser, appLocalizations);
                       },
-                      child: Text(appLocalizations.completeMaintenance), // أضف هذا النص
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: Text(appLocalizations.completeMaintenance),
                     ),
                   ),
                 if (!isCompletedTab && currentUser.userRoleEnum == UserRole.maintenanceManager)
                   Align(
                     alignment: Alignment.center,
                     child: TextButton.icon(
-                      icon: Icon(Icons.edit, size: 20),
-                      label: Text(appLocalizations.editMaintenance), // أضف هذا النص
+                      icon: Icon(Icons.edit, size: 20, color: AppColors.secondary),
+                      label: Text(appLocalizations.editMaintenance, style: TextStyle(color: AppColors.secondary)),
                       onPressed: () {
                         _showScheduleMaintenanceDialog(context, useCases, appLocalizations, currentUser, maintenanceLog: log);
                       },
@@ -249,8 +329,8 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                   Align(
                     alignment: Alignment.center,
                     child: TextButton.icon(
-                      icon: Icon(Icons.delete, size: 20, color: Colors.red),
-                      label: Text(appLocalizations.deleteMaintenance), // أضف هذا النص
+                      icon: Icon(Icons.delete, size: 20, color: Colors.redAccent),
+                      label: Text(appLocalizations.deleteMaintenance, style: TextStyle(color: Colors.redAccent)),
                       onPressed: () {
                         _showDeleteConfirmationDialog(context, useCases, appLocalizations, log.id, log.machineName);
                       },
@@ -267,15 +347,15 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
   Color _getMaintenanceStatusColor(String status) {
     switch (status) {
       case 'scheduled':
-        return Colors.blue;
+        return Colors.blue.shade700;
       case 'in_progress':
-        return Colors.orange;
+        return AppColors.accentOrange;
       case 'completed':
-        return Colors.green;
+        return Colors.green.shade700;
       case 'cancelled':
-        return Colors.red;
+        return Colors.red.shade700;
       default:
-        return Colors.grey;
+        return Colors.grey.shade600;
     }
   }
 
@@ -296,7 +376,7 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
           SizedBox(width: 4),
           Text(
             '$label:',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.dark),
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
           ),
@@ -324,10 +404,9 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
         [TextEditingController()]; // Start with one empty controller
 
     if (isEditing && maintenanceLog!.machineId.isNotEmpty) {
-      // Try to pre-select the machine for editing
       useCases.getAllMachines().first.then((machines) {
         setState(() {
-          _selectedMachine = machines.firstWhere((m) => m.id == maintenanceLog.machineId, orElse: () => machines.first); // Fallback
+          _selectedMachine = machines.firstWhere((m) => m.id == maintenanceLog.machineId, orElse: () => machines.first);
         });
       });
     }
@@ -338,7 +417,12 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text(isEditing ? appLocalizations.editMaintenance : appLocalizations.scheduleMaintenance),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                isEditing ? appLocalizations.editMaintenance : appLocalizations.scheduleMaintenance,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
               content: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
@@ -350,16 +434,15 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                         stream: useCases.getAllMachines(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return Center(child: CircularProgressIndicator(color: AppColors.primary));
                           }
                           if (snapshot.hasError) {
-                            return Text('خطأ في تحميل الآلات: ${snapshot.error}');
+                            return Text('خطأ في تحميل الآلات: ${snapshot.error}', style: TextStyle(color: Colors.red));
                           }
                           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Text('لا توجد آلات متاحة. يرجى إضافة آلات أولاً.');
+                            return Text('لا توجد آلات متاحة. يرجى إضافة آلات أولاً.', style: TextStyle(color: Colors.grey));
                           }
 
-                          // Set initial value only if not set and in editing mode
                           if (isEditing && _selectedMachine == null) {
                             _selectedMachine = snapshot.data!.firstWhere(
                                   (m) => m.id == maintenanceLog!.machineId,
@@ -369,7 +452,15 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
 
                           return DropdownButtonFormField<MachineModel>(
                             value: _selectedMachine,
-                            decoration: InputDecoration(labelText: appLocalizations.machine, border: OutlineInputBorder()), // أضف هذا النص
+                            decoration: InputDecoration(
+                              labelText: appLocalizations.machine,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              prefixIcon: Icon(Icons.precision_manufacturing_outlined, color: AppColors.dark),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                              ),
+                            ),
                             items: snapshot.data!.map((machine) {
                               return DropdownMenuItem(
                                 value: machine,
@@ -389,7 +480,15 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                       // Maintenance Type
                       DropdownButtonFormField<MaintenanceType>(
                         value: _selectedType,
-                        decoration: InputDecoration(labelText: appLocalizations.maintenanceType, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.maintenanceType,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          prefixIcon: Icon(Icons.build_circle_outlined, color: AppColors.dark),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                          ),
+                        ),
                         items: MaintenanceType.values.map((type) {
                           return DropdownMenuItem(
                             value: type,
@@ -409,19 +508,46 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                           '${appLocalizations.maintenanceDate}: ${intl.DateFormat('yyyy-MM-dd HH:mm').format(_selectedDateTime)}',
                           textAlign: TextAlign.right,
                           textDirection: TextDirection.rtl,
+                          style: TextStyle(color: AppColors.dark),
                         ),
-                        trailing: Icon(Icons.calendar_today),
+                        trailing: Icon(Icons.calendar_today, color: AppColors.primary),
                         onTap: () async {
                           final DateTime? pickedDate = await showDatePicker(
                             context: context,
                             initialDate: _selectedDateTime,
                             firstDate: DateTime.now().subtract(Duration(days: 365)),
                             lastDate: DateTime.now().add(Duration(days: 365 * 5)),
+                            builder: (context, child) => Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: AppColors.primary, // dialog primary color
+                                  onPrimary: Colors.white, // text color on primary
+                                  onSurface: AppColors.dark, // text color on surface
+                                ),
+                                textButtonTheme: TextButtonThemeData(
+                                  style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                                ),
+                              ),
+                              child: child!,
+                            ),
                           );
                           if (pickedDate != null) {
                             final TimeOfDay? pickedTime = await showTimePicker(
                               context: context,
                               initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
+                              builder: (context, child) => Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: AppColors.primary,
+                                    onPrimary: Colors.white,
+                                    onSurface: AppColors.dark,
+                                  ),
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                                  ),
+                                ),
+                                child: child!,
+                              ),
                             );
                             if (pickedTime != null) {
                               setState(() {
@@ -440,13 +566,24 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                       SizedBox(height: 12),
                       TextFormField(
                         controller: _notesController,
-                        decoration: InputDecoration(labelText: appLocalizations.notes, border: OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.notes,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          prefixIcon: Icon(Icons.notes_outlined, color: AppColors.dark),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                          ),
+                        ),
                         maxLines: 3,
                         textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                       ),
                       SizedBox(height: 12),
                       // Checklist Items
-                      Text(appLocalizations.checklist, style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.right),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(appLocalizations.checklist, style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.dark)),
+                      ),
                       ..._checklistControllers.asMap().entries.map((entry) {
                         int idx = entry.key;
                         TextEditingController controller = entry.value;
@@ -455,13 +592,19 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                             Expanded(
                               child: TextFormField(
                                 controller: controller,
-                                decoration: InputDecoration(hintText: appLocalizations.checklistItem, border: UnderlineInputBorder()), // أضف هذا النص
+                                decoration: InputDecoration(
+                                  hintText: appLocalizations.checklistItem,
+                                  border: UnderlineInputBorder(),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: AppColors.primary, width: 2),
+                                  ),
+                                ),
                                 textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                                 validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
                               ),
                             ),
                             IconButton(
-                              icon: Icon(Icons.remove_circle, color: Colors.red),
+                              icon: Icon(Icons.remove_circle, color: Colors.redAccent),
                               onPressed: () {
                                 setState(() {
                                   _checklistControllers.removeAt(idx);
@@ -474,8 +617,8 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                       Align(
                         alignment: Alignment.centerLeft,
                         child: TextButton.icon(
-                          icon: Icon(Icons.add),
-                          label: Text(appLocalizations.addChecklistItem), // أضف هذا النص
+                          icon: Icon(Icons.add, color: AppColors.primary),
+                          label: Text(appLocalizations.addChecklistItem, style: TextStyle(color: AppColors.primary)),
                           onPressed: () {
                             setState(() {
                               _checklistControllers.add(TextEditingController());
@@ -491,17 +634,26 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                 TextButton(
                   child: Text(appLocalizations.cancel),
                   onPressed: () => Navigator.of(dialogContext).pop(),
+                  style: TextButton.styleFrom(foregroundColor: AppColors.dark),
                 ),
-                ElevatedButton(
-                  child: Text(isEditing ? appLocalizations.save : appLocalizations.schedule), // أضف هذا النص
+                ElevatedButton.icon(
+                  icon: Icon(isEditing ? Icons.save : Icons.add_task, color: Colors.white),
+                  label: Text(isEditing ? appLocalizations.save : appLocalizations.schedule, style: TextStyle(color: Colors.white)),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       final List<String> tasks = _checklistControllers.map((c) => c.text.trim()).where((s) => s.isNotEmpty).toList();
                       if (tasks.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.checklistRequired))); // أضف هذا النص
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.checklistRequired)));
                         return;
                       }
-
+                      // Show loading indicator
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext loadingContext) {
+                          return Center(child: CircularProgressIndicator(color: AppColors.primary));
+                        },
+                      );
                       try {
                         if (isEditing) {
                           await useCases.updateMaintenanceLog(
@@ -510,34 +662,43 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                             machineName: _selectedMachine!.name,
                             maintenanceDate: _selectedDateTime,
                             type: _selectedType,
-                            responsibleUid: maintenanceLog.responsibleUid, // Keep original responsible for now
+                            responsibleUid: maintenanceLog.responsibleUid,
                             responsibleName: maintenanceLog.responsibleName,
                             notes: _notesController.text.isEmpty ? null : _notesController.text,
                             checklist: tasks.map((task) => MaintenanceChecklistItem(
                                 task: task,
-                                completed: maintenanceLog.checklist.any((item) => item.task == task && item.completed) // Preserve completion status
+                                completed: maintenanceLog.checklist.any((item) => item.task == task && item.completed)
                             )).toList(),
-                            status: maintenanceLog.status, // Preserve status (scheduled/in_progress)
+                            status: maintenanceLog.status,
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.maintenanceUpdatedSuccessfully))); // أضف هذا النص
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.maintenanceUpdatedSuccessfully)));
                         } else {
                           await useCases.scheduleMaintenance(
                             selectedMachine: _selectedMachine!,
                             maintenanceDateTime: _selectedDateTime,
                             type: _selectedType,
-                            responsibleUser: currentUser, // Current user is the one scheduling/responsible
+                            responsibleUser: currentUser,
                             notes: _notesController.text.isEmpty ? null : _notesController.text,
                             checklistTasks: tasks,
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.maintenanceScheduledSuccessfully))); // أضف هذا النص
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.maintenanceScheduledSuccessfully)));
                         }
+                        Navigator.of(context).pop(); // Pop loading
                         Navigator.of(dialogContext).pop();
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorSavingMaintenance}: $e'))); // أضف هذا النص
+                        Navigator.of(context).pop(); // Pop loading
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorSavingMaintenance}: $e')));
                         print('Error saving maintenance: $e');
                       }
                     }
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
               ],
             );
@@ -559,17 +720,31 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text(appLocalizations.completeMaintenanceConfirmation), // أضف هذا النص
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            appLocalizations.completeMaintenanceConfirmation,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(appLocalizations.confirmCompleteMaintenance), // أضف هذا النص
+              Text(
+                appLocalizations.confirmCompleteMaintenance,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: AppColors.dark),
+              ),
               SizedBox(height: 16),
               TextFormField(
                 controller: finalNotesController,
                 decoration: InputDecoration(
                   labelText: appLocalizations.notes,
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  prefixIcon: Icon(Icons.notes_outlined, color: AppColors.dark),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                  ),
                 ),
                 maxLines: 3,
                 textAlign: TextAlign.right,
@@ -581,11 +756,21 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
             TextButton(
               child: Text(appLocalizations.cancel),
               onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(foregroundColor: AppColors.dark),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.complete),
+            ElevatedButton.icon(
+              icon: Icon(Icons.done_all, color: Colors.white),
+              label: Text(appLocalizations.complete, style: TextStyle(color: Colors.white)),
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  },
+                );
                 try {
                   await useCases.completeMaintenanceTask(
                     log: log,
@@ -593,17 +778,23 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                     updatedChecklist: log.checklist.map((item) => item.copyWith(completed: true, completedAt: Timestamp.now())).toList(),
                     finalNotes: finalNotesController.text.isEmpty ? null : finalNotesController.text,
                   );
+                  Navigator.of(context).pop(); // Pop loading
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(appLocalizations.maintenanceCompletedSuccessfully)), // أضف هذا النص
+                    SnackBar(content: Text(appLocalizations.maintenanceCompletedSuccessfully)),
                   );
-                  // TODO: Update machine status to 'ready' via MachineryOperatorUseCases
                 } catch (e) {
+                  Navigator.of(context).pop(); // Pop loading
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${appLocalizations.errorCompletingMaintenance}: $e')), // أضف هذا النص
+                    SnackBar(content: Text('${appLocalizations.errorCompletingMaintenance}: $e')),
                   );
                   print('Error completing maintenance: $e');
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
             ),
           ],
         );
@@ -622,24 +813,49 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: Text(appLocalizations.confirmDeletion),
-          content: Text('${appLocalizations.confirmDeleteMaintenance}: "$machineName"؟'), // أضف هذا النص
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.confirmDeletion, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text(
+            '${appLocalizations.confirmDeleteMaintenance}: "$machineName"؟\n\n${appLocalizations.thisActionCannotBeUndone}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
           actions: <Widget>[
             TextButton(
               child: Text(appLocalizations.cancel),
               onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(foregroundColor: AppColors.dark),
             ),
-            ElevatedButton(
-              child: Text(appLocalizations.delete),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.delete_forever, color: Colors.white),
+              label: Text(appLocalizations.delete, style: TextStyle(color: Colors.white)),
               onPressed: () async {
+                Navigator.of(dialogContext).pop(); // Pop confirmation dialog
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext loadingContext) {
+                    return Center(child: CircularProgressIndicator(color: AppColors.primary));
+                  },
+                );
                 try {
                   await useCases.deleteMaintenanceLog(logId);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.maintenanceDeletedSuccessfully))); // أضف هذا النص
-                  Navigator.of(dialogContext).pop();
+                  Navigator.of(context).pop(); // Pop loading
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.maintenanceDeletedSuccessfully)));
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorDeletingMaintenance}: $e'))); // أضف هذا النص
+                  Navigator.of(context).pop(); // Pop loading
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorDeletingMaintenance}: $e')));
                 }
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ],
         );

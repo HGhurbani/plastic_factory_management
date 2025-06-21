@@ -324,7 +324,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ));
 
       modules.add(_buildModuleButton(
-        isComingSoon: true,
         context: context,
         title: appLocalizations.productionOrderManagement,
         subtitle: "إدارة وتتبع الطلبات",
@@ -334,7 +333,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ));
 
       modules.add(_buildModuleButton(
-        isComingSoon: true,
         context: context,
         title: appLocalizations.operatorProfiles,
         subtitle: "ملفات المشغلين",
@@ -344,7 +342,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ));
 
       modules.add(_buildModuleButton(
-        isComingSoon: true,
         context: context,
         title: appLocalizations.maintenanceProgram,
         subtitle: "برنامج الصيانة",
