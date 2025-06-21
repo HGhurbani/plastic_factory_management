@@ -23,6 +23,8 @@
   "requiredQuantity": "الكمية المطلوبة",
   "product": "المنتج",
   "batchNumber": "رقم الدفعة",
+  "directProductionOrders": "طلبات الإنتاج المباشرة",
+  "productionOrdersFromSales": "طلبات المبيعات",
   "orderPreparer": "الموظف المسؤول عن الطلب",
   "status": "الحالة",
   "pending": "قيد الانتظار",
