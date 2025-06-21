@@ -122,6 +122,7 @@ class SalesUseCases {
     final updatedOrder = order.copyWith(
       status: SalesOrderStatus.pendingFulfillment,
       approvedByUid: accountant.uid,
+      approvedByName: accountant.name,
       approvedAt: Timestamp.now(),
       rejectionReason: null,
       moldTasksEnabled: false,
@@ -165,6 +166,7 @@ class SalesUseCases {
     final updatedOrder = order.copyWith(
       status: SalesOrderStatus.rejected,
       approvedByUid: accountant.uid,
+      approvedByName: accountant.name,
       approvedAt: Timestamp.now(),
       rejectionReason: reason,
       moldTasksEnabled: false,
