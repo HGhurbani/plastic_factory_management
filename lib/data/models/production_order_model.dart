@@ -155,6 +155,7 @@ class ProductionOrderModel {
   final String productName; // Redundant: Product Name (for easier display)
   final int requiredQuantity;
   final String batchNumber;
+  final String? salesOrderId; // If this order was generated from a sales order
   final String orderPreparerUid; // UID of the user who prepared the order
   final String orderPreparerName;
   final ProductionOrderStatus status; // Current overall status of the order (enum)
@@ -171,6 +172,7 @@ class ProductionOrderModel {
     required this.productName,
     required this.requiredQuantity,
     required this.batchNumber,
+    this.salesOrderId,
     required this.orderPreparerUid,
     required this.orderPreparerName,
     required this.status,
@@ -190,6 +192,7 @@ class ProductionOrderModel {
       productName: data['productName'] ?? '',
       requiredQuantity: data['requiredQuantity'] ?? 0,
       batchNumber: data['batchNumber'] ?? '',
+      salesOrderId: data['salesOrderId'],
       orderPreparerUid: data['orderPreparerUid'] ?? '',
       orderPreparerName: data['orderPreparerName'] ?? '',
       status: ProductionOrderStatusExtension.fromString(data['status'] ?? 'pending'),
@@ -211,6 +214,7 @@ class ProductionOrderModel {
       'productName': productName,
       'requiredQuantity': requiredQuantity,
       'batchNumber': batchNumber,
+      'salesOrderId': salesOrderId,
       'orderPreparerUid': orderPreparerUid,
       'orderPreparerName': orderPreparerName,
       'status': status.toFirestoreString(),
@@ -230,6 +234,7 @@ class ProductionOrderModel {
     String? productName,
     int? requiredQuantity,
     String? batchNumber,
+    String? salesOrderId,
     String? orderPreparerUid,
     String? orderPreparerName,
     ProductionOrderStatus? status,
@@ -246,6 +251,7 @@ class ProductionOrderModel {
       productName: productName ?? this.productName,
       requiredQuantity: requiredQuantity ?? this.requiredQuantity,
       batchNumber: batchNumber ?? this.batchNumber,
+      salesOrderId: salesOrderId ?? this.salesOrderId,
       orderPreparerUid: orderPreparerUid ?? this.orderPreparerUid,
       orderPreparerName: orderPreparerName ?? this.orderPreparerName,
       status: status ?? this.status,

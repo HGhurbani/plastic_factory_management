@@ -23,6 +23,7 @@ class ProductionOrdersListScreen extends StatefulWidget {
 
 class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen> {
   String _selectedStatusFilter = 'all';
+  String _selectedSourceFilter = 'all';
 
   @override
   Widget build(BuildContext context) {
@@ -132,13 +133,36 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                 ),
               ),
             ),
+          if (isManager)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildFilterChip(appLocalizations.all, 'all', _selectedSourceFilter, (value) {
+                      setState(() {
+                        _selectedSourceFilter = value;
+                      });
+                    }),
+                    _buildFilterChip(appLocalizations.directProductionOrders, 'direct', _selectedSourceFilter, (value) {
+                      setState(() {
+                        _selectedSourceFilter = value;
+                      });
+                    }),
+                    _buildFilterChip(appLocalizations.productionOrdersFromSales, 'sales', _selectedSourceFilter, (value) {
+                      setState(() {
+                        _selectedSourceFilter = value;
+                      });
+                    }),
+                  ],
+                ),
+              ),
+            ),
           Expanded(
             child: StreamBuilder<List<ProductionOrderModel>>(
-              stream: _selectedStatusFilter == 'all'
-                  ? productionUseCases.getProductionOrders()
-                  : productionUseCases.getProductionOrders().map((orders) {
-                return orders.where((order) => order.status.toFirestoreString() == _selectedStatusFilter).toList();
-              }),
+              stream: productionUseCases.getProductionOrders(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator(color: AppColors.primary));
@@ -213,9 +237,28 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                   );
                 }
 
+                List<ProductionOrderModel> orders = snapshot.data!;
+
+                if (_selectedStatusFilter != 'all') {
+                  orders = orders
+                      .where((order) =>
+                          order.status.toFirestoreString() == _selectedStatusFilter)
+                      .toList();
+                }
+
+                if (_selectedSourceFilter == 'direct') {
+                  orders = orders
+                      .where((order) => order.salesOrderId == null || order.salesOrderId!.isEmpty)
+                      .toList();
+                } else if (_selectedSourceFilter == 'sales') {
+                  orders = orders
+                      .where((order) => order.salesOrderId != null && order.salesOrderId!.isNotEmpty)
+                      .toList();
+                }
+
                 final List<ProductionOrderModel> filteredOrders = isPreparer
-                    ? snapshot.data!.where((order) => order.orderPreparerUid == currentUser.uid).toList()
-                    : snapshot.data!;
+                    ? orders.where((order) => order.orderPreparerUid == currentUser.uid).toList()
+                    : orders;
 
                 if (filteredOrders.isEmpty) {
                   return Center(
@@ -302,6 +345,8 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                               const Divider(height: 16), // Separator
                               _buildInfoRow(appLocalizations.requiredQuantity, order.requiredQuantity.toString(), icon: Icons.production_quantity_limits_outlined),
                               _buildInfoRow(appLocalizations.batchNumber, order.batchNumber, icon: Icons.batch_prediction_outlined),
+                              if (order.salesOrderId != null && order.salesOrderId!.isNotEmpty)
+                                _buildInfoRow(appLocalizations.salesOrder, '#${order.salesOrderId!.substring(0, 6)}', icon: Icons.shopping_cart_outlined),
                               _buildInfoRow(appLocalizations.orderPreparer, order.orderPreparerName, icon: Icons.person_outline),
                               _buildInfoRow(
                                 'تاريخ الإنشاء',

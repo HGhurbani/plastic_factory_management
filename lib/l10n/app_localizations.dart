@@ -40,6 +40,8 @@ class AppLocalizations {
   String get requiredQuantity => _strings["requiredQuantity"] ?? "requiredQuantity";
   String get product => _strings["product"] ?? "product";
   String get batchNumber => _strings["batchNumber"] ?? "batchNumber";
+  String get directProductionOrders => _strings["directProductionOrders"] ?? "directProductionOrders";
+  String get productionOrdersFromSales => _strings["productionOrdersFromSales"] ?? "productionOrdersFromSales";
   String get orderPreparer => _strings["orderPreparer"] ?? "orderPreparer";
   String get status => _strings["status"] ?? "status";
   String get pending => _strings["pending"] ?? "pending";

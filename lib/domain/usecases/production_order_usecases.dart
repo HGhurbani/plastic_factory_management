@@ -71,6 +71,7 @@ class ProductionOrderUseCases {
     required int requiredQuantity,
     required String batchNumber,
     required UserModel orderPreparer, // Pass the current user model
+    String? salesOrderId,
   }) async {
     // Define the initial workflow stages
     final List<ProductionWorkflowStage> initialWorkflow = [
@@ -96,6 +97,7 @@ class ProductionOrderUseCases {
       productName: selectedProduct.name,
       requiredQuantity: requiredQuantity,
       batchNumber: batchNumber,
+      salesOrderId: salesOrderId,
       orderPreparerUid: orderPreparer.uid,
       orderPreparerName: orderPreparer.name,
       status: ProductionOrderStatus.pending, // الحالة الإجمالية للطلب هي 'قيد الانتظار'
@@ -134,6 +136,7 @@ class ProductionOrderUseCases {
         productName: item.productName,
         requiredQuantity: item.quantity,
         batchNumber: '${order.id}-$i',
+        salesOrderId: order.id,
         orderPreparerUid: preparer.uid,
         orderPreparerName: preparer.name,
         status: ProductionOrderStatus.pending,
