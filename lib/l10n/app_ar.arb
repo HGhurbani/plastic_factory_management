@@ -389,6 +389,10 @@
               "errorSavingUser": "خطأ في حفظ المستخدم",
               "confirmDeleteUser": "تأكيد حذف المستخدم",
               "userDeletedSuccessfully": "تم حذف المستخدم بنجاح.",
-              "errorDeletingUser": "خطأ في حذف المستخدم"
-
+              "errorDeletingUser": "خطأ في حذف المستخدم",
+  "loginPrompt": "يرجى تسجيل الدخول للمتابعة.",
+  "login": "تسجيل الدخول",
+  "tryAgain": "حاول مرة أخرى",
+  "clearFilter": "مسح الفلتر",
+  "orderId": "رقم الطلب"
 }

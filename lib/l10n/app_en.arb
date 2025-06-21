@@ -396,5 +396,10 @@
   "confirmDeleteUser": "Confirm deleting user",
   "userDeletedSuccessfully": "User deleted successfully",
   "errorDeletingUser": "Error deleting user",
+  "loginPrompt": "Please log in to continue.",
+  "login": "Login",
+  "tryAgain": "Try Again",
+  "clearFilter": "Clear Filter",
+  "orderId": "Order ID",
   "unknown": "Unknown"
 }
