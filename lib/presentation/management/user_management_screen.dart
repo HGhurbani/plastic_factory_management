@@ -9,6 +9,7 @@ import 'package:plastic_factory_management/core/constants/app_enums.dart'; // En
 import 'package:plastic_factory_management/theme/app_colors.dart'; // Ensure AppColors defines your primary, secondary, etc.
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:ui' as ui;
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
@@ -139,13 +140,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                           children: [
                             // User Name with icon (الآن على اليسار)
                             Row(
-                              textDirection: TextDirection.rtl,
+                              textDirection: ui.TextDirection.rtl,
                               children: [
                                 Icon(Icons.person_outline, color: AppColors.primary, size: 28),
                                 const SizedBox(width: 8),
                                 Text(
                                   user.name,
-                                  textDirection: TextDirection.rtl,
+                                  textDirection: ui.TextDirection.rtl,
                                   textAlign: TextAlign.right,
                                   style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                                 ),
@@ -270,7 +271,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
-            textDirection: TextDirection.rtl,
+            textDirection: ui.TextDirection.rtl,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -282,7 +283,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
               ),
               textAlign: TextAlign.left,
-              textDirection: TextDirection.rtl,
+              textDirection: ui.TextDirection.rtl,
             ),
           ),
         ],
@@ -337,7 +338,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                           return null;
                         },
                         textAlign: TextAlign.right,
-                        textDirection: TextDirection.rtl,
+                        textDirection: ui.TextDirection.rtl,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
@@ -349,7 +350,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                         ),
                         validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
                         textAlign: TextAlign.right,
-                        textDirection: TextDirection.rtl,
+                        textDirection: ui.TextDirection.rtl,
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<UserRole>(
@@ -363,7 +364,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             .where((r) => r != UserRole.unknown) // Exclude 'unknown'
                             .map((r) => DropdownMenuItem(
                           value: r,
-                          child: Text(r.toArabicString(), textDirection: TextDirection.rtl),
+                          child: Text(r.toArabicString(), textDirection: ui.TextDirection.rtl,),
                         ))
                             .toList(),
                         onChanged: (UserRole? newValue) {
@@ -382,7 +383,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                           prefixIcon: const Icon(Icons.badge_outlined),
                         ),
                         textAlign: TextAlign.right,
-                        textDirection: TextDirection.rtl,
+                        textDirection: ui.TextDirection.rtl,
                       ),
                       if (!isEditing) ...[
                         const SizedBox(height: 12),
@@ -400,7 +401,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                             return null;
                           },
                           textAlign: TextAlign.right,
-                          textDirection: TextDirection.rtl,
+                          textDirection: ui.TextDirection.rtl,
                         ),
                       ],
                     ],
