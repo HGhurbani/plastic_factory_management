@@ -41,6 +41,13 @@ class UserDatasource {
     await _firestore.collection('users').doc(uid).delete();
   }
 
+  Future<void> setTermsAccepted(String uid, Timestamp acceptedAt) async {
+    await _firestore
+        .collection('users')
+        .doc(uid)
+        .update({'termsAcceptedAt': acceptedAt});
+  }
+
   Future<List<UserModel>> getUsersByRole(String role) async {
     final snapshot = await _firestore
         .collection('users')

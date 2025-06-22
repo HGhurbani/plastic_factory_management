@@ -64,9 +64,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         _emailController.text.trim(),
         _passwordController.text,
       );
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
-      }
+      await _navigateAfterLogin();
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = _getErrorMessage(e.code);
@@ -176,9 +174,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         creds['name']!,
         role,
       );
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
-      }
+      await _navigateAfterLogin();
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = _getErrorMessage(e.code);
@@ -193,6 +189,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> _navigateAfterLogin() async {
+    final user = await _authService.getCurrentUserFirestoreData();
+    if (!mounted) return;
+    if (user != null && user.termsAcceptedAt == null) {
+      Navigator.of(context).pushReplacementNamed(
+        AppRouter.termsRoute,
+        arguments: user.uid,
+      );
+    } else {
+      Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
     }
   }
 

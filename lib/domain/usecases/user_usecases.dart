@@ -61,4 +61,8 @@ class UserUseCases {
   Future<void> deleteUser(String uid) {
     return repository.deleteUser(uid);
   }
+
+  Future<void> acceptTerms(String uid) {
+    return repository.setTermsAccepted(uid, Timestamp.now());
+  }
 }

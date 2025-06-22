@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:plastic_factory_management/presentation/auth/login_screen.dart';
+import 'package:plastic_factory_management/presentation/auth/terms_of_use_screen.dart';
 import 'package:plastic_factory_management/presentation/home/home_screen.dart';
 import 'package:plastic_factory_management/presentation/production/create_production_order_screen.dart';
 import 'package:plastic_factory_management/presentation/production/production_orders_list_screen.dart';
@@ -25,6 +26,7 @@ import 'package:plastic_factory_management/presentation/management/user_manageme
 class AppRouter {
   static const String loginRoute = '/';
   static const String homeRoute = '/home';
+  static const String termsRoute = '/terms';
   static const String createProductionOrderRoute = '/production/create';
   static const String productionOrdersListRoute = '/production/list';
   static const String rawMaterialsRoute = '/inventory/raw_materials';
@@ -81,6 +83,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => AccountingScreen());
       case userManagementRoute:
         return MaterialPageRoute(builder: (_) => UserManagementScreen());
+      case termsRoute:
+        final uid = settings.arguments as String;
+        return MaterialPageRoute(
+            builder: (_) => TermsOfUseScreen(uid: uid));
       case notificationsRoute:
         return MaterialPageRoute(builder: (_) => const NotificationsScreen());
       default:
