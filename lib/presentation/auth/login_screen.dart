@@ -8,7 +8,6 @@ import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/presentation/routes/app_router.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
 
-import 'terms_of_use_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -24,8 +23,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _errorMessage;
-  bool _termsAcceptedLocally = false;
-  bool _hasViewedTerms = false; // New state variable to track if terms screen was opened
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   bool _showQuickLogin = false;
@@ -57,20 +54,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
-
-    if (!_hasViewedTerms) { // Check if user has at least opened terms
-      setState(() {
-        _errorMessage = "يرجى قراءة شروط الاستخدام أولاً."; // New specific message
-      });
-      return;
-    }
-
-    if (!_termsAcceptedLocally) {
-      setState(() {
-        _errorMessage = AppLocalizations.of(context)!.acceptTerms; // "أوافق على شروط الاستخدام"
-      });
-      return;
-    }
 
     setState(() {
       _isLoading = true;
@@ -182,18 +165,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   Future<void> _quickSignInRole(UserRole role) async {
     final creds = _roleCredentials[role]!;
-    if (!_hasViewedTerms) {
-      setState(() {
-        _errorMessage = "يرجى قراءة شروط الاستخدام أولاً.";
-      });
-      return;
-    }
-    if (!_termsAcceptedLocally) {
-      setState(() {
-        _errorMessage = AppLocalizations.of(context)!.acceptTerms;
-      });
-      return;
-    }
 
     setState(() {
       _isLoading = true;
@@ -375,8 +346,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               _buildEmailField(appLocalizations),
               const SizedBox(height: 20),
               _buildPasswordField(appLocalizations),
-              const SizedBox(height: 20), // Adjusted spacing
-              _buildTermsAndConditionsCheckbox(appLocalizations), // New terms checkbox
               const SizedBox(height: 24),
               if (_errorMessage != null) _buildErrorMessage(),
               const SizedBox(height: 24),
@@ -475,63 +444,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     );
   }
 
-  Widget _buildTermsAndConditionsCheckbox(AppLocalizations appLocalizations) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Row(
-        children: [
-          Checkbox(
-            value: _termsAcceptedLocally,
-            onChanged: _hasViewedTerms // Only allow changing if terms have been viewed
-                ? (newValue) {
-              setState(() {
-                _termsAcceptedLocally = newValue!;
-              });
-            }
-                : null, // Disable checkbox if not viewed
-            activeColor: AppColors.primary,
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                if (_hasViewedTerms) { // Only toggle if terms have been viewed
-                  setState(() {
-                    _termsAcceptedLocally = !_termsAcceptedLocally;
-                  });
-                }
-              },
-              child: Text(
-                appLocalizations.acceptTerms, // "أوافق على شروط الاستخدام"
-                style: TextStyle(
-                  color: _termsAcceptedLocally ? Colors.black87 : (_hasViewedTerms ? Colors.black87 : Colors.grey), // Grey out if not viewed
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              // Navigate to TermsOfUseScreen for reading
-              await Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => TermsOfUseScreen(uid: FirebaseAuth.instance.currentUser?.uid ?? ''), // Pass current UID or empty string if not logged in yet
-              ));
-              // After returning from TermsOfUseScreen, set _hasViewedTerms to true
-              setState(() {
-                _hasViewedTerms = true;
-              });
-            },
-            child: Text(
-              _hasViewedTerms ? "لقد قرأتها" : "اقرأ الشروط", // Dynamic text based on _hasViewedTerms
-              style: TextStyle(
-                color: AppColors.secondary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildErrorMessage() {
     return Container(
