@@ -7,6 +7,8 @@ import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart'; // Ensure UserRole enum and extension are correctly defined here
 import 'package:plastic_factory_management/theme/app_colors.dart'; // Ensure AppColors defines your primary, secondary, etc.
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
@@ -172,6 +174,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                         _buildInfoRow(appLocalizations.email, user.email, icon: Icons.email_outlined), // Localized label
                         if (user.employeeId != null && user.employeeId!.isNotEmpty)
                           _buildInfoRow(appLocalizations.employeeId, user.employeeId!, icon: Icons.badge_outlined), // Localized label
+                        _buildInfoRow(
+                          appLocalizations.termsAcceptedAt,
+                          user.termsAcceptedAt != null
+                              ? _formatDate(user.termsAcceptedAt!)
+                              : appLocalizations.notAcceptedYet,
+                          icon: user.termsAcceptedAt != null
+                              ? Icons.check_circle_outline
+                              : Icons.warning_amber_outlined,
+                          textColor: user.termsAcceptedAt != null ? Colors.black87 : Colors.red,
+                        ),
                         const SizedBox(height: 8),
                         Align(
                           alignment: Alignment.bottomLeft, // Align actions to bottom left for RTL
@@ -277,6 +289,11 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       ),
 
     );
+  }
+
+  String _formatDate(Timestamp timestamp) {
+    final date = timestamp.toDate();
+    return DateFormat('yyyy/MM/dd').format(date);
   }
 
   void _showAddEditUserDialog(BuildContext context, UserUseCases useCases, AppLocalizations appLocalizations, {UserModel? user}) {

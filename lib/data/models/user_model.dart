@@ -10,6 +10,7 @@ class UserModel {
   final String role; // يتم تخزينها كنص (e.g., 'factory_manager')
   final String? employeeId;
   final Timestamp createdAt;
+  final Timestamp? termsAcceptedAt; // تاريخ قبول المستخدم للشروط
 
   UserModel({
     required this.uid,
@@ -18,6 +19,7 @@ class UserModel {
     required this.role,
     this.employeeId,
     required this.createdAt,
+    this.termsAcceptedAt,
   });
 
   // التحويل من Map ( Firestore document) إلى كائن UserModel
@@ -29,6 +31,7 @@ class UserModel {
       role: data['role'] as String,
       employeeId: data['employeeId'] as String?,
       createdAt: data['createdAt'] as Timestamp,
+      termsAcceptedAt: data['termsAcceptedAt'] as Timestamp?,
     );
   }
 
@@ -42,6 +45,7 @@ class UserModel {
       role: data['role'] as String,
       employeeId: data['employeeId'] as String?,
       createdAt: data['createdAt'] as Timestamp,
+      termsAcceptedAt: data['termsAcceptedAt'] as Timestamp?,
     );
   }
 
@@ -54,6 +58,7 @@ class UserModel {
       'role': role,
       'employeeId': employeeId,
       'createdAt': createdAt,
+      'termsAcceptedAt': termsAcceptedAt,
     };
   }
 
@@ -67,6 +72,7 @@ class UserModel {
     String? role,
     String? employeeId,
     Timestamp? createdAt,
+    Timestamp? termsAcceptedAt,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -75,6 +81,7 @@ class UserModel {
       role: role ?? this.role,
       employeeId: employeeId ?? this.employeeId,
       createdAt: createdAt ?? this.createdAt,
+      termsAcceptedAt: termsAcceptedAt ?? this.termsAcceptedAt,
     );
   }
 

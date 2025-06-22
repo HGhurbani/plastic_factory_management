@@ -384,6 +384,11 @@ class AppLocalizations {
   String get confirmDeleteUser => _strings["confirmDeleteUser"] ?? "confirmDeleteUser";
   String get userDeletedSuccessfully => _strings["userDeletedSuccessfully"] ?? "userDeletedSuccessfully";
   String get errorDeletingUser => _strings["errorDeletingUser"] ?? "errorDeletingUser";
+  String get termsOfUseTitle => _strings["termsOfUseTitle"] ?? "termsOfUseTitle";
+  String get termsOfUseText => _strings["termsOfUseText"] ?? "termsOfUseText";
+  String get acceptTerms => _strings["acceptTerms"] ?? "acceptTerms";
+  String get termsAcceptedAt => _strings["termsAcceptedAt"] ?? "termsAcceptedAt";
+  String get notAcceptedYet => _strings["notAcceptedYet"] ?? "notAcceptedYet";
   String get loginPrompt => _strings["loginPrompt"] ?? "loginPrompt";
   String get login => _strings["login"] ?? "login";
   String get tryAgain => _strings["tryAgain"] ?? "tryAgain";

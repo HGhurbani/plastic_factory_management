@@ -3,6 +3,7 @@
 import 'package:plastic_factory_management/data/datasources/user_datasource.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/repositories/user_repository.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserRepositoryImpl implements UserRepository {
   final UserDatasource datasource;
@@ -37,5 +38,10 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<void> deleteUser(String uid) {
     return datasource.deleteUser(uid);
+  }
+
+  @override
+  Future<void> setTermsAccepted(String uid, Timestamp acceptedAt) {
+    return datasource.setTermsAccepted(uid, acceptedAt);
   }
 }
