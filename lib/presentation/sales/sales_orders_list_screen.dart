@@ -12,7 +12,7 @@ import 'package:plastic_factory_management/domain/usecases/production_order_usec
 import 'package:intl/intl.dart' as intl;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import 'sales_order_detail_page.dart';
 import 'create_sales_order_screen.dart';
 import '../../theme/app_colors.dart'; // Ensure this defines your app's color scheme
 
@@ -116,16 +116,26 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       _selectedStatusFilter = value;
                     });
                   }),
+                  _buildFilterChip(appLocalizations.warehouseProcessing, SalesOrderStatus.warehouseProcessing.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                  // _buildFilterChip(appLocalizations.awaitingMoldApproval, SalesOrderStatus.awaitingMoldApproval.toFirestoreString(), _selectedStatusFilter, (value) {
+                  //   setState(() {
+                  //     _selectedStatusFilter = value;
+                  //   });
+                  // }),
                   _buildFilterChip(appLocalizations.inProduction, SalesOrderStatus.inProduction.toFirestoreString(), _selectedStatusFilter, (value) {
                     setState(() {
                       _selectedStatusFilter = value;
                     });
                   }),
-                  _buildFilterChip(appLocalizations.fulfilled, SalesOrderStatus.fulfilled.toFirestoreString(), _selectedStatusFilter, (value) {
-                    setState(() {
-                      _selectedStatusFilter = value;
-                    });
-                  }),
+                  // _buildFilterChip(appLocalizations.fulfilled, SalesOrderStatus.fulfilled.toFirestoreString(), _selectedStatusFilter, (value) {
+                  //   setState(() {
+                  //     _selectedStatusFilter = value;
+                  //   });
+                  // }),
                   _buildFilterChip(appLocalizations.canceled, SalesOrderStatus.canceled.toFirestoreString(), _selectedStatusFilter, (value) {
                     setState(() {
                       _selectedStatusFilter = value;
@@ -136,16 +146,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       _selectedStatusFilter = value;
                     });
                   }),
-                  _buildFilterChip(appLocalizations.warehouseProcessing, SalesOrderStatus.warehouseProcessing.toFirestoreString(), _selectedStatusFilter, (value) {
-                    setState(() {
-                      _selectedStatusFilter = value;
-                    });
-                  }),
-                  _buildFilterChip(appLocalizations.awaitingMoldApproval, SalesOrderStatus.awaitingMoldApproval.toFirestoreString(), _selectedStatusFilter, (value) {
-                    setState(() {
-                      _selectedStatusFilter = value;
-                    });
-                  }),
+
                 ],
               ),
             ),
@@ -269,7 +270,10 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: InkWell( // Use InkWell for better visual feedback on tap
                         onTap: () {
-                          _showSalesOrderDetailDialog(context, appLocalizations, order);
+                          // Navigate to the new SalesOrderDetailPage
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => SalesOrderDetailPage(order: order),
+                          ));
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Padding(
@@ -340,26 +344,43 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
+
   Widget _buildFilterChip(String label, String value, String selectedValue, Function(String) onSelected) {
+    final bool isSelected = selectedValue == value;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: ChoiceChip(
-        label: Text(label),
-        selected: selectedValue == value,
+        showCheckmark: false,
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected)
+              Icon(Icons.check, size: 18, color: AppColors.primary),
+            if (isSelected)
+              const SizedBox(width: 4),
+            Text(label),
+          ],
+        ),
+        selected: isSelected,
         onSelected: (bool selected) {
           if (selected) {
             onSelected(value);
           }
         },
-        selectedColor: AppColors.primary.withOpacity(0.2), // Use AppColors
+        selectedColor: AppColors.primary.withOpacity(0.2),
         labelStyle: TextStyle(
-          color: selectedValue == value ? AppColors.primary : Colors.black87,
-          fontWeight: selectedValue == value ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? AppColors.primary : Colors.black87,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
-        elevation: selectedValue == value ? 0 : 1, // Add elevation when selected
+        elevation: isSelected ? 0 : 1,
+        side: !isSelected
+            ? BorderSide(color: AppColors.primary, width: 0.5)
+            : BorderSide.none,
       ),
     );
   }
+
 
   Widget _buildTrailingActions(
       BuildContext context,
@@ -390,38 +411,43 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     // Role-specific actions
     if (isAccountant && order.status == SalesOrderStatus.pendingApproval) {
       actions.add(
-        ElevatedButton.icon(
-          icon: const Icon(Icons.check_circle_outline),
-          label: Text(appLocalizations.approve),
-          onPressed: () => _showApproveDialog(context, useCases, appLocalizations, order),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-            textStyle: const TextStyle(fontSize: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.check_circle_outline, color: Colors.white),
+              label: Text(appLocalizations.approve),
+              onPressed: () => _showApproveDialog(context, useCases, appLocalizations, order),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                textStyle: const TextStyle(fontSize: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            ),
+            const SizedBox(width: 12), // ← المسافة بين الزرين
+            ElevatedButton.icon(
+              icon: const Icon(Icons.cancel_outlined, color: Colors.white),
+              label: Text(appLocalizations.reject),
+              onPressed: () => _showRejectDialog(context, useCases, appLocalizations, order),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                textStyle: const TextStyle(fontSize: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            ),
+          ],
         ),
       );
-      actions.add(
-        ElevatedButton.icon(
-          icon: const Icon(Icons.cancel_outlined),
-          label: Text(appLocalizations.reject),
-          onPressed: () => _showRejectDialog(context, useCases, appLocalizations, order),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            textStyle: const TextStyle(fontSize: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        ),
-      );
+
     } else if (isProductionOrderPreparer &&
         order.status == SalesOrderStatus.pendingFulfillment) {
       actions.add(
         ElevatedButton.icon(
-          icon: const Icon(Icons.local_shipping_outlined),
+          icon: const Icon(Icons.local_shipping_outlined, color: Colors.white,),
           label: Text(appLocalizations.initiateSupply),
           onPressed: () => _showInitiateSupplyDialog(
               context, useCases, appLocalizations, order, currentUser),
@@ -436,12 +462,20 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       );
     } else if (isInventoryManager && order.status == SalesOrderStatus.warehouseProcessing) {
       actions.add(
-        IconButton(
-          icon: const Icon(Icons.receipt_long_outlined, color: AppColors.secondary),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.receipt_long_outlined, color: Colors.white),
+          label: Text(appLocalizations.warehouseDocumentation), // أو استخدم 'تجهيز الطلب'
           onPressed: () => _showWarehouseDocDialog(context, useCases, appLocalizations, order, currentUser),
-          tooltip: appLocalizations.warehouseDocumentation,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.secondary,
+            foregroundColor: Colors.white,
+            textStyle: const TextStyle(fontSize: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
         ),
       );
+
     } else if (isManager && order.status == SalesOrderStatus.warehouseProcessing) { // Manager can also fulfill after warehouse processing
       actions.add(
         IconButton(
@@ -505,149 +539,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     }
   }
 
-  void _showSalesOrderDetailDialog(BuildContext context, AppLocalizations appLocalizations, SalesOrderModel order) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-          contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          title: Text(
-            '${appLocalizations.salesOrder} #${order.id.substring(0, 6)}...',
-            textAlign: TextAlign.right,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _buildInfoRow(appLocalizations.customerName, order.customerName, icon: Icons.person),
-                _buildInfoRow(appLocalizations.salesRepresentative, order.salesRepresentativeName, icon: Icons.badge),
-                _buildInfoRow(appLocalizations.totalAmount, '﷼${order.totalAmount.toStringAsFixed(2)}', icon: Icons.currency_exchange, isBold: true, textColor: AppColors.primary),
-                _buildInfoRow(appLocalizations.status, order.status.toArabicString(), icon: Icons.info_outline, textColor: _getSalesOrderStatusColor(order.status), isBold: true),
-                _buildInfoRow(appLocalizations.orderDate, intl.DateFormat('yyyy-MM-dd HH:mm').format(order.createdAt.toDate()), icon: Icons.date_range),
-                const SizedBox(height: 16),
-                Text(appLocalizations.orderItems, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), textAlign: TextAlign.right),
-                const Divider(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: order.orderItems.map((item) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Text(
-                      '${item.productName} - ${item.quantity} ${item.quantityUnit ?? appLocalizations.units} @ ﷼${item.unitPrice.toStringAsFixed(2)}', // Use item.quantityUnit if available
-                      textAlign: TextAlign.right,
-                      textDirection: TextDirection.rtl,
-                      style: TextStyle(fontSize: 15, color: Colors.grey[800]),
-                    ),
-                  )).toList(),
-                ),
-                if (order.customerSignatureUrl != null && order.customerSignatureUrl!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(appLocalizations.customerSignature, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), textAlign: TextAlign.right),
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            order.customerSignatureUrl!,
-                            height: 120,
-                            width: double.infinity,
-                            fit: BoxFit.contain,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              final expected = loadingProgress.expectedTotalBytes;
-                              final value = expected != null
-                                  ? loadingProgress.cumulativeBytesLoaded / expected
-                                  : null;
-                              return Center(child: CircularProgressIndicator(value: value));
-                            },
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                                  height: 120,
-                                  color: Colors.grey[200],
-                                  child: Center(child: Icon(Icons.broken_image, size: 50, color: Colors.grey[400])),
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                const SizedBox(height: 16),
-                Text(appLocalizations.orderFlowDetails, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), textAlign: TextAlign.right),
-                const Divider(),
-                if (order.approvedAt != null)
-                  _buildInfoRow(
-                    appLocalizations.approvalTime,
-                    '${intl.DateFormat('yyyy-MM-dd HH:mm').format(order.approvedAt!.toDate())} ${appLocalizations.approvedBy} ${order.approvedByName ?? appLocalizations.unknown}',
-                    icon: Icons.check_circle_outline,
-                  ),
-                if (order.warehouseManagerName != null && order.warehouseManagerName!.isNotEmpty)
-                  _buildInfoRow(appLocalizations.warehouseManager, order.warehouseManagerName!, icon: Icons.warehouse),
-                if (order.warehouseNotes != null && order.warehouseNotes!.isNotEmpty)
-                  _buildInfoRow(appLocalizations.warehouseNotes, order.warehouseNotes!, icon: Icons.notes),
-                if (order.warehouseImages.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(appLocalizations.warehouseImages, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15), textAlign: TextAlign.right),
-                  const SizedBox(height: 4),
-                  Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
-                    children: order.warehouseImages.map((e) => GestureDetector(
-                      onTap: () => _showImagePreviewDialog(context, e),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(e, width: 80, height: 80, fit: BoxFit.cover),
-                      ),
-                    )).toList(),
-                  ),
-                ],
-                if (order.deliveryTime != null)
-                  _buildInfoRow(appLocalizations.expectedDeliveryTime,
-                      intl.DateFormat('yyyy-MM-dd HH:mm').format(order.deliveryTime!.toDate()), icon: Icons.delivery_dining),
-                if (order.moldSupervisorName != null && order.moldSupervisorName!.isNotEmpty)
-                  _buildInfoRow(appLocalizations.moldInstallationSupervisor, order.moldSupervisorName!, icon: Icons.person_pin),
-                if (order.moldInstallationNotes != null && order.moldInstallationNotes!.isNotEmpty)
-                  _buildInfoRow(appLocalizations.moldInstallationNotes, order.moldInstallationNotes!, icon: Icons.notes),
-                if (order.moldInstallationImages.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(appLocalizations.moldInstallationImages, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15), textAlign: TextAlign.right),
-                  const SizedBox(height: 4),
-                  Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
-                    children: order.moldInstallationImages.map((e) => GestureDetector(
-                      onTap: () => _showImagePreviewDialog(context, e),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(e, width: 80, height: 80, fit: BoxFit.cover),
-                      ),
-                    )).toList(),
-                  ),
-                ],
-                if (order.productionManagerName != null && order.productionManagerName!.isNotEmpty)
-                  _buildInfoRow(appLocalizations.productionManager, order.productionManagerName!, icon: Icons.engineering),
-                if (order.productionRejectionReason != null && order.productionRejectionReason!.isNotEmpty)
-                  _buildInfoRow(appLocalizations.rejectionReason, order.productionRejectionReason!, icon: Icons.cancel, textColor: Colors.red),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(appLocalizations.close),
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   Widget _buildInfoRow(String label, String value, {Color? textColor, bool isBold = false, IconData? icon}) {
     return Padding(
@@ -890,7 +782,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
           ),
           ElevatedButton.icon(
-            icon: const Icon(Icons.check),
+            icon: const Icon(Icons.check,color: Colors.white,),
             label: Text(appLocalizations.approve),
             onPressed: () async {
               Navigator.of(context).pop(); // Pop the confirmation dialog
@@ -1053,7 +945,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
             ElevatedButton.icon(
-              icon: const Icon(Icons.send), // Send icon
+              icon: const Icon(Icons.send, color: Colors.white,), // Send icon
               label: Text(appLocalizations.initiateSupply),
               onPressed: () async {
                 if (_selectedStorekeeper == null) {
@@ -1383,7 +1275,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                           await _pickImages(ImageSource.camera);
                           setState(() {});
                         },
-                        icon: const Icon(Icons.camera_alt),
+                        icon: const Icon(Icons.camera_alt,color: Colors.white,),
                         label: Text(appLocalizations.camera),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blueAccent, foregroundColor: Colors.white,
@@ -1398,7 +1290,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                           await _pickImages(ImageSource.gallery);
                           setState(() {});
                         },
-                        icon: const Icon(Icons.photo_library),
+                        icon: const Icon(Icons.photo_library, color: Colors.white,),
                         label: Text(appLocalizations.gallery),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.purpleAccent, foregroundColor: Colors.white,
@@ -1527,7 +1419,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
             ElevatedButton.icon(
-              icon: const Icon(Icons.send_to_mobile), // Specific icon for "send to production"
+              icon: const Icon(Icons.send_to_mobile,color: Colors.white,), // Specific icon for "send to production"
               label: Text(appLocalizations.sendToProduction),
               onPressed: () async {
                 Navigator.of(context).pop(); // Pop the dialog

@@ -119,7 +119,7 @@ class _OperatorProfilesScreenState extends State<OperatorProfilesScreen> {
               final operator = snapshot.data![index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 4, // Increased elevation for prominence
+                elevation: 1, // Increased elevation for prominence
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
                 child: InkWell( // Added InkWell for tap feedback
                   onTap: () {

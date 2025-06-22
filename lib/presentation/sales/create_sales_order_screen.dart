@@ -392,8 +392,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  '${appLocalizations.totalAmount}: \$${_totalAmount.toStringAsFixed(2)}',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary),
+                  '${appLocalizations.totalAmount}: ${_totalAmount.toStringAsFixed(2)} ر.س',                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary),
                   textDirection: TextDirection.rtl,
                 ),
               ),

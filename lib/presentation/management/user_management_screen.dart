@@ -119,7 +119,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               final user = snapshot.data![index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 6, // Increased elevation for prominence
+                elevation: 1, // Increased elevation for prominence
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Rounded corners
                 child: InkWell( // Added InkWell for tap feedback
                   onTap: () {
@@ -397,7 +397,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
                 ),
                 ElevatedButton.icon(
-                  icon: Icon(isEditing ? Icons.save : Icons.person_add),
+                  icon: Icon(isEditing ? Icons.save : Icons.person_add,color: Colors.white,),
                   label: Text(isEditing ? appLocalizations.save : appLocalizations.add), // Localized
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {

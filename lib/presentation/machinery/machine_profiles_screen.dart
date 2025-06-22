@@ -407,7 +407,7 @@ class _MachineProfilesScreenState extends State<MachineProfilesScreen> {
                   style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
                 ),
                 ElevatedButton.icon(
-                  icon: Icon(isEditing ? Icons.save : Icons.add),
+                  icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white,),
                   label: Text(isEditing ? appLocalizations.save : appLocalizations.add),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {

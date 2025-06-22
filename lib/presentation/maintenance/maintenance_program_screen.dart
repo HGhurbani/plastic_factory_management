@@ -141,7 +141,7 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                           onPressed: () {
                             _showScheduleMaintenanceDialog(context, maintenanceUseCases, appLocalizations, currentUser);
                           },
-                          icon: const Icon(Icons.add),
+                          icon: const Icon(Icons.add, color: Colors.white,),
                           label: Text(appLocalizations.scheduleMaintenance),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,

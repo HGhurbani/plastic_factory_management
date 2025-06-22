@@ -122,7 +122,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 4, // Slightly increased elevation for better prominence
+                elevation: 1, // Slightly increased elevation for better prominence
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10), // Rounded corners for a softer look
                   side: isBelowMin ? const BorderSide(color: Colors.red, width: 2) : BorderSide.none, // Red border for low stock
@@ -315,7 +315,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
               style: TextButton.styleFrom(foregroundColor: Colors.grey[700]), // Styled cancel button
             ),
             ElevatedButton.icon( // Changed to ElevatedButton.icon
-              icon: Icon(isEditing ? Icons.save : Icons.add),
+              icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white,),
               label: Text(isEditing ? appLocalizations.save : appLocalizations.add),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {

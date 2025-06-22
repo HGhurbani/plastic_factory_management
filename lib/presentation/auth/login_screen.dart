@@ -270,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ),
         const SizedBox(height: 16),
         Text(
-          'إدارة المصنع البلاستيكي',
+          'إدارة مصنع ASCAL',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
@@ -287,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ),
         const SizedBox(height: 8),
         Text(
-          'نظام إدارة شامل للمصانع البلاستيكية',
+          'نظام إدارة شامل لمصنع ASCAL',
           style: TextStyle(
             fontSize: 16,
             color: Colors.white.withOpacity(0.9),

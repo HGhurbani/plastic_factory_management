@@ -746,7 +746,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                       ),
                       const SizedBox(height: 8),
                       ElevatedButton.icon(
-                        icon: const Icon(Icons.add_shopping_cart), // More specific icon
+                        icon: const Icon(Icons.add_shopping_cart,color: Colors.white,), // More specific icon
                         label: Text(appLocalizations.addMaterial),
                         onPressed: () async {
                           final newBom = await _showAddBomMaterialDialog(context, useCases, appLocalizations);
@@ -773,7 +773,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                   style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
                 ),
                 ElevatedButton.icon(
-                  icon: Icon(isEditing ? Icons.save : Icons.add),
+                  icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white,),
                   label: Text(isEditing ? appLocalizations.save : appLocalizations.add),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
