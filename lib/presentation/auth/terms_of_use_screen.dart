@@ -104,6 +104,14 @@ class TermsOfUseScreen extends StatelessWidget {
                     height: 50, // Set a fixed height for the button
                     child: ElevatedButton.icon(
                       onPressed: () async {
+                        // Don't allow accepting if no user ID provided (before login)
+                        if (uid.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('يجب تسجيل الدخول أولاً لقبول الشروط.')),
+                          );
+                          return;
+                        }
+
                         // Show a loading indicator
                         showDialog(
                           context: context,
@@ -118,7 +126,7 @@ class TermsOfUseScreen extends StatelessWidget {
                             Navigator.of(context).pop(); // Dismiss loading indicator
                             // Show a success message
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('تم قبول الشروط بنجاح!'),duration: const Duration(seconds: 2),),
+                              SnackBar(content: Text('تم قبول الشروط بنجاح!'), duration: const Duration(seconds: 2)),
                             );
                             Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
                           }
