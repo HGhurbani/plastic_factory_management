@@ -521,7 +521,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               });
             },
             child: Text(
-              _hasViewedTerms ? "لقد قرأتها" : "اقرأ الشروط", // Dynamic text based on _hasViewedTerms
+              _hasViewedTerms ? "اقرأ الشروط" : "اقرأ الشروط", // Dynamic text based on _hasViewedTerms
               style: TextStyle(
                 color: AppColors.secondary,
                 fontWeight: FontWeight.bold,
