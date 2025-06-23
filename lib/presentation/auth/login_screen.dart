@@ -7,6 +7,8 @@ import 'package:plastic_factory_management/core/services/auth_service.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/presentation/routes/app_router.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
+import 'package:provider/provider.dart';
+import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
 
 import 'terms_of_use_screen.dart';
 
@@ -229,14 +231,22 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     final user = await _authService.getCurrentUserFirestoreData();
     if (!mounted) return;
 
-    if (user != null && user.termsAcceptedAt == null) {
-      // If user hasn't accepted terms in Firestore, redirect to terms screen
-      Navigator.of(context).pushReplacementNamed(
-        AppRouter.termsRoute,
-        arguments: user.uid,
-      );
+    if (user != null) {
+      if (user.termsAcceptedAt == null) {
+        if (_termsAcceptedLocally) {
+          final userUseCases = Provider.of<UserUseCases>(context, listen: false);
+          await userUseCases.acceptTerms(user.uid);
+          Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
+        } else {
+          Navigator.of(context).pushReplacementNamed(
+            AppRouter.termsRoute,
+            arguments: user.uid,
+          );
+        }
+      } else {
+        Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
+      }
     } else {
-      // If terms already accepted (or no user data found unexpectedly), go to home
       Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
     }
   }
@@ -511,13 +521,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           ),
           TextButton(
             onPressed: () async {
-              // Navigate to TermsOfUseScreen for reading
-              await Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => TermsOfUseScreen(uid: FirebaseAuth.instance.currentUser?.uid ?? ''), // Pass current UID or empty string if not logged in yet
+              final accepted = await Navigator.of(context).push<bool>(MaterialPageRoute(
+                builder: (context) => TermsOfUseScreen(uid: FirebaseAuth.instance.currentUser?.uid ?? ''),
               ));
-              // After returning from TermsOfUseScreen, set _hasViewedTerms to true
               setState(() {
                 _hasViewedTerms = true;
+                if (accepted == true) {
+                  _termsAcceptedLocally = true;
+                }
               });
             },
             child: Text(

@@ -104,11 +104,8 @@ class TermsOfUseScreen extends StatelessWidget {
                     height: 50, // Set a fixed height for the button
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        // Don't allow accepting if no user ID provided (before login)
                         if (uid.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('يجب تسجيل الدخول أولاً لقبول الشروط.')),
-                          );
+                          Navigator.of(context).pop(true); // Return acceptance before login
                           return;
                         }
 
@@ -124,7 +121,6 @@ class TermsOfUseScreen extends StatelessWidget {
                           await userUseCases.acceptTerms(uid);
                           if (context.mounted) {
                             Navigator.of(context).pop(); // Dismiss loading indicator
-                            // Show a success message
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('تم قبول الشروط بنجاح!'), duration: const Duration(seconds: 2)),
                             );
@@ -132,12 +128,12 @@ class TermsOfUseScreen extends StatelessWidget {
                           }
                         } catch (e) {
                           if (context.mounted) {
-                            Navigator.of(context).pop(); // Dismiss loading indicator
+                            Navigator.of(context).pop();
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('حدث خطأ أثناء قبول الشروط: ${e.toString()}')),
                             );
                           }
-                          print('Error accepting terms: $e'); // For debugging
+                          print('Error accepting terms: $e');
                         }
                       },
                       icon: const Icon(Icons.check_circle_outline, color: Colors.white),
