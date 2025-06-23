@@ -864,8 +864,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       )
           : Directionality(
         textDirection: TextDirection.rtl,
-        child: CustomScrollView(
-          slivers: [
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: [
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(20),
