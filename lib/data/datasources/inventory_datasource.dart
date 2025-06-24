@@ -5,6 +5,7 @@ import 'package:plastic_factory_management/core/services/file_upload_service.dar
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'dart:io';
+import 'dart:typed_data';
 
 class InventoryDatasource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -46,11 +47,17 @@ class InventoryDatasource {
     return null;
   }
 
-  Future<void> addProduct(ProductModel product, {File? imageFile}) async {
+  Future<void> addProduct(ProductModel product,
+      {File? imageFile, Uint8List? imageBytes}) async {
     String? imageUrl;
     if (imageFile != null) {
       imageUrl = await _uploadService.uploadFile(
         imageFile,
+        'product_images/${product.productCode}_${DateTime.now().microsecondsSinceEpoch}.jpg',
+      );
+    } else if (imageBytes != null) {
+      imageUrl = await _uploadService.uploadBytes(
+        imageBytes,
         'product_images/${product.productCode}_${DateTime.now().microsecondsSinceEpoch}.jpg',
       );
     }
@@ -58,11 +65,17 @@ class InventoryDatasource {
     // Update the product model with the Firestore generated ID if needed for local use
   }
 
-  Future<void> updateProduct(ProductModel product, {File? newImageFile}) async {
+  Future<void> updateProduct(ProductModel product,
+      {File? newImageFile, Uint8List? newImageBytes}) async {
     String? imageUrl = product.imageUrl; // Keep existing image URL by default
     if (newImageFile != null) {
       imageUrl = await _uploadService.uploadFile(
         newImageFile,
+        'product_images/${product.productCode}_${DateTime.now().microsecondsSinceEpoch}.jpg',
+      );
+    } else if (newImageBytes != null) {
+      imageUrl = await _uploadService.uploadBytes(
+        newImageBytes,
         'product_images/${product.productCode}_${DateTime.now().microsecondsSinceEpoch}.jpg',
       );
     }

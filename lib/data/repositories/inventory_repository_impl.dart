@@ -3,6 +3,7 @@ import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/domain/repositories/inventory_repository.dart';
 import 'dart:io';
+import 'dart:typed_data';
 
 class InventoryRepositoryImpl implements InventoryRepository {
   final InventoryDatasource datasource;
@@ -42,13 +43,17 @@ class InventoryRepositoryImpl implements InventoryRepository {
   }
 
   @override
-  Future<void> addProduct(ProductModel product, {File? imageFile}) {
-    return datasource.addProduct(product, imageFile: imageFile);
+  Future<void> addProduct(ProductModel product,
+      {File? imageFile, Uint8List? imageBytes}) {
+    return datasource.addProduct(product,
+        imageFile: imageFile, imageBytes: imageBytes);
   }
 
   @override
-  Future<void> updateProduct(ProductModel product, {File? newImageFile}) {
-    return datasource.updateProduct(product, newImageFile: newImageFile);
+  Future<void> updateProduct(ProductModel product,
+      {File? newImageFile, Uint8List? newImageBytes}) {
+    return datasource.updateProduct(product,
+        newImageFile: newImageFile, newImageBytes: newImageBytes);
   }
 
   @override

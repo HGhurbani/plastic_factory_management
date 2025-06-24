@@ -4,6 +4,7 @@ import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/domain/repositories/inventory_repository.dart';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart'; // لاستخدام Timestamp
 
 class InventoryUseCases {
@@ -71,6 +72,7 @@ class InventoryUseCases {
     required String name,
     String? description,
     File? imageFile,
+    Uint8List? imageBytes,
     required List<ProductMaterial> billOfMaterials,
     required List<String> colors,
     required List<String> additives,
@@ -94,7 +96,8 @@ class InventoryUseCases {
       productType: productType,
       expectedProductionTimePerUnit: expectedProductionTimePerUnit,
     );
-    await repository.addProduct(newProduct, imageFile: imageFile);
+    await repository.addProduct(newProduct,
+        imageFile: imageFile, imageBytes: imageBytes);
   }
 
   Future<void> updateProduct({
@@ -103,6 +106,7 @@ class InventoryUseCases {
     required String name,
     String? description,
     File? newImageFile,
+    Uint8List? newImageBytes,
     String? existingImageUrl, // لتمرير الرابط الحالي في حال عدم تغيير الصورة
     required List<ProductMaterial> billOfMaterials,
     required List<String> colors,
@@ -128,7 +132,8 @@ class InventoryUseCases {
       productType: productType,
       expectedProductionTimePerUnit: expectedProductionTimePerUnit,
     );
-    await repository.updateProduct(updatedProduct, newImageFile: newImageFile);
+    await repository.updateProduct(updatedProduct,
+        newImageFile: newImageFile, newImageBytes: newImageBytes);
   }
 
   Future<void> deleteProduct(String productId) async {
