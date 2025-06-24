@@ -7,6 +7,8 @@ import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
 import 'dart:io';
 import 'package:plastic_factory_management/theme/app_colors.dart'; // Ensure this defines primary, secondary, etc.
 
@@ -460,6 +462,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     List<ProductMaterial> _billOfMaterials = List<ProductMaterial>.from(product?.billOfMaterials ?? []);
 
     File? _pickedImage;
+    Uint8List? _pickedImageBytes;
     String? _existingImageUrl = product?.imageUrl;
 
     final ImagePicker _picker = ImagePicker();
@@ -467,10 +470,20 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     Future<void> _pickImage() async {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
-        setState(() {
-          _pickedImage = File(pickedFile.path);
-          _existingImageUrl = null;
-        });
+        if (kIsWeb) {
+          final bytes = await pickedFile.readAsBytes();
+          setState(() {
+            _pickedImageBytes = bytes;
+            _pickedImage = null;
+            _existingImageUrl = null;
+          });
+        } else {
+          setState(() {
+            _pickedImage = File(pickedFile.path);
+            _pickedImageBytes = null;
+            _existingImageUrl = null;
+          });
+        }
       }
     }
 
@@ -501,11 +514,20 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                             backgroundColor: Colors.grey[100],
                             backgroundImage: _pickedImage != null
                                 ? FileImage(_pickedImage!)
-                                : (_existingImageUrl != null ? NetworkImage(_existingImageUrl!) as ImageProvider : null),
-                            child: _pickedImage == null && _existingImageUrl == null
-                                ? Icon(Icons.add_a_photo, size: 60, color: AppColors.primary.withOpacity(0.7)) // More inviting icon
+                                : (_pickedImageBytes != null
+                                    ? MemoryImage(_pickedImageBytes!)
+                                    : (_existingImageUrl != null
+                                        ? NetworkImage(_existingImageUrl!) as ImageProvider
+                                        : null)),
+                            child: _pickedImage == null &&
+                                    _pickedImageBytes == null &&
+                                    _existingImageUrl == null
+                                ? Icon(Icons.add_a_photo,
+                                    size: 60,
+                                    color: AppColors.primary.withOpacity(0.7)) // More inviting icon
                                 : null,
-                            foregroundColor: Colors.white, // Ensure icon color is visible on background
+                            foregroundColor:
+                                Colors.white, // Ensure icon color is visible on background
                           ),
                         ),
                       ),
@@ -799,6 +821,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                             name: _nameController.text,
                             description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
                             newImageFile: _pickedImage,
+                            newImageBytes: _pickedImageBytes,
                             existingImageUrl: _existingImageUrl,
                             billOfMaterials: _billOfMaterials,
                             colors: _colors,
@@ -817,6 +840,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                             name: _nameController.text,
                             description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
                             imageFile: _pickedImage,
+                            imageBytes: _pickedImageBytes,
                             billOfMaterials: _billOfMaterials,
                             colors: _colors,
                             additives: _additives,
