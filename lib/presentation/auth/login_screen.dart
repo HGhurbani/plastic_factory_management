@@ -60,20 +60,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (!_hasViewedTerms) { // Check if user has at least opened terms
-      setState(() {
-        _errorMessage = "يرجى قراءة شروط الاستخدام أولاً."; // New specific message
-      });
-      return;
-    }
-
-    if (!_termsAcceptedLocally) {
-      setState(() {
-        _errorMessage = AppLocalizations.of(context)!.acceptTerms; // "أوافق على شروط الاستخدام"
-      });
-      return;
-    }
-
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -184,19 +170,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   Future<void> _quickSignInRole(UserRole role) async {
     final creds = _roleCredentials[role]!;
-    if (!_hasViewedTerms) {
-      setState(() {
-        _errorMessage = "يرجى قراءة شروط الاستخدام أولاً.";
-      });
-      return;
-    }
-    if (!_termsAcceptedLocally) {
-      setState(() {
-        _errorMessage = AppLocalizations.of(context)!.acceptTerms;
-      });
-      return;
-    }
-
     setState(() {
       _isLoading = true;
       _errorMessage = null;
