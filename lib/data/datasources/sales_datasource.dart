@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/data/models/customer_model.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart'; // لجلب المنتجات من المخزون
 import 'dart:io';
+import 'dart:typed_data';
 
 class SalesDatasource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -53,15 +54,22 @@ class SalesDatasource {
     });
   }
 
-  Future<void> addSalesOrder(SalesOrderModel order, {File? signatureFile}) async {
+  Future<void> addSalesOrder(
+    SalesOrderModel order, {
+    File? signatureFile,
+    Uint8List? signatureBytes,
+  }) async {
     String? signatureUrl;
+    final path =
+        'customer_signatures/${order.customerId}_${order.id}_${DateTime.now().microsecondsSinceEpoch}.png';
     if (signatureFile != null) {
-      signatureUrl = await _uploadService.uploadFile(
-        signatureFile,
-        'customer_signatures/${order.customerId}_${order.id}_${DateTime.now().microsecondsSinceEpoch}.png',
-      );
+      signatureUrl = await _uploadService.uploadFile(signatureFile, path);
+    } else if (signatureBytes != null) {
+      signatureUrl = await _uploadService.uploadBytes(signatureBytes, path);
     }
-    await _firestore.collection('sales_orders').add(order.copyWith(customerSignatureUrl: signatureUrl).toMap());
+    await _firestore
+        .collection('sales_orders')
+        .add(order.copyWith(customerSignatureUrl: signatureUrl).toMap());
   }
 
   Future<void> updateSalesOrder(SalesOrderModel order) async {

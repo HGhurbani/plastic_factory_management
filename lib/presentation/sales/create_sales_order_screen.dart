@@ -13,6 +13,7 @@ import 'package:signature/signature.dart'; // للتوقيع الرقمي
 import 'dart:io'; // لاستخدام File
 import 'dart:typed_data'; // لاستخدام Uint8List
 import 'package:path_provider/path_provider.dart'; // لحفظ التوقيع مؤقتاً
+import 'package:flutter/foundation.dart';
 
 class CreateSalesOrderScreen extends StatefulWidget {
   @override
@@ -237,12 +238,19 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
       });
 
       try {
-        final Uint8List? signaturePngBytes = await _signatureController.toPngBytes();
+        final Uint8List? signaturePngBytes =
+            await _signatureController.toPngBytes();
         File? signatureFile;
+        Uint8List? signatureBytes;
         if (signaturePngBytes != null) {
-          final tempDir = await getTemporaryDirectory();
-          signatureFile = File('${tempDir.path}/customer_signature_${DateTime.now().microsecondsSinceEpoch}.png');
-          await signatureFile.writeAsBytes(signaturePngBytes);
+          if (kIsWeb) {
+            signatureBytes = signaturePngBytes;
+          } else {
+            final tempDir = await getTemporaryDirectory();
+            signatureFile = File(
+                '${tempDir.path}/customer_signature_${DateTime.now().microsecondsSinceEpoch}.png');
+            await signatureFile.writeAsBytes(signaturePngBytes);
+          }
         }
 
         await useCases.createSalesOrder(
@@ -251,6 +259,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
           orderItems: _orderItems,
           totalAmount: _totalAmount,
           customerSignatureFile: signatureFile,
+          customerSignatureBytes: signatureBytes,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.salesOrderCreatedSuccessfully)),

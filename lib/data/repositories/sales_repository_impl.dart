@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/domain/repositories/sales_repository.dart'; // سنقوم بإنشاء هذا لاحقاً
 import 'dart:io';
+import 'dart:typed_data';
 
 class SalesRepositoryImpl implements SalesRepository {
   final SalesDatasource datasource;
@@ -48,8 +49,16 @@ class SalesRepositoryImpl implements SalesRepository {
   }
 
   @override
-  Future<void> addSalesOrder(SalesOrderModel order, {File? signatureFile}) {
-    return datasource.addSalesOrder(order, signatureFile: signatureFile);
+  Future<void> addSalesOrder(
+    SalesOrderModel order, {
+    File? signatureFile,
+    Uint8List? signatureBytes,
+  }) {
+    return datasource.addSalesOrder(
+      order,
+      signatureFile: signatureFile,
+      signatureBytes: signatureBytes,
+    );
   }
 
   @override
