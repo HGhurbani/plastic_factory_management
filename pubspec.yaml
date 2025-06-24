@@ -17,6 +17,7 @@ dependencies:
   firebase_core: ^2.27.0 # أحدث إصدار متاح حالياً
   firebase_auth: ^4.17.8 # أحدث إصدار متاح حالياً
   cloud_firestore: ^4.15.8 # أحدث إصدار متاح حالياً
+  firebase_storage: ^11.3.0
 
   # UI and Utilities
   image_picker: ^1.0.7 # لاختيار الصور
