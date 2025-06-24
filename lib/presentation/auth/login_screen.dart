@@ -307,8 +307,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: Colors.white,
             shape: BoxShape.circle,
+            color: Colors.white, // خلفية بيضاء
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -317,42 +317,54 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               ),
             ],
           ),
-          child: const Icon(
-            Icons.factory,
-            size: 40,
-            color: AppColors.primary,
+          padding: const EdgeInsets.all(12), // تقليل حجم الشعار قليلاً
+          child: Image.asset(
+            'assets/logo.png',
+            fit: BoxFit.contain, // إظهار الشعار كاملاً داخل الدائرة
           ),
         ),
         const SizedBox(height: 16),
-        Text(
-          'إدارة مصنع ASCAL',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            shadows: [
-              Shadow(
-                color: Colors.black.withOpacity(0.3),
-                offset: const Offset(0, 2),
-                blurRadius: 4,
+        RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  offset: Offset(0, 2),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+            children: [
+              TextSpan(
+                text: 'ASCAL ',
+                style: TextStyle(color: Colors.grey.shade300), // رمادي فاتح
+              ),
+              const TextSpan(
+                text: 'Plast',
+                style: TextStyle(color: Colors.white), // أبيض
               ),
             ],
           ),
-          textAlign: TextAlign.center,
         ),
+
         const SizedBox(height: 8),
         Text(
-          'نظام إدارة شامل لمصنع ASCAL',
+          'نظام إدارة شامل للمصنع',
           style: TextStyle(
             fontSize: 16,
             color: Colors.white.withOpacity(0.9),
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w900,
           ),
           textAlign: TextAlign.center,
         ),
       ],
     );
   }
+
 
   Widget _buildLoginCard(BuildContext context, AppLocalizations appLocalizations) {
     return Card(

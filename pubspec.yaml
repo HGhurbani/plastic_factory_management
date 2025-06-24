@@ -45,7 +45,7 @@ flutter:
 
   assets:
     - lib/l10n/
-    - assets/logo.svg
+    - assets/logo.png
 
   fonts:
     - family: Tajawal

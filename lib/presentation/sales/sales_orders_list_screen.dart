@@ -476,17 +476,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         ),
       );
 
-    } else if (isManager && order.status == SalesOrderStatus.warehouseProcessing) { // Manager can also fulfill after warehouse processing
-      actions.add(
-        IconButton(
-          icon: const Icon(Icons.done_all, color: Colors.green),
-          onPressed: () {
-            _showFulfillOrderDialog(context, useCases, appLocalizations, order.id, order.customerName);
-          },
-          tooltip: appLocalizations.markAsFulfilled,
-        ),
-      );
-    } else if (isMoldInstallationSupervisor &&
+    }  else if (isMoldInstallationSupervisor &&
         order.status == SalesOrderStatus.awaitingMoldApproval) {
       actions.add(
         IconButton(
@@ -651,7 +641,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
             ElevatedButton.icon(
-              icon: const Icon(Icons.done_all),
+              icon: const Icon(Icons.done_all, color: Colors.white,),
               label: Text(appLocalizations.fulfill),
               onPressed: () async {
                 Navigator.of(dialogContext).pop(); // Pop the confirmation dialog
