@@ -222,7 +222,7 @@ class _WarehouseRequestsScreenState extends State<WarehouseRequestsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                       Text(
-                        "${appLocalizations.totalAmount}: \$${order.totalAmount.toStringAsFixed(2)}",
+                        "${appLocalizations.totalAmount}: ريال سعودي ${order.totalAmount.toStringAsFixed(2)}",
                         textDirection: TextDirection.rtl,
                         textAlign: TextAlign.right,
                       ),
