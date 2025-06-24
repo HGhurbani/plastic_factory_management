@@ -7,6 +7,7 @@ import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/repositories/sales_repository.dart';
 import 'dart:io';
+import 'dart:typed_data';
 import 'notification_usecases.dart';
 import 'user_usecases.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
@@ -83,6 +84,7 @@ class SalesUseCases {
     required List<SalesOrderItem> orderItems,
     required double totalAmount,
     File? customerSignatureFile,
+    Uint8List? customerSignatureBytes,
   }) async {
     final newOrder = SalesOrderModel(
       id: '', // Firestore will generate
@@ -95,7 +97,11 @@ class SalesUseCases {
       status: SalesOrderStatus.pendingApproval, // Initial status awaiting accountant
       createdAt: Timestamp.now(),
     );
-    await repository.addSalesOrder(newOrder, signatureFile: customerSignatureFile);
+    await repository.addSalesOrder(
+      newOrder,
+      signatureFile: customerSignatureFile,
+      signatureBytes: customerSignatureBytes,
+    );
 
     // Notify accountants for financial approval
     final accountants = await userUseCases.getUsersByRole(UserRole.accountant);

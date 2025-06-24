@@ -3,7 +3,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:plastic_factory_management/core/services/file_upload_service.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/production_order_model.dart';
@@ -15,6 +14,7 @@ import 'package:image_picker/image_picker.dart'; // لإرفاق الصور
 import 'package:signature/signature.dart'; // للتوقيع الرقمي
 import 'dart:io'; // لاستخدام File
 import 'dart:typed_data'; // لاستخدام Uint8List
+import 'package:flutter/foundation.dart';
 
 // شاشة تفاصيل طلب الإنتاج
 class ProductionOrderDetailScreen extends StatefulWidget {
@@ -46,18 +46,12 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     }
   }
 
-  Future<String?> _exportSignature() async {
+  Future<Uint8List?> _exportSignature() async {
     if (_signatureController.isEmpty) {
       return null;
     }
     final Uint8List? data = await _signatureController.toPngBytes();
-    if (data == null) return null;
-
-    // Save to a temporary file
-    final tempDir = await getTemporaryDirectory(); // تحتاج إلى import path_provider
-    final file = File('${tempDir.path}/${DateTime.now().microsecondsSinceEpoch}.png');
-    await file.writeAsBytes(data);
-    return file.path; // Return path to be uploaded
+    return data;
   }
 
 
@@ -400,7 +394,6 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     _pickedImages.clear(); // Clear previous selections
     _signatureController.clear();
     String? notes;
-    File? signatureFile;
 
     await showDialog(
       context: context,
@@ -526,21 +519,20 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                       );
                       return;
                     }
+                    Uint8List? signatureBytes;
                     if (requiresSignature) {
-                      String? sigPath = await _exportSignature();
-                      if (sigPath != null) {
-                        signatureFile = File(sigPath);
-                      }
+                      signatureBytes = await _exportSignature();
                     }
 
                     Navigator.of(dialogContext).pop(); // Dismiss dialog
                     try {
                       String? signatureUrl;
-                      if (signatureFile != null) {
-                        // Upload signature image
-                        final ref = _signatureController.isEmpty
-                            ? null
-                            : await _uploadFile(signatureFile!, 'signatures/${order.id}_${stageName}_${DateTime.now().microsecondsSinceEpoch}.png');
+                      if (signatureBytes != null) {
+                        final ref = await _uploadFile(
+                          bytes: signatureBytes,
+                          path:
+                              'signatures/${order.id}_${stageName}_${DateTime.now().microsecondsSinceEpoch}.png',
+                        );
                         signatureUrl = ref?.toString();
                       }
 
@@ -737,7 +729,6 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     String? notes;
     String? delayReason;
     double? actualTimeMinutes;
-    File? signatureFile;
 
     // Calculate expected time if needed (from product model)
     final expectedTimeMinutes = order.requiredQuantity * (await Provider.of<ProductionOrderUseCases>(context, listen: false).getProductById(order.productId))!.expectedProductionTimePerUnit;
@@ -905,20 +896,20 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                       return;
                     }
 
+                    Uint8List? signatureBytes;
                     if (requiresSignature) {
-                      String? sigPath = await _exportSignature();
-                      if (sigPath != null) {
-                        signatureFile = File(sigPath);
-                      }
+                      signatureBytes = await _exportSignature();
                     }
 
                     Navigator.of(dialogContext).pop();
                     try {
                       String? signatureUrl;
-                      if (signatureFile != null) {
-                        final ref = _signatureController.isEmpty
-                            ? null
-                            : await _uploadFile(signatureFile!, 'signatures/${order.id}_${stageName}_${DateTime.now().microsecondsSinceEpoch}.png');
+                      if (signatureBytes != null) {
+                        final ref = await _uploadFile(
+                          bytes: signatureBytes,
+                          path:
+                              'signatures/${order.id}_${stageName}_${DateTime.now().microsecondsSinceEpoch}.png',
+                        );
                         signatureUrl = ref?.toString();
                       }
 
@@ -965,9 +956,14 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
   }
 
   // Helper function to upload file to external server
-  Future<Uri?> _uploadFile(File file, String path) async {
+  Future<Uri?> _uploadFile({File? file, Uint8List? bytes, required String path}) async {
     try {
-      final url = await _uploadService.uploadFile(file, path);
+      String? url;
+      if (bytes != null) {
+        url = await _uploadService.uploadBytes(bytes, path);
+      } else if (file != null) {
+        url = await _uploadService.uploadFile(file, path);
+      }
       return url != null ? Uri.parse(url) : null;
     } catch (e) {
       print('Error uploading file: $e');

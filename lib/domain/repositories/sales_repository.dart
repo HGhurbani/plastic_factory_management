@@ -4,6 +4,7 @@ import 'package:plastic_factory_management/data/models/customer_model.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'dart:io';
+import 'dart:typed_data';
 
 abstract class SalesRepository {
   Stream<List<CustomerModel>> getCustomers();
@@ -14,7 +15,11 @@ abstract class SalesRepository {
 
   Stream<List<SalesOrderModel>> getSalesOrders();
   Stream<List<SalesOrderModel>> getSalesOrdersBySalesRepresentative(String salesRepUid);
-  Future<void> addSalesOrder(SalesOrderModel order, {File? signatureFile});
+  Future<void> addSalesOrder(
+    SalesOrderModel order, {
+    File? signatureFile,
+    Uint8List? signatureBytes,
+  });
   Future<void> updateSalesOrder(SalesOrderModel order);
   Future<void> deleteSalesOrder(String orderId);
 
