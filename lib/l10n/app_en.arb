@@ -403,6 +403,7 @@
   "acceptTerms": "Accept Terms",
   "termsAcceptedAt": "Terms accepted on",
   "notAcceptedYet": "Not yet accepted",
+  "mustAcceptTerms": "You must accept the terms to continue",
   "loginPrompt": "Please log in to continue.",
   "login": "Login",
   "tryAgain": "Try Again",

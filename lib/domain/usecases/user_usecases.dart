@@ -46,16 +46,18 @@ class UserUseCases {
     required String name,
     required UserRole role,
     String? employeeId,
-  }) {
+  }) async {
+    final existing = await repository.getUserById(uid);
     final user = UserModel(
       uid: uid,
       email: email,
       name: name,
       role: role.toFirestoreString(),
       employeeId: employeeId,
-      createdAt: Timestamp.now(),
+      createdAt: existing?.createdAt ?? Timestamp.now(),
+      termsAcceptedAt: existing?.termsAcceptedAt,
     );
-    return repository.updateUser(user);
+    await repository.updateUser(user);
   }
 
   Future<void> deleteUser(String uid) {
