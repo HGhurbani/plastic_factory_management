@@ -397,6 +397,7 @@
   "acceptTerms": "أوافق على الشروط",
   "termsAcceptedAt": "تاريخ قبول الشروط",
   "notAcceptedYet": "لم يتم القبول بعد",
+  "mustAcceptTerms": "يجب الموافقة على الشروط للمتابعة",
   "loginPrompt": "يرجى تسجيل الدخول للمتابعة.",
   "login": "تسجيل الدخول",
   "tryAgain": "حاول مرة أخرى",

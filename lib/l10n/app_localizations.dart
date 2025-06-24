@@ -389,6 +389,8 @@ class AppLocalizations {
   String get acceptTerms => _strings["acceptTerms"] ?? "acceptTerms";
   String get termsAcceptedAt => _strings["termsAcceptedAt"] ?? "termsAcceptedAt";
   String get notAcceptedYet => _strings["notAcceptedYet"] ?? "notAcceptedYet";
+  String get mustAcceptTerms =>
+      _strings["mustAcceptTerms"] ?? "mustAcceptTerms";
   String get loginPrompt => _strings["loginPrompt"] ?? "loginPrompt";
   String get login => _strings["login"] ?? "login";
   String get tryAgain => _strings["tryAgain"] ?? "tryAgain";

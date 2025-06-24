@@ -204,6 +204,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     final user = await _authService.getCurrentUserFirestoreData();
     if (!mounted) return;
 
+    final appLocalizations = AppLocalizations.of(context)!;
+
     if (user != null) {
       if (user.termsAcceptedAt == null) {
         if (_termsAcceptedLocally) {
@@ -211,6 +213,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           await userUseCases.acceptTerms(user.uid);
           Navigator.of(context).pushReplacementNamed(AppRouter.homeRoute);
         } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(appLocalizations.mustAcceptTerms)),
+          );
           Navigator.of(context).pushReplacementNamed(
             AppRouter.termsRoute,
             arguments: user.uid,
