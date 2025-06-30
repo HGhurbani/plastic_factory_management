@@ -67,7 +67,6 @@ class InventoryUseCases {
     required List<String> colors,
     required double percentage,
     required List<String> additives,
-    List<String> templateIds = const [],
   }) async {
     final newTemplate = TemplateModel(
       id: '',
@@ -78,7 +77,6 @@ class InventoryUseCases {
       colors: colors,
       percentage: percentage,
       additives: additives,
-      templateIds: templateIds,
     );
     await repository.addTemplate(newTemplate);
   }
@@ -92,7 +90,6 @@ class InventoryUseCases {
     required List<String> colors,
     required double percentage,
     required List<String> additives,
-    List<String>? templateIds,
   }) async {
     final updated = TemplateModel(
       id: id,
@@ -103,7 +100,6 @@ class InventoryUseCases {
       colors: colors,
       percentage: percentage,
       additives: additives,
-      templateIds: templateIds ?? [],
     );
     await repository.updateTemplate(updated);
   }
