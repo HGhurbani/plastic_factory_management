@@ -554,16 +554,62 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                 content: Form(
                   key: _formKey,
                   child: isAdding
-                      ? TextFormField(
-                          controller: _nameController,
-                          decoration: InputDecoration(
-                            labelText: appLocalizations.productName,
-                            border: const OutlineInputBorder(),
-                            suffixIcon: const Icon(Icons.title),
+                      ? SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextFormField(
+                                controller: _nameController,
+                                decoration: InputDecoration(
+                                  labelText: appLocalizations.productName,
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: const Icon(Icons.title),
+                                ),
+                                textDirection: TextDirection.rtl,
+                                textAlign: TextAlign.right,
+                                validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                              ),
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(appLocalizations.templates, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              ),
+                              const SizedBox(height: 8),
+                              StreamBuilder<List<TemplateModel>>(
+                                stream: useCases.getTemplates(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  }
+                                  final templates = snapshot.data ?? [];
+                                  final available = templates.where((t) => !_selectedTemplateIds.contains(t.id)).toList();
+                                  final nameMap = {for (var t in templates) t.id: t.name};
+                                  return Wrap(
+                                    spacing: 8.0,
+                                    runSpacing: 4.0,
+                                    children: [
+                                      ..._selectedTemplateIds.map((id) => Chip(
+                                            label: Text(nameMap[id] ?? appLocalizations.unknown),
+                                            deleteIcon: const Icon(Icons.cancel, size: 18),
+                                            onDeleted: () { setState(() { _selectedTemplateIds.remove(id); }); },
+                                            backgroundColor: AppColors.lightGrey,
+                                          )),
+                                      ActionChip(
+                                        avatar: const Icon(Icons.add_circle_outline, color: AppColors.primary),
+                                        label: Text(appLocalizations.add),
+                                        onPressed: () async {
+                                          final newId = await _showSelectTemplateDialog(context, available, appLocalizations);
+                                          if (newId != null && !_selectedTemplateIds.contains(newId)) {
+                                            setState(() { _selectedTemplateIds.add(newId); });
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
                           ),
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
-                          validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
                         )
                       : SingleChildScrollView(
                           child: Column(
