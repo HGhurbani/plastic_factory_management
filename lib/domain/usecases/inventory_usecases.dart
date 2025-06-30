@@ -108,6 +108,11 @@ class InventoryUseCases {
     await repository.deleteTemplate(templateId);
   }
 
+  Future<List<TemplateModel>> getTemplatesByIds(List<String> ids) async {
+    final all = await repository.getTemplates().first;
+    return all.where((t) => ids.contains(t.id)).toList();
+  }
+
   // --- Product Catalog Use Cases ---
 
   Stream<List<ProductModel>> getProducts() {
