@@ -188,136 +188,65 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       AppLocalizations appLocalizations,
       InventoryUseCases inventoryUseCases,
       ) {
-    return GestureDetector(
-      onTap: () {
-        if (product.templateIds.isNotEmpty) {
-          _showProductTemplatesDialog(context, appLocalizations, inventoryUseCases, product);
-        } else {
-          _showProductDetailsDialog(context, appLocalizations, product);
-        }
-      },
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        clipBehavior: Clip.antiAlias,
-        child: Directionality(
-          textDirection: TextDirection.rtl, // Ensure RTL for all children
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, // Becomes RIGHT in RTL
-            children: [
-              // --- Image Section ---
-              AspectRatio(
-                aspectRatio: 16 / 10, // Maintain a consistent image aspect ratio
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    product.imageUrl != null && product.imageUrl!.isNotEmpty
-                        ? Image.network(
-                      product.imageUrl!,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const Center(child: CircularProgressIndicator(color: AppColors.primary));
-                      },
-                      errorBuilder: (context, error, stackTrace) =>
-                          Center(child: Icon(Icons.broken_image, size: 50, color: Colors.grey[400])),
-                    )
-                        : Container(
-                      color: Colors.grey[200],
-                      child: Center(child: Icon(Icons.image_not_supported_outlined, size: 50, color: Colors.grey[500])),
-                    ),
-                    // Product Type Badge
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: product.productType == 'single' ? Colors.blue.withOpacity(0.8) : Colors.green.withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          product.productType == 'single' ? appLocalizations.single : appLocalizations.compound,
-                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    // Three-dot menu for edit and delete
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      child: PopupMenuButton<String>(
-                        icon: const Icon(Icons.more_vert, color: Colors.white, size: 24),
-                        onSelected: (String result) {
-                          if (result == 'edit') {
-                            _showAddEditProductDialog(context, inventoryUseCases, appLocalizations, product: product);
-                          } else if (result == 'delete') {
-                            _showDeleteProductConfirmationDialog(context, inventoryUseCases, appLocalizations, product.id, product.name);
-                          }
-                        },
-                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                          PopupMenuItem<String>(
-                            value: 'edit',
-                            child: Row(
-                              children: [
-                                const Icon(Icons.edit, color: AppColors.primary),
-                                const SizedBox(width: 8),
-                                Text(appLocalizations.edit),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem<String>(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                const Icon(Icons.delete_outline, color: Colors.redAccent),
-                                const SizedBox(width: 8),
-                                Text(appLocalizations.delete),
-                              ],
-                            ),
-                          ),
-                        ],
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        elevation: 4,
-                      ),
-                    ),
-                  ],
-                ),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(12),
+        onTap: () {
+          if (product.templateIds.isNotEmpty) {
+            _showProductTemplatesDialog(context, appLocalizations, inventoryUseCases, product);
+          } else {
+            _showProductDetailsDialog(context, appLocalizations, product);
+          }
+        },
+        leading: const CircleAvatar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          child: Icon(Icons.category),
+        ),
+        title: Text(
+          product.name,
+          textDirection: TextDirection.rtl,
+          textAlign: TextAlign.right,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        subtitle: Text(
+          '${appLocalizations.templates}: ${product.templateIds.length}',
+          textDirection: TextDirection.rtl,
+          textAlign: TextAlign.right,
+        ),
+        trailing: PopupMenuButton<String>(
+          onSelected: (String result) {
+            if (result == 'edit') {
+              _showAddEditProductDialog(context, inventoryUseCases, appLocalizations, product: product);
+            } else if (result == 'delete') {
+              _showDeleteProductConfirmationDialog(context, inventoryUseCases, appLocalizations, product.id, product.name);
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            PopupMenuItem<String>(
+              value: 'edit',
+              child: Row(
+                children: [
+                  const Icon(Icons.edit, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Text(appLocalizations.edit),
+                ],
               ),
-
-              // --- Details Section ---
-              Padding(
-                // **تعديل: تقليل الهوامش لجعل الكرت أقصر**
-                padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, // Becomes RIGHT in RTL
-                  children: [
-                    Text(
-                      product.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${appLocalizations.productCode}: ${product.productCode}',
-                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${appLocalizations.packagingType}: ${product.packagingType}',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+            ),
+            PopupMenuItem<String>(
+              value: 'delete',
+              child: Row(
+                children: [
+                  const Icon(Icons.delete_outline, color: Colors.redAccent),
+                  const SizedBox(width: 8),
+                  Text(appLocalizations.delete),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -624,11 +553,123 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                 ),
                 content: Form(
                   key: _formKey,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isEditing) ...[
+                  child: isAdding
+                      ? TextFormField(
+                          controller: _nameController,
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.productName,
+                            border: const OutlineInputBorder(),
+                            suffixIcon: const Icon(Icons.title),
+                          ),
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.right,
+                          validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                        )
+                      : SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Center(
+                                child: GestureDetector(
+                                  onTap: () => _pickImage(setState),
+                                  child: CircleAvatar(
+                                    radius: 60,
+                                    backgroundColor: Colors.grey[100],
+                                    backgroundImage: _pickedImageBytes != null
+                                        ? MemoryImage(_pickedImageBytes!)
+                                        : (_pickedImage != null
+                                            ? FileImage(_pickedImage!)
+                                            : (_existingImageUrl != null
+                                                ? NetworkImage(_existingImageUrl!)
+                                                : null)) as ImageProvider?,
+                                    child: _pickedImage == null &&
+                                            _pickedImageBytes == null &&
+                                            _existingImageUrl == null
+                                        ? Icon(Icons.add_a_photo,
+                                            size: 60,
+                                            color: AppColors.primary.withOpacity(0.7))
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _productCodeController,
+                                decoration: InputDecoration(
+                                  labelText: appLocalizations.productCode,
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: const Icon(Icons.tag),
+                                ),
+                                validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                              ),
+                              const SizedBox(height: 12),
+                              TextFormField(
+                                controller: _nameController,
+                                decoration: InputDecoration(
+                                  labelText: appLocalizations.productName,
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: const Icon(Icons.title),
+                                ),
+                                validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                              ),
+                              const SizedBox(height: 12),
+                              TextFormField(
+                                controller: _descriptionController,
+                                decoration: InputDecoration(
+                                  labelText: appLocalizations.description,
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: const Icon(Icons.notes),
+                                ),
+                                maxLines: 3,
+                              ),
+                              const SizedBox(height: 12),
+                              TextFormField(
+                                controller: _packagingTypeController,
+                                decoration: InputDecoration(
+                                  labelText: appLocalizations.packagingType,
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: const Icon(Icons.backpack),
+                                ),
+                                validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                              ),
+                              const SizedBox(height: 12),
+                              TextFormField(
+                                controller: _expectedProductionTimeController,
+                                decoration: InputDecoration(
+                                  labelText: appLocalizations.expectedProductionTimePerUnit,
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: const Icon(Icons.schedule),
+                                ),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value!.isEmpty) return appLocalizations.fieldRequired;
+                                  if (double.tryParse(value) == null || double.parse(value) <= 0) return appLocalizations.invalidNumberPositive;
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              SwitchListTile(
+                                title: Text(appLocalizations.requiresPackaging),
+                                value: _requiresPackaging,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    _requiresPackaging = newValue;
+                                  });
+                                },
+                                secondary: const Icon(Icons.archive_outlined),
+                                controlAffinity: ListTileControlAffinity.trailing,
+                              ),
+                              SwitchListTile(
+                                title: Text(appLocalizations.requiresSticker),
+                                value: _requiresSticker,
+                                onChanged: (bool newValue) {
+                                  setState(() {
+                                    _requiresSticker = newValue;
+                                  });
+                                },
+                                secondary: const Icon(Icons.sticky_note_2_outlined),
+                                controlAffinity: ListTileControlAffinity.trailing,
+                              ),
                         Center(
                           child: GestureDetector(
                             onTap: () => _pickImage(setState),
@@ -982,7 +1023,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                             );
                             await useCases.addProduct(
                               productCode: 'TMP-${DateTime.now().millisecondsSinceEpoch}',
-                              name: 'Template-based product',
+                              name: _nameController.text,
                               description: null,
                               billOfMaterials: const [],
                               colors: const [],
