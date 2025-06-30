@@ -121,7 +121,7 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          _showAddEditTemplateDialog(context, useCases, appLocalizations, template: template);
+          _showTemplateDetailsDialog(context, appLocalizations, template);
         },
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -194,6 +194,58 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showTemplateDetailsDialog(BuildContext context, AppLocalizations appLocalizations, TemplateModel template) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(
+              template.name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildInfoRow(appLocalizations.templateCode, template.code, icon: Icons.qr_code_2),
+                  _buildInfoRow(appLocalizations.timeRequired, template.timeRequired.toString(), icon: Icons.timer),
+                  _buildInfoRow(appLocalizations.percentage, template.percentage.toString(), icon: Icons.percent),
+                  if (template.colors.isNotEmpty)
+                    _buildInfoRow(appLocalizations.colors, template.colors.join('، '), icon: Icons.color_lens),
+                  if (template.additives.isNotEmpty)
+                    _buildInfoRow(appLocalizations.additives, template.additives.join('، '), icon: Icons.add),
+                  if (template.materialsUsed.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: template.materialsUsed.map((m) {
+                        final name = _rawMaterialNames[m.materialId] ?? appLocalizations.unknownMaterial;
+                        return Text('${m.ratio} - $name', style: const TextStyle(fontSize: 14));
+                      }).toList(),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text(appLocalizations.close),
+                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
