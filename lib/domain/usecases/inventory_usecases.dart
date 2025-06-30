@@ -2,6 +2,7 @@
 
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
+import 'package:plastic_factory_management/data/models/template_model.dart';
 import 'package:plastic_factory_management/domain/repositories/inventory_repository.dart';
 import 'dart:io';
 import 'dart:typed_data';
@@ -19,17 +20,15 @@ class InventoryUseCases {
   }
 
   Future<void> addRawMaterial({
+    required String code,
     required String name,
-    required double currentQuantity,
     required String unit,
-    required double minStockLevel,
   }) async {
     final newMaterial = RawMaterialModel(
       id: '', // Firestore will generate
+      code: code,
       name: name,
-      currentQuantity: currentQuantity,
       unit: unit,
-      minStockLevel: minStockLevel,
       lastUpdated: Timestamp.now(),
     );
     await repository.addRawMaterial(newMaterial);
@@ -37,17 +36,15 @@ class InventoryUseCases {
 
   Future<void> updateRawMaterial({
     required String id,
+    required String code,
     required String name,
-    required double currentQuantity,
     required String unit,
-    required double minStockLevel,
   }) async {
     final updatedMaterial = RawMaterialModel(
       id: id,
+      code: code,
       name: name,
-      currentQuantity: currentQuantity,
       unit: unit,
-      minStockLevel: minStockLevel,
       lastUpdated: Timestamp.now(),
     );
     await repository.updateRawMaterial(updatedMaterial);
@@ -55,6 +52,64 @@ class InventoryUseCases {
 
   Future<void> deleteRawMaterial(String materialId) async {
     await repository.deleteRawMaterial(materialId);
+  }
+
+  // --- Template Use Cases ---
+  Stream<List<TemplateModel>> getTemplates() {
+    return repository.getTemplates();
+  }
+
+  Future<void> addTemplate({
+    required String code,
+    required String name,
+    required double timeRequired,
+    required List<TemplateMaterial> materialsUsed,
+    required List<String> colors,
+    required double percentage,
+    required List<String> additives,
+    List<String> templateIds = const [],
+  }) async {
+    final newTemplate = TemplateModel(
+      id: '',
+      code: code,
+      name: name,
+      timeRequired: timeRequired,
+      materialsUsed: materialsUsed,
+      colors: colors,
+      percentage: percentage,
+      additives: additives,
+      templateIds: templateIds,
+    );
+    await repository.addTemplate(newTemplate);
+  }
+
+  Future<void> updateTemplate({
+    required String id,
+    required String code,
+    required String name,
+    required double timeRequired,
+    required List<TemplateMaterial> materialsUsed,
+    required List<String> colors,
+    required double percentage,
+    required List<String> additives,
+    List<String>? templateIds,
+  }) async {
+    final updated = TemplateModel(
+      id: id,
+      code: code,
+      name: name,
+      timeRequired: timeRequired,
+      materialsUsed: materialsUsed,
+      colors: colors,
+      percentage: percentage,
+      additives: additives,
+      templateIds: templateIds ?? [],
+    );
+    await repository.updateTemplate(updated);
+  }
+
+  Future<void> deleteTemplate(String templateId) async {
+    await repository.deleteTemplate(templateId);
   }
 
   // --- Product Catalog Use Cases ---
@@ -76,6 +131,7 @@ class InventoryUseCases {
     required List<ProductMaterial> billOfMaterials,
     required List<String> colors,
     required List<String> additives,
+    List<String> templateIds = const [],
     required String packagingType,
     required bool requiresPackaging,
     required bool requiresSticker,
@@ -90,6 +146,7 @@ class InventoryUseCases {
       billOfMaterials: billOfMaterials,
       colors: colors,
       additives: additives,
+      templateIds: templateIds,
       packagingType: packagingType,
       requiresPackaging: requiresPackaging,
       requiresSticker: requiresSticker,
@@ -111,6 +168,7 @@ class InventoryUseCases {
     required List<ProductMaterial> billOfMaterials,
     required List<String> colors,
     required List<String> additives,
+    List<String>? templateIds,
     required String packagingType,
     required bool requiresPackaging,
     required bool requiresSticker,
@@ -126,6 +184,7 @@ class InventoryUseCases {
       billOfMaterials: billOfMaterials,
       colors: colors,
       additives: additives,
+      templateIds: templateIds ?? [],
       packagingType: packagingType,
       requiresPackaging: requiresPackaging,
       requiresSticker: requiresSticker,

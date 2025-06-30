@@ -157,6 +157,7 @@ class AppLocalizations {
   String get errorRejectingStage => _strings["errorRejectingStage"] ?? "errorRejectingStage";
   String get addRawMaterial => _strings["addRawMaterial"] ?? "addRawMaterial";
   String get editRawMaterial => _strings["editRawMaterial"] ?? "editRawMaterial";
+  String get materialCode => _strings["materialCode"] ?? "materialCode";
   String get materialName => _strings["materialName"] ?? "materialName";
   String get add => _strings["add"] ?? "add";
   String get save => _strings["save"] ?? "save";

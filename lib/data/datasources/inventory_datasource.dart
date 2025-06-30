@@ -4,12 +4,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:plastic_factory_management/core/services/file_upload_service.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
+import 'package:plastic_factory_management/data/models/template_model.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
 class InventoryDatasource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FileUploadService _uploadService = FileUploadService();
+
+  // --- Template Operations ---
+  Stream<List<TemplateModel>> getTemplates() {
+    return _firestore.collection('templates').snapshots().map((snapshot) {
+      return snapshot.docs
+          .map((doc) => TemplateModel.fromDocumentSnapshot(doc))
+          .toList();
+    });
+  }
+
+  Future<void> addTemplate(TemplateModel template) async {
+    await _firestore.collection('templates').add(template.toMap());
+  }
+
+  Future<void> updateTemplate(TemplateModel template) async {
+    await _firestore
+        .collection('templates')
+        .doc(template.id)
+        .update(template.toMap());
+  }
+
+  Future<void> deleteTemplate(String templateId) async {
+    await _firestore.collection('templates').doc(templateId).delete();
+  }
 
   // --- Raw Materials Operations ---
 

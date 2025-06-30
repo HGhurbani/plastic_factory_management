@@ -118,7 +118,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             itemBuilder: (context, index) {
               final material = snapshot.data![index];
-              final isBelowMin = material.currentQuantity <= material.minStockLevel;
+              const bool isBelowMin = false; // quantities not tracked
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -139,42 +139,12 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                       ),
                     ),
                     title: Text(
-                      material.name,
+                      '${material.code} - ${material.name}',
                       textDirection: TextDirection.rtl,
                       textAlign: TextAlign.right,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18), // Larger, bolder title
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const SizedBox(height: 4),
-                        Text(
-                          '${appLocalizations.currentQuantity}: ${material.currentQuantity} ${material.unit}',
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            color: isBelowMin ? Colors.red[800] : Colors.grey[700],
-                            fontWeight: isBelowMin ? FontWeight.bold : FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          '${appLocalizations.minStockLevel}: ${material.minStockLevel} ${material.unit}',
-                          textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                        if (isBelowMin)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              appLocalizations.lowStockWarning,
-                              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14),
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                      ],
-                    ),
+                    subtitle: const SizedBox.shrink(),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -224,10 +194,9 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
         RawMaterialModel? material,
       }) {
     final isEditing = material != null;
+    final _codeController = TextEditingController(text: material?.code);
     final _nameController = TextEditingController(text: material?.name);
-    final _quantityController = TextEditingController(text: material?.currentQuantity.toString());
     final _unitController = TextEditingController(text: material?.unit);
-    final _minStockController = TextEditingController(text: material?.minStockLevel.toString());
     final _formKey = GlobalKey<FormState>();
 
     showDialog(
@@ -258,19 +227,13 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
-                    controller: _quantityController,
+                    controller: _codeController,
                     decoration: InputDecoration(
-                      labelText: appLocalizations.currentQuantity,
+                      labelText: appLocalizations.materialCode,
                       border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.numbers), // Icon for quantity
+                      prefixIcon: const Icon(Icons.tag),
                     ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value!.isEmpty) return appLocalizations.fieldRequired;
-                      if (double.tryParse(value) == null) return appLocalizations.invalidNumber;
-                      if (double.parse(value) < 0) return appLocalizations.quantityCannotBeNegative; // New validation
-                      return null;
-                    },
+                    validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
                     textAlign: TextAlign.right,
                     textDirection: TextDirection.rtl,
                   ),
@@ -287,23 +250,6 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                     textDirection: TextDirection.rtl,
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _minStockController,
-                    decoration: InputDecoration(
-                      labelText: appLocalizations.minStockLevel,
-                      border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.low_priority), // Icon for min stock
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value!.isEmpty) return appLocalizations.fieldRequired;
-                      if (double.tryParse(value) == null) return appLocalizations.invalidNumber;
-                      if (double.parse(value) < 0) return appLocalizations.minStockCannotBeNegative; // New validation
-                      return null;
-                    },
-                    textAlign: TextAlign.right,
-                    textDirection: TextDirection.rtl,
-                  ),
                 ],
               ),
             ),
@@ -323,19 +269,17 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                     if (isEditing) {
                       await useCases.updateRawMaterial(
                         id: material!.id,
+                        code: _codeController.text,
                         name: _nameController.text,
-                        currentQuantity: double.parse(_quantityController.text),
                         unit: _unitController.text,
-                        minStockLevel: double.parse(_minStockController.text),
                       );
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(appLocalizations.materialUpdatedSuccessfully)));
                     } else {
                       await useCases.addRawMaterial(
+                        code: _codeController.text,
                         name: _nameController.text,
-                        currentQuantity: double.parse(_quantityController.text),
                         unit: _unitController.text,
-                        minStockLevel: double.parse(_minStockController.text),
                       );
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(appLocalizations.materialAddedSuccessfully)));

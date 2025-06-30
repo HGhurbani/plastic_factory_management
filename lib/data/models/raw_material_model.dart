@@ -4,19 +4,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RawMaterialModel {
   final String id;
+  final String code; // كود المادة
   final String name;
-  final double currentQuantity;
   final String unit; // وحدة القياس، مثل 'kg', 'liter', 'piece'
-  final double minStockLevel; // الحد الأدنى للمخزون (للتنبيهات)
-  final Timestamp lastUpdated;
+  final Timestamp? lastUpdated;
 
   RawMaterialModel({
     required this.id,
+    required this.code,
     required this.name,
-    required this.currentQuantity,
     required this.unit,
-    required this.minStockLevel,
-    required this.lastUpdated,
+    this.lastUpdated,
   });
 
   // Constructor from a Firestore DocumentSnapshot
@@ -24,21 +22,19 @@ class RawMaterialModel {
     final data = doc.data() as Map<String, dynamic>;
     return RawMaterialModel(
       id: doc.id,
+      code: data['code'] ?? '',
       name: data['name'] ?? '',
-      currentQuantity: (data['currentQuantity'] as num?)?.toDouble() ?? 0.0,
       unit: data['unit'] ?? '',
-      minStockLevel: (data['minStockLevel'] as num?)?.toDouble() ?? 0.0,
-      lastUpdated: data['lastUpdated'] ?? Timestamp.now(),
+      lastUpdated: data['lastUpdated'] as Timestamp?,
     );
   }
 
   // Convert RawMaterialModel to a Map for Firestore
   Map<String, dynamic> toMap() {
     return {
+      'code': code,
       'name': name,
-      'currentQuantity': currentQuantity,
       'unit': unit,
-      'minStockLevel': minStockLevel,
       'lastUpdated': lastUpdated,
     };
   }
@@ -46,18 +42,16 @@ class RawMaterialModel {
   // Create a copy with updated values (useful for local state updates before saving)
   RawMaterialModel copyWith({
     String? id,
+    String? code,
     String? name,
-    double? currentQuantity,
     String? unit,
-    double? minStockLevel,
     Timestamp? lastUpdated,
   }) {
     return RawMaterialModel(
       id: id ?? this.id,
+      code: code ?? this.code,
       name: name ?? this.name,
-      currentQuantity: currentQuantity ?? this.currentQuantity,
       unit: unit ?? this.unit,
-      minStockLevel: minStockLevel ?? this.minStockLevel,
       lastUpdated: lastUpdated ?? this.lastUpdated,
     );
   }
