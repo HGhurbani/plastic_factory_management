@@ -176,6 +176,7 @@
   "errorRejectingStage": "خطأ في رفض المرحلة: ",
   "addRawMaterial": "إضافة مادة أولية",
   "editRawMaterial": "تعديل مادة أولية",
+  "materialCode": "كود المادة",
   "materialName": "اسم المادة",
   "add": "إضافة",
   "save": "حفظ",

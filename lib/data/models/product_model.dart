@@ -40,6 +40,7 @@ class ProductModel {
   final List<ProductMaterial> billOfMaterials; // المواد المستخدمة لإنتاجه مع الكميات
   final List<String> colors; // الألوان المتاحة للمنتج
   final List<String> additives; // الإضافات المطلوبة (مثل مثبتات UV)
+  final List<String> templateIds; // القوالب المستخدمة
   final String packagingType; // نوع التعبئة (مثال: 'صندوق', 'تغليف حراري')
   final bool requiresPackaging; // هل يحتاج المنتج لتعبئة؟
   final bool requiresSticker; // هل يحتاج المنتج لستيكر؟
@@ -55,6 +56,7 @@ class ProductModel {
     required this.billOfMaterials,
     required this.colors,
     required this.additives,
+    this.templateIds = const [],
     required this.packagingType,
     required this.requiresPackaging,
     required this.requiresSticker,
@@ -77,6 +79,7 @@ class ProductModel {
           [],
       colors: List<String>.from(data['colors'] ?? []),
       additives: List<String>.from(data['additives'] ?? []),
+      templateIds: List<String>.from(data['templateIds'] ?? []),
       packagingType: data['packagingType'] ?? '',
       requiresPackaging: data['requiresPackaging'] ?? false,
       requiresSticker: data['requiresSticker'] ?? false,
@@ -95,6 +98,7 @@ class ProductModel {
       'billOfMaterials': billOfMaterials.map((e) => e.toMap()).toList(),
       'colors': colors,
       'additives': additives,
+      'templateIds': templateIds,
       'packagingType': packagingType,
       'requiresPackaging': requiresPackaging,
       'requiresSticker': requiresSticker,
@@ -113,6 +117,7 @@ class ProductModel {
     List<ProductMaterial>? billOfMaterials,
     List<String>? colors,
     List<String>? additives,
+    List<String>? templateIds,
     String? packagingType,
     bool? requiresPackaging,
     bool? requiresSticker,
@@ -128,6 +133,7 @@ class ProductModel {
       billOfMaterials: billOfMaterials ?? this.billOfMaterials,
       colors: colors ?? this.colors,
       additives: additives ?? this.additives,
+      templateIds: templateIds ?? this.templateIds,
       packagingType: packagingType ?? this.packagingType,
       requiresPackaging: requiresPackaging ?? this.requiresPackaging,
       requiresSticker: requiresSticker ?? this.requiresSticker,

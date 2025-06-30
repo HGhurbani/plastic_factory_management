@@ -2,6 +2,7 @@
 
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
+import 'package:plastic_factory_management/data/models/template_model.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -10,6 +11,12 @@ abstract class InventoryRepository {
   Future<void> addRawMaterial(RawMaterialModel material);
   Future<void> updateRawMaterial(RawMaterialModel material);
   Future<void> deleteRawMaterial(String materialId);
+
+  // Template operations
+  Stream<List<TemplateModel>> getTemplates();
+  Future<void> addTemplate(TemplateModel template);
+  Future<void> updateTemplate(TemplateModel template);
+  Future<void> deleteTemplate(String templateId);
 
   Stream<List<ProductModel>> getProducts();
   Future<ProductModel?> getProductById(String productId);
