@@ -474,6 +474,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
         ProductModel? product,
       }) {
     final isEditing = product != null;
+    final bool isAdding = !isEditing;
     final _formKey = GlobalKey<FormState>();
     final _productCodeController = TextEditingController(text: product?.productCode);
     final _nameController = TextEditingController(text: product?.name);
@@ -535,6 +536,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        if (isEditing) ...[
                         Center(
                           child: GestureDetector(
                             onTap: () => _pickImage(setState),
@@ -728,6 +730,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                             ),
                           ],
                         ),
+                      ], // end isEditing
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,
@@ -768,14 +771,15 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                           },
                         ),
                         const SizedBox(height: 12),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        ),
-                        const SizedBox(height: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _billOfMaterials.asMap().entries.map((entry) {
+                        if (isEditing) ...[
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          ),
+                          const SizedBox(height: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _billOfMaterials.asMap().entries.map((entry) {
                             final int index = entry.key;
                             final ProductMaterial bom = entry.value;
                             final materialName = _rawMaterialNames[bom.materialId] ?? appLocalizations.unknownMaterial;
@@ -810,11 +814,12 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                         ),
+                        ),
                       ],
+                    ], // end isEditing
                     ),
                   ),
                 ),
@@ -830,21 +835,21 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                       icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white,),
                       label: Text(isEditing ? appLocalizations.save : appLocalizations.add),
                       onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          if (_billOfMaterials.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(appLocalizations.bomRequired)));
-                            return;
-                          }
-                          try {
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext loadingContext) {
-                                return const Center(child: CircularProgressIndicator());
-                              },
-                            );
-                            if (isEditing) {
+                        if (isEditing) {
+                          if (_formKey.currentState!.validate()) {
+                            if (_billOfMaterials.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(appLocalizations.bomRequired)));
+                              return;
+                            }
+                            try {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext loadingContext) {
+                                  return const Center(child: CircularProgressIndicator());
+                                },
+                              );
                               await useCases.updateProduct(
                                 id: product!.id,
                                 productCode: _productCodeController.text,
@@ -865,26 +870,40 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text(appLocalizations.productUpdatedSuccessfully)));
-                            } else {
-                              await useCases.addProduct(
-                                productCode: _productCodeController.text,
-                                name: _nameController.text,
-                                description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-                                imageFile: _pickedImage,
-                                imageBytes: _pickedImageBytes,
-                                billOfMaterials: _billOfMaterials,
-                                colors: _colors,
-                                additives: _additives,
-                                templateIds: _selectedTemplateIds,
-                                packagingType: _packagingTypeController.text,
-                                requiresPackaging: _requiresPackaging,
-                                requiresSticker: _requiresSticker,
-                                productType: _productType,
-                                expectedProductionTimePerUnit: double.parse(_expectedProductionTimeController.text),
-                              );
+                              Navigator.of(context).pop();
+                              Navigator.of(dialogContext).pop();
+                            } catch (e) {
+                              Navigator.of(context).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(appLocalizations.productAddedSuccessfully)));
+                                SnackBar(content: Text('${appLocalizations.errorSavingProduct}: ${e.toString()}')),
+                              );
                             }
+                          }
+                        } else {
+                          try {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext loadingContext) {
+                                return const Center(child: CircularProgressIndicator());
+                              },
+                            );
+                            await useCases.addProduct(
+                              productCode: 'TMP-${DateTime.now().millisecondsSinceEpoch}',
+                              name: 'Template-based product',
+                              description: null,
+                              billOfMaterials: const [],
+                              colors: const [],
+                              additives: const [],
+                              templateIds: _selectedTemplateIds,
+                              packagingType: '',
+                              requiresPackaging: false,
+                              requiresSticker: false,
+                              productType: 'single',
+                              expectedProductionTimePerUnit: 0,
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(appLocalizations.productAddedSuccessfully)));
                             Navigator.of(context).pop();
                             Navigator.of(dialogContext).pop();
                           } catch (e) {
