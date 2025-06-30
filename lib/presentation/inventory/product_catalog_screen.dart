@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
+import 'package:plastic_factory_management/data/models/template_model.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -22,11 +23,14 @@ class ProductCatalogScreen extends StatefulWidget {
 class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
   // A map to store raw material names, fetched once to avoid repeated calls
   Map<String, String> _rawMaterialNames = {};
+  // A map to store template names as "id: name"
+  Map<String, String> _templateNames = {};
 
   @override
   void initState() {
     super.initState();
     _fetchRawMaterialNames();
+    _fetchTemplateNames();
   }
 
   // Fetch raw material names to display instead of IDs in BOM
@@ -36,6 +40,17 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     if (mounted) {
       setState(() {
         _rawMaterialNames = {for (var material in materials) material.id: material.name};
+      });
+    }
+  }
+
+  // Fetch template names for display
+  Future<void> _fetchTemplateNames() async {
+    final inventoryUseCases = Provider.of<InventoryUseCases>(context, listen: false);
+    final templates = await inventoryUseCases.getTemplates().first;
+    if (mounted) {
+      setState(() {
+        _templateNames = {for (var t in templates) t.id: t.name};
       });
     }
   }
@@ -371,6 +386,18 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                   ),
 
                   const SizedBox(height: 12),
+                  Text(appLocalizations.templates, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                  const SizedBox(height: 4),
+                  Text(
+                    product.templateIds.isEmpty
+                        ? appLocalizations.notApplicable
+                        : product.templateIds
+                            .map((id) => _templateNames[id] ?? appLocalizations.unknown)
+                            .join('، '),
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+
+                  const SizedBox(height: 12),
                   Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
                   const SizedBox(height: 4),
                   if (product.billOfMaterials.isEmpty)
@@ -460,6 +487,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     List<String> _colors = List<String>.from(product?.colors ?? []);
     List<String> _additives = List<String>.from(product?.additives ?? []);
     List<ProductMaterial> _billOfMaterials = List<ProductMaterial>.from(product?.billOfMaterials ?? []);
+    List<String> _selectedTemplateIds = List<String>.from(product?.templateIds ?? []);
 
     File? _pickedImage;
     Uint8List? _pickedImageBytes;
@@ -703,6 +731,45 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,
+                          child: Text(appLocalizations.templates, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        ),
+                        const SizedBox(height: 8),
+                        StreamBuilder<List<TemplateModel>>(
+                          stream: useCases.getTemplates(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            final templates = snapshot.data ?? [];
+                            final available = templates.where((t) => !_selectedTemplateIds.contains(t.id)).toList();
+                            final nameMap = {for (var t in templates) t.id: t.name};
+                            return Wrap(
+                              spacing: 8.0,
+                              runSpacing: 4.0,
+                              children: [
+                                ..._selectedTemplateIds.map((id) => Chip(
+                                  label: Text(nameMap[id] ?? appLocalizations.unknown),
+                                  deleteIcon: const Icon(Icons.cancel, size: 18),
+                                  onDeleted: () { setState(() { _selectedTemplateIds.remove(id); }); },
+                                  backgroundColor: AppColors.lightGrey,
+                                )),
+                                ActionChip(
+                                  avatar: const Icon(Icons.add_circle_outline, color: AppColors.primary),
+                                  label: Text(appLocalizations.add),
+                                  onPressed: () async {
+                                    final newId = await _showSelectTemplateDialog(context, available, appLocalizations);
+                                    if (newId != null && !_selectedTemplateIds.contains(newId)) {
+                                      setState(() { _selectedTemplateIds.add(newId); });
+                                    }
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerRight,
                           child: Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         ),
                         const SizedBox(height: 8),
@@ -789,6 +856,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                                 billOfMaterials: _billOfMaterials,
                                 colors: _colors,
                                 additives: _additives,
+                                templateIds: _selectedTemplateIds,
                                 packagingType: _packagingTypeController.text,
                                 requiresPackaging: _requiresPackaging,
                                 requiresSticker: _requiresSticker,
@@ -807,6 +875,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                                 billOfMaterials: _billOfMaterials,
                                 colors: _colors,
                                 additives: _additives,
+                                templateIds: _selectedTemplateIds,
                                 packagingType: _packagingTypeController.text,
                                 requiresPackaging: _requiresPackaging,
                                 requiresSticker: _requiresSticker,
@@ -962,6 +1031,50 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                         quantityPerUnit: double.parse(_quantityController.text),
                         unit: _selectedMaterial!.unit,
                       ));
+                    }
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  Future<String?> _showSelectTemplateDialog(BuildContext context, List<TemplateModel> availableTemplates, AppLocalizations appLocalizations) async {
+    TemplateModel? _selectedTemplate;
+    return await showDialog<String>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(builder: (context, setState) {
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              title: Text(appLocalizations.selectTemplate),
+              content: DropdownButtonFormField<TemplateModel>(
+                value: _selectedTemplate,
+                decoration: InputDecoration(
+                  labelText: appLocalizations.selectTemplate,
+                  border: const OutlineInputBorder(),
+                ),
+                isExpanded: true,
+                items: availableTemplates.map((template) => DropdownMenuItem(
+                  value: template,
+                  child: Text(template.name),
+                )).toList(),
+                onChanged: (value) => setState(() { _selectedTemplate = value; }),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(appLocalizations.cancel),
+                  onPressed: () => Navigator.pop(dialogContext),
+                ),
+                ElevatedButton(
+                  child: Text(appLocalizations.add),
+                  onPressed: () {
+                    if (_selectedTemplate != null) {
+                      Navigator.pop(dialogContext, _selectedTemplate!.id);
                     }
                   },
                 ),
