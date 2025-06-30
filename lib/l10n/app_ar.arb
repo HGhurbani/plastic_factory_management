@@ -54,6 +54,8 @@
   "materialsUsed": "المواد المستخدمة لإنتاجه",
   "colors": "الألوان",
   "additives": "إضافات",
+  "templates": "القوالب",
+  "selectTemplate": "اختر القالب",
   "packagingType": "نوع التعبئة",
   "requiresPackaging": "هل يحتاج تغليف؟",
   "requiresSticker": "هل يحتاج ستيكر؟",
