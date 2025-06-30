@@ -317,9 +317,10 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
               title: Text(appLocalizations.addMaterial),
               content: Form(
                 key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                     StreamBuilder<List<RawMaterialModel>>(
                       stream: useCases.getRawMaterials(),
                       builder: (context, snapshot) {
