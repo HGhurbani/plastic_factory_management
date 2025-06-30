@@ -41,9 +41,12 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
       appBar: AppBar(
         title: Text(appLocalizations.templates),
         centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add_box_outlined),
             onPressed: () {
               _showAddEditTemplateDialog(context, inventoryUseCases, appLocalizations);
             },
@@ -113,25 +116,83 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
   Widget _buildTemplateItem(BuildContext context, TemplateModel template, InventoryUseCases useCases, AppLocalizations appLocalizations) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        title: Text('${template.code} - ${template.name}', textDirection: TextDirection.rtl, textAlign: TextAlign.right),
-        subtitle: Text('${appLocalizations.timeRequired}: ${template.timeRequired}', textDirection: TextDirection.rtl, textAlign: TextAlign.right),
-        trailing: PopupMenuButton<String>(
-          onSelected: (value) {
-            if (value == 'edit') {
-              _showAddEditTemplateDialog(context, useCases, appLocalizations, template: template);
-            } else if (value == 'delete') {
-              _showDeleteTemplateConfirmationDialog(context, useCases, appLocalizations, template.id, template.name);
-            }
-          },
-          itemBuilder: (context) => [
-            PopupMenuItem(value: 'edit', child: Row(children: [const Icon(Icons.edit, color: AppColors.primary), const SizedBox(width: 8), Text(appLocalizations.edit)])),
-            PopupMenuItem(value: 'delete', child: Row(children: [const Icon(Icons.delete_outline, color: Colors.redAccent), const SizedBox(width: 8), Text(appLocalizations.delete)])),
-          ],
-        ),
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
         onTap: () {
           _showAddEditTemplateDialog(context, useCases, appLocalizations, template: template);
         },
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    textDirection: TextDirection.rtl,
+                    children: [
+                      const Icon(Icons.crop_square, color: AppColors.primary, size: 28),
+                      const SizedBox(width: 8),
+                      Text(
+                        template.name,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'edit') {
+                        _showAddEditTemplateDialog(context, useCases, appLocalizations, template: template);
+                      } else if (value == 'delete') {
+                        _showDeleteTemplateConfirmationDialog(context, useCases, appLocalizations, template.id, template.name);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(value: 'edit', child: Row(children: [const Icon(Icons.edit, color: AppColors.primary), const SizedBox(width: 8), Text(appLocalizations.edit)])),
+                      PopupMenuItem(value: 'delete', child: Row(children: [const Icon(Icons.delete_outline, color: Colors.redAccent), const SizedBox(width: 8), Text(appLocalizations.delete)])),
+                    ],
+                  ),
+                ],
+              ),
+              const Divider(height: 16),
+              _buildInfoRow(appLocalizations.templateCode, template.code, icon: Icons.qr_code_2),
+              _buildInfoRow(appLocalizations.timeRequired, template.timeRequired.toString(), icon: Icons.timer),
+              _buildInfoRow(appLocalizations.percentage, template.percentage.toString(), icon: Icons.percent),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, {IconData? icon}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            '$label:',
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            textDirection: TextDirection.rtl,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 15, color: Colors.black87),
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -154,7 +215,12 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
           return Directionality(
             textDirection: TextDirection.rtl,
             child: AlertDialog(
-              title: Text(isEditing ? appLocalizations.editTemplate : appLocalizations.addTemplate),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                isEditing ? appLocalizations.editTemplate : appLocalizations.addTemplate,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
               content: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
@@ -163,36 +229,60 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                     children: [
                       TextFormField(
                         controller: _codeController,
-                        decoration: InputDecoration(labelText: appLocalizations.templateCode, border: const OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.templateCode,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.qr_code),
+                        ),
                         validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                        textAlign: TextAlign.right,
+                        textDirection: TextDirection.rtl,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _nameController,
-                        decoration: InputDecoration(labelText: appLocalizations.templateName, border: const OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.templateName,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.title),
+                        ),
                         validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                        textAlign: TextAlign.right,
+                        textDirection: TextDirection.rtl,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _timeController,
-                        decoration: InputDecoration(labelText: appLocalizations.timeRequired, border: const OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.timeRequired,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.timer),
+                        ),
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         validator: (value) {
                           if (value!.isEmpty) return appLocalizations.fieldRequired;
                           if (double.tryParse(value) == null) return appLocalizations.invalidNumber;
                           return null;
                         },
+                        textAlign: TextAlign.right,
+                        textDirection: TextDirection.rtl,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _percentageController,
-                        decoration: InputDecoration(labelText: appLocalizations.percentage, border: const OutlineInputBorder()),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.percentage,
+                          border: const OutlineInputBorder(),
+                          prefixIcon: const Icon(Icons.percent),
+                        ),
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         validator: (value) {
                           if (value!.isEmpty) return appLocalizations.fieldRequired;
                           if (double.tryParse(value) == null) return appLocalizations.invalidNumber;
                           return null;
                         },
+                        textAlign: TextAlign.right,
+                        textDirection: TextDirection.rtl,
                       ),
                       const SizedBox(height: 12),
                       Align(
@@ -259,8 +349,10 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
                   child: Text(appLocalizations.cancel),
+                  style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
                 ),
-                ElevatedButton(
+                ElevatedButton.icon(
+                  icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       try {
@@ -292,7 +384,14 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                       }
                     }
                   },
-                  child: Text(isEditing ? appLocalizations.save : appLocalizations.add),
+                  label: Text(isEditing ? appLocalizations.save : appLocalizations.add),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -314,7 +413,8 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
           return Directionality(
             textDirection: TextDirection.rtl,
             child: AlertDialog(
-              title: Text(appLocalizations.addMaterial),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(appLocalizations.addMaterial, textAlign: TextAlign.center),
               content: Form(
                 key: _formKey,
                 child: SingleChildScrollView(
@@ -330,7 +430,11 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                         final materials = snapshot.data!.where((m) => !existingIds.contains(m.id)).toList();
                         return DropdownButtonFormField<RawMaterialModel>(
                           value: _selected,
-                          decoration: InputDecoration(labelText: appLocalizations.rawMaterial, border: const OutlineInputBorder()),
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.rawMaterial,
+                            border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.inventory_2),
+                          ),
                           isExpanded: true,
                           items: materials.map((m) => DropdownMenuItem(value: m, child: Text(m.name))).toList(),
                           onChanged: (val) { setState(() { _selected = val; unit = val?.unit; }); },
@@ -341,13 +445,20 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _ratioController,
-                      decoration: InputDecoration(labelText: appLocalizations.percentage, border: const OutlineInputBorder(), suffixText: unit ?? ''),
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.percentage,
+                        border: const OutlineInputBorder(),
+                        suffixText: unit ?? '',
+                        prefixIcon: const Icon(Icons.percent),
+                      ),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       validator: (value) {
                         if (value!.isEmpty) return appLocalizations.fieldRequired;
                         if (double.tryParse(value) == null) return appLocalizations.invalidNumber;
                         return null;
                       },
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
                     ),
                   ],
                 ),
@@ -355,17 +466,28 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
 
             ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(appLocalizations.cancel)),
-                ElevatedButton(
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(appLocalizations.cancel),
+                  style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+                ),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.add, color: Colors.white),
                   onPressed: () {
                     if (_formKey.currentState!.validate() && _selected != null) {
                       Navigator.pop(dialogContext, TemplateMaterial(materialId: _selected!.id, ratio: double.parse(_ratioController.text)));
                     }
                   },
-                  child: Text(appLocalizations.add),
+                  label: Text(appLocalizations.add),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
                 ),
               ],
-            ),);
+            ),
+          );
         });
       },
     );
@@ -380,11 +502,34 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            title: Text(title),
-            content: TextField(controller: controller, decoration: InputDecoration(hintText: title, border: const OutlineInputBorder())),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(title, textAlign: TextAlign.center),
+            content: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: title,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.text_fields),
+              ),
+              textAlign: TextAlign.right,
+              textDirection: TextDirection.rtl,
+            ),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(appLocalizations.cancel)),
-              ElevatedButton(onPressed: () => Navigator.pop(dialogContext, controller.text.trim()), child: Text(appLocalizations.add)),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(appLocalizations.cancel),
+                style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.check, color: Colors.white),
+                onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
+                label: Text(appLocalizations.add),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
             ],
           ),
         );
@@ -399,13 +544,15 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Text(appLocalizations.confirmDeletion, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-            content: Text('${appLocalizations.confirmDeleteProduct}: "$templateName"\n\n${appLocalizations.thisActionCannotBeUndone}', textAlign: TextAlign.right),
+            content: Text('${appLocalizations.confirmDeleteProduct}: "$templateName"\n\n${appLocalizations.thisActionCannotBeUndone}', textAlign: TextAlign.center),
             actionsAlignment: MainAxisAlignment.spaceAround,
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(),
                 child: Text(appLocalizations.cancel),
+                style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
               ),
               ElevatedButton.icon(
                 icon: const Icon(Icons.delete_forever, color: Colors.white),
@@ -418,7 +565,11 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${appLocalizations.errorDeletingProduct}: $e')));
                   }
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
               ),
             ],
           ),
