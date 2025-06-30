@@ -41,7 +41,7 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
       appBar: AppBar(
         title: Text(appLocalizations.templates),
         centerTitle: true,
-        actions: [
+        actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
@@ -255,7 +255,7 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                   ),
                 ),
               ),
-              actions: [
+              actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
                   child: Text(appLocalizations.cancel),
@@ -352,7 +352,7 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                   ],
                 ),
               ),
-              actions: [
+              actions: <Widget>[
                 TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(appLocalizations.cancel)),
                 ElevatedButton(
                   onPressed: () {
@@ -381,7 +381,7 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
           child: AlertDialog(
             title: Text(title),
             content: TextField(controller: controller, decoration: InputDecoration(hintText: title, border: const OutlineInputBorder())),
-            actions: [
+            actions: <Widget>[
               TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(appLocalizations.cancel)),
               ElevatedButton(onPressed: () => Navigator.pop(dialogContext, controller.text.trim()), child: Text(appLocalizations.add)),
             ],
@@ -401,7 +401,7 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
             title: Text(appLocalizations.confirmDeletion, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
             content: Text('${appLocalizations.confirmDeleteProduct}: "$templateName"\n\n${appLocalizations.thisActionCannotBeUndone}', textAlign: TextAlign.right),
             actionsAlignment: MainAxisAlignment.spaceAround,
-            actions: [
+            actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.of(dialogContext).pop(),
                 child: Text(appLocalizations.cancel),
