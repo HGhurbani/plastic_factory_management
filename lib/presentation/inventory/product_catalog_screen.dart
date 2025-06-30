@@ -151,14 +151,8 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
             );
           }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(16.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.95, //  **تعديل: جعل الكرت أقصر**
-            ),
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               final product = snapshot.data![index];
