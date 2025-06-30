@@ -8,6 +8,7 @@ import 'package:plastic_factory_management/presentation/production/create_produc
 import 'package:plastic_factory_management/presentation/production/production_orders_list_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/raw_materials_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/product_catalog_screen.dart'; // يمكن إعادة استخدامها
+import 'package:plastic_factory_management/presentation/inventory/templates_screen.dart';
 import 'package:plastic_factory_management/presentation/machinery/machine_profiles_screen.dart';
 import 'package:plastic_factory_management/presentation/machinery/operator_profiles_screen.dart';
 import 'package:plastic_factory_management/presentation/machinery/mold_installation_tasks_screen.dart';
@@ -31,6 +32,7 @@ class AppRouter {
   static const String productionOrdersListRoute = '/production/list';
   static const String rawMaterialsRoute = '/inventory/raw_materials';
   static const String productCatalogRoute = '/inventory/product_catalog';
+  static const String templatesRoute = '/inventory/templates';
   static const String machineProfilesRoute = '/machinery/machines';
   static const String operatorProfilesRoute = '/machinery/operators';
   static const String moldInstallationTasksRoute = '/machinery/mold_tasks';
@@ -59,6 +61,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => RawMaterialsScreen());
       case productCatalogRoute:
         return MaterialPageRoute(builder: (_) => ProductCatalogScreen());
+      case templatesRoute:
+        return MaterialPageRoute(builder: (_) => const TemplatesScreen());
       case machineProfilesRoute:
         return MaterialPageRoute(builder: (_) => MachineProfilesScreen());
       case operatorProfilesRoute:
