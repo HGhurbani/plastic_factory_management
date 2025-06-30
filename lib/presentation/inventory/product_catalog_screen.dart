@@ -190,7 +190,11 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       ) {
     return GestureDetector(
       onTap: () {
-        _showProductDetailsDialog(context, appLocalizations, product);
+        if (product.templateIds.isNotEmpty) {
+          _showProductTemplatesDialog(context, appLocalizations, inventoryUseCases, product);
+        } else {
+          _showProductDetailsDialog(context, appLocalizations, product);
+        }
       },
       child: Card(
         elevation: 2,
@@ -462,6 +466,94 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _showProductTemplatesDialog(BuildContext context,
+      AppLocalizations appLocalizations,
+      InventoryUseCases useCases,
+      ProductModel product) async {
+    final templates = await useCases.getTemplatesByIds(product.templateIds);
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(appLocalizations.templates,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: templates
+                    .map((t) => _buildTemplateDetails(appLocalizations, t))
+                    .toList(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                child: Text(appLocalizations.close),
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                style:
+                    TextButton.styleFrom(foregroundColor: AppColors.primary),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTemplateDetails(
+      AppLocalizations appLocalizations, TemplateModel template) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(template.name,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, fontSize: 16)),
+            const Divider(height: 16),
+            _buildDetailRow(appLocalizations.templateCode, template.code,
+                icon: Icons.qr_code_2),
+            _buildDetailRow(appLocalizations.timeRequired,
+                template.timeRequired.toString(),
+                icon: Icons.timer),
+            _buildDetailRow(appLocalizations.percentage,
+                template.percentage.toString(),
+                icon: Icons.percent),
+            if (template.colors.isNotEmpty)
+              _buildDetailRow(
+                  appLocalizations.colors, template.colors.join('، '),
+                  icon: Icons.color_lens),
+            if (template.additives.isNotEmpty)
+              _buildDetailRow(
+                  appLocalizations.additives, template.additives.join('، '),
+                  icon: Icons.add),
+            if (template.materialsUsed.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(appLocalizations.materialsUsed,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: template.materialsUsed.map((m) {
+                  final name =
+                      _rawMaterialNames[m.materialId] ?? appLocalizations.unknownMaterial;
+                  return Text('${m.ratio} - $name',
+                      style: const TextStyle(fontSize: 14));
+                }).toList(),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
