@@ -33,9 +33,11 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
   Future<void> _fetchRawMaterialNames() async {
     final inventoryUseCases = Provider.of<InventoryUseCases>(context, listen: false);
     final materials = await inventoryUseCases.getRawMaterials().first; // Get current list once
-    setState(() {
-      _rawMaterialNames = {for (var material in materials) material.id: material.name};
-    });
+    if (mounted) {
+      setState(() {
+        _rawMaterialNames = {for (var material in materials) material.id: material.name};
+      });
+    }
   }
 
   @override
@@ -73,7 +75,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, color: Colors.red, size: 60),
+                    const Icon(Icons.error_outline, color: Colors.red, size: 60),
                     const SizedBox(height: 16),
                     Text(
                       appLocalizations.errorLoadingProducts, // New localization key
@@ -140,7 +142,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 0.75, // Slightly adjusted for better fit with added content
+              childAspectRatio: 0.95, //  **تعديل: جعل الكرت أقصر**
             ),
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
@@ -162,6 +164,9 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     );
   }
 
+  // =======================================================================
+  // WIDGET المُعدّل: كرت المنتج
+  // =======================================================================
   Widget _buildProductGridItem(
       BuildContext context,
       ProductModel product,
@@ -173,273 +178,268 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
         _showProductDetailsDialog(context, appLocalizations, product);
       },
       child: Card(
-        elevation: 1, // Increased elevation for a more prominent card
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), // More rounded corners
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 3,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  product.imageUrl != null && product.imageUrl!.isNotEmpty
-                      ? Image.network(
-                    product.imageUrl!,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          // value: loadingProgress.progress,
-                          color: AppColors.primary,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) =>
-                        Center(child: Icon(Icons.broken_image, size: 50, color: Colors.grey[400])),
-                  )
-                      : Container(
-                    color: Colors.grey[200],
-                    child: Center(child: Icon(Icons.image_not_supported_outlined, size: 50, color: Colors.grey[500])),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: product.productType == 'single' ? Colors.blue.withOpacity(0.8) : Colors.green.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        product.productType == 'single' ? appLocalizations.single : appLocalizations.compound,
-                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  // New: Three-dot menu for edit and delete
-                  Positioned(
-                    top: 8,
-                    left: 8, // Position on the left side
-                    child: PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: Colors.white, size: 24), // Three dots icon
-                      onSelected: (String result) {
-                        if (result == 'edit') {
-                          _showAddEditProductDialog(context, inventoryUseCases, appLocalizations, product: product);
-                        } else if (result == 'delete') {
-                          _showDeleteProductConfirmationDialog(context, inventoryUseCases, appLocalizations, product.id, product.name);
-                        }
+        child: Directionality(
+          textDirection: TextDirection.rtl, // Ensure RTL for all children
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, // Becomes RIGHT in RTL
+            children: [
+              // --- Image Section ---
+              AspectRatio(
+                aspectRatio: 16 / 10, // Maintain a consistent image aspect ratio
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    product.imageUrl != null && product.imageUrl!.isNotEmpty
+                        ? Image.network(
+                      product.imageUrl!,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(child: CircularProgressIndicator(color: AppColors.primary));
                       },
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                        PopupMenuItem<String>(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.edit, color: AppColors.primary),
-                              const SizedBox(width: 8),
-                              Text(appLocalizations.edit),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.delete_outline, color: Colors.redAccent),
-                              const SizedBox(width: 8),
-                              Text(appLocalizations.delete),
-                            ],
-                          ),
-                        ),
-                      ],
-                      color: Colors.white, // Background color of the dropdown menu
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      elevation: 4,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Center(child: Icon(Icons.broken_image, size: 50, color: Colors.grey[400])),
+                    )
+                        : Container(
+                      color: Colors.grey[200],
+                      child: Center(child: Icon(Icons.image_not_supported_outlined, size: 50, color: Colors.grey[500])),
                     ),
-                  ),
-                ],
+                    // Product Type Badge
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: product.productType == 'single' ? Colors.blue.withOpacity(0.8) : Colors.green.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          product.productType == 'single' ? appLocalizations.single : appLocalizations.compound,
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    // Three-dot menu for edit and delete
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert, color: Colors.white, size: 24),
+                        onSelected: (String result) {
+                          if (result == 'edit') {
+                            _showAddEditProductDialog(context, inventoryUseCases, appLocalizations, product: product);
+                          } else if (result == 'delete') {
+                            _showDeleteProductConfirmationDialog(context, inventoryUseCases, appLocalizations, product.id, product.name);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                          PopupMenuItem<String>(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.edit, color: AppColors.primary),
+                                const SizedBox(width: 8),
+                                Text(appLocalizations.edit),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem<String>(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                const Icon(Icons.delete_outline, color: Colors.redAccent),
+                                const SizedBox(width: 8),
+                                Text(appLocalizations.delete),
+                              ],
+                            ),
+                          ),
+                        ],
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        elevation: 4,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+
+              // --- Details Section ---
+              Padding(
+                // **تعديل: تقليل الهوامش لجعل الكرت أقصر**
+                padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start, // Becomes RIGHT in RTL
                   children: [
                     Text(
                       product.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), // Slightly larger
-                      textAlign: TextAlign.right,
-                      maxLines: 1, // Limit to one line for better fit
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${appLocalizations.productCode}: ${product.productCode}',
                       style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       '${appLocalizations.packagingType}: ${product.packagingType}',
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
-                    // Removed individual IconButton for edit and delete
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
+  // **تعديل: ضمان RTL كامل**
   void _showProductDetailsDialog(BuildContext context, AppLocalizations appLocalizations, ProductModel product) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-          contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          title: Text(product.name, textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (product.imageUrl != null && product.imageUrl!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        product.imageUrl!,
-                        height: 180,
-                        width: double.infinity,
-                        fit: BoxFit.contain,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            // child: CircularProgressIndicator(value: loadingProgress.progress),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) =>
-                            Container(
-                              height: 180,
-                              color: Colors.grey[200],
-                              child: Center(child: Icon(Icons.broken_image, size: 60, color: Colors.grey[400])),
-                            ),
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+            actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (product.imageUrl != null && product.imageUrl!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          product.imageUrl!,
+                          height: 180,
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(child: CircularProgressIndicator());
+                          },
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                height: 180,
+                                color: Colors.grey[200],
+                                child: Center(child: Icon(Icons.broken_image, size: 60, color: Colors.grey[400])),
+                              ),
+                        ),
                       ),
                     ),
-                  ),
-                _buildDetailRow(appLocalizations.productCode, product.productCode, icon: Icons.qr_code),
-                if (product.description != null && product.description!.isNotEmpty)
-                  _buildDetailRow(appLocalizations.description, product.description!, icon: Icons.description),
-                _buildDetailRow(appLocalizations.packagingType, product.packagingType, icon: Icons.eco),
-                _buildDetailRow(appLocalizations.requiresPackaging, product.requiresPackaging ? appLocalizations.yes : appLocalizations.no, icon: Icons.archive),
-                _buildDetailRow(appLocalizations.requiresSticker, product.requiresSticker ? appLocalizations.yes : appLocalizations.no, icon: Icons.sticky_note_2),
-                _buildDetailRow(appLocalizations.productType, product.productType == 'single' ? appLocalizations.single : appLocalizations.compound, icon: Icons.category),
-                _buildDetailRow(appLocalizations.expectedProductionTimePerUnit, '${product.expectedProductionTimePerUnit.toStringAsFixed(1)} ${appLocalizations.minutesPerUnit}', icon: Icons.timer),
+                  _buildDetailRow(appLocalizations.productCode, product.productCode, icon: Icons.qr_code),
+                  if (product.description != null && product.description!.isNotEmpty)
+                    _buildDetailRow(appLocalizations.description, product.description!, icon: Icons.description),
+                  _buildDetailRow(appLocalizations.packagingType, product.packagingType, icon: Icons.eco),
+                  _buildDetailRow(appLocalizations.requiresPackaging, product.requiresPackaging ? appLocalizations.yes : appLocalizations.no, icon: Icons.archive),
+                  _buildDetailRow(appLocalizations.requiresSticker, product.requiresSticker ? appLocalizations.yes : appLocalizations.no, icon: Icons.sticky_note_2),
+                  _buildDetailRow(appLocalizations.productType, product.productType == 'single' ? appLocalizations.single : appLocalizations.compound, icon: Icons.category),
+                  _buildDetailRow(appLocalizations.expectedProductionTimePerUnit, '${product.expectedProductionTimePerUnit.toStringAsFixed(1)} ${appLocalizations.minutesPerUnit}', icon: Icons.timer),
 
-                const Divider(height: 24),
-                Text(appLocalizations.colors, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), textAlign: TextAlign.right),
-                const SizedBox(height: 4),
-                Text(
-                  product.colors.isEmpty ? appLocalizations.notApplicable : product.colors.join(', '),
-                  textAlign: TextAlign.right,
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-
-                const SizedBox(height: 12),
-                Text(appLocalizations.additives, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), textAlign: TextAlign.right),
-                const SizedBox(height: 4),
-                Text(
-                  product.additives.isEmpty ? appLocalizations.notApplicable : product.additives.join(', '),
-                  textAlign: TextAlign.right,
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-
-                const SizedBox(height: 12),
-                Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17), textAlign: TextAlign.right),
-                const SizedBox(height: 4),
-                if (product.billOfMaterials.isEmpty)
+                  const Divider(height: 24),
+                  Text(appLocalizations.colors, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                  const SizedBox(height: 4),
                   Text(
-                    appLocalizations.notApplicable,
-                    textAlign: TextAlign.right,
+                    product.colors.isEmpty ? appLocalizations.notApplicable : product.colors.join('، '),
                     style: TextStyle(color: Colors.grey[700]),
-                  )
-                else
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: product.billOfMaterials.map((bom) {
-                      final materialName = _rawMaterialNames[bom.materialId] ?? appLocalizations.unknownMaterial;
-                      return Text(
-                        '${bom.quantityPerUnit} ${bom.unit} من $materialName',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(color: Colors.grey[700]),
-                      );
-                    }).toList(),
                   ),
-              ],
+
+                  const SizedBox(height: 12),
+                  Text(appLocalizations.additives, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                  const SizedBox(height: 4),
+                  Text(
+                    product.additives.isEmpty ? appLocalizations.notApplicable : product.additives.join('، '),
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+
+                  const SizedBox(height: 12),
+                  Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                  const SizedBox(height: 4),
+                  if (product.billOfMaterials.isEmpty)
+                    Text(
+                      appLocalizations.notApplicable,
+                      style: TextStyle(color: Colors.grey[700]),
+                    )
+                  else
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: product.billOfMaterials.map((bom) {
+                        final materialName = _rawMaterialNames[bom.materialId] ?? appLocalizations.unknownMaterial;
+                        return Text(
+                          '${bom.quantityPerUnit} ${bom.unit} من $materialName',
+                          style: TextStyle(color: Colors.grey[700]),
+                        );
+                      }).toList(),
+                    ),
+                ],
+              ),
             ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(appLocalizations.close),
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+              ),
+            ],
           ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(appLocalizations.close),
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-            ),
-          ],
         );
       },
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {Color? textColor, bool isBold = false, IconData? icon}) {
+  // **تعديل: تحسين row التفاصيل لـ RTL**
+  Widget _buildDetailRow(String label, String value, {IconData? icon}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 15, // Slightly larger font size
-                color: textColor ?? Colors.black87,
-                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              ),
-              textAlign: TextAlign.right,
-              textDirection: TextDirection.rtl,
-            ),
-          ),
-          const SizedBox(width: 8),
+          if (icon != null) ...[
+            Icon(icon, size: 18, color: AppColors.primary.withOpacity(0.7)),
+            const SizedBox(width: 8),
+          ],
           Text(
             '$label:',
             style: const TextStyle(
-              fontSize: 15, // Slightly larger font size
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
-            textAlign: TextAlign.right,
-            textDirection: TextDirection.rtl,
           ),
-          if (icon != null) ...[
-            const SizedBox(width: 8),
-            Icon(icon, size: 18, color: AppColors.primary.withOpacity(0.7)), // Icon for visual clarity
-          ]
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Colors.black87,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
+  // **تعديل: ضمان RTL كامل**
   void _showAddEditProductDialog(
       BuildContext context,
       InventoryUseCases useCases,
@@ -452,7 +452,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     final _nameController = TextEditingController(text: product?.name);
     final _descriptionController = TextEditingController(text: product?.description);
     final _packagingTypeController = TextEditingController(text: product?.packagingType);
-    final _expectedProductionTimeController = TextEditingController(text: product?.expectedProductionTimePerUnit.toStringAsFixed(1)); // Format for display
+    final _expectedProductionTimeController = TextEditingController(text: product?.expectedProductionTimePerUnit.toStringAsFixed(1));
 
     bool _requiresPackaging = product?.requiresPackaging ?? false;
     bool _requiresSticker = product?.requiresSticker ?? false;
@@ -467,7 +467,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
 
     final ImagePicker _picker = ImagePicker();
 
-    Future<void> _pickImage() async {
+    Future<void> _pickImage(StateSetter setState) async {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         if (kIsWeb) {
@@ -487,392 +487,356 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
       }
     }
 
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: Text(
-                isEditing ? appLocalizations.editProduct : appLocalizations.addProduct,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-              content: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Image Picker
-                      Center(
-                        child: GestureDetector(
-                          onTap: _pickImage,
-                          child: CircleAvatar(
-                            radius: 60, // Larger avatar
-                            backgroundColor: Colors.grey[100],
-                            backgroundImage: _pickedImage != null
-                                ? FileImage(_pickedImage!)
-                                : (_pickedImageBytes != null
-                                    ? MemoryImage(_pickedImageBytes!)
-                                    : (_existingImageUrl != null
-                                        ? NetworkImage(_existingImageUrl!) as ImageProvider
-                                        : null)),
-                            child: _pickedImage == null &&
-                                    _pickedImageBytes == null &&
-                                    _existingImageUrl == null
-                                ? Icon(Icons.add_a_photo,
-                                    size: 60,
-                                    color: AppColors.primary.withOpacity(0.7)) // More inviting icon
-                                : null,
-                            foregroundColor:
-                                Colors.white, // Ensure icon color is visible on background
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _productCodeController,
-                        decoration: InputDecoration(
-                          labelText: appLocalizations.productCode,
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.tag), // Icon for code
-                        ),
-                        validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
-                        textAlign: TextAlign.right, textDirection: TextDirection.rtl,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          labelText: appLocalizations.productName,
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.title), // Icon for name
-                        ),
-                        validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
-                        textAlign: TextAlign.right, textDirection: TextDirection.rtl,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _descriptionController,
-                        decoration: InputDecoration(
-                          labelText: appLocalizations.description,
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.notes), // Icon for description
-                        ),
-                        maxLines: 3,
-                        textAlign: TextAlign.right, textDirection: TextDirection.rtl,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _packagingTypeController,
-                        decoration: InputDecoration(
-                          labelText: appLocalizations.packagingType,
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.backpack), // Icon for packaging
-                        ),
-                        validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
-                        textAlign: TextAlign.right, textDirection: TextDirection.rtl,
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: _expectedProductionTimeController,
-                        decoration: InputDecoration(
-                          labelText: appLocalizations.expectedProductionTimePerUnit,
-                          border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.schedule), // Icon for time
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value!.isEmpty) return appLocalizations.fieldRequired;
-                          if (double.tryParse(value) == null || double.parse(value) <= 0) return appLocalizations.invalidNumberPositive; // New validation message
-                          return null;
-                        },
-                        textAlign: TextAlign.right, textDirection: TextDirection.rtl,
-                      ),
-                      const SizedBox(height: 12),
-                      // Requires Packaging checkbox
-                      SwitchListTile(
-                        title: Text(appLocalizations.requiresPackaging, textDirection: TextDirection.rtl),
-                        value: _requiresPackaging,
-                        onChanged: (bool newValue) {
-                          setState(() {
-                            _requiresPackaging = newValue;
-                          });
-                        },
-                        secondary: const Icon(Icons.archive_outlined), // Icon for switch
-                      ),
-                      // Requires Sticker checkbox
-                      SwitchListTile(
-                        title: Text(appLocalizations.requiresSticker, textDirection: TextDirection.rtl),
-                        value: _requiresSticker,
-                        onChanged: (bool newValue) {
-                          setState(() {
-                            _requiresSticker = newValue;
-                          });
-                        },
-                        secondary: const Icon(Icons.sticky_note_2_outlined), // Icon for switch
-                      ),
-                      const SizedBox(height: 12),
-                      // Product Type Radio Buttons
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(appLocalizations.productType, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(appLocalizations.single, textDirection: TextDirection.rtl),
-                              Radio<String>(
-                                value: 'single',
-                                groupValue: _productType,
-                                onChanged: (String? value) {
-                                  setState(() {
-                                    _productType = value!;
-                                  });
-                                },
-                                activeColor: AppColors.primary,
-                              ),
-                              const SizedBox(width: 16),
-                              Text(appLocalizations.compound, textDirection: TextDirection.rtl),
-                              Radio<String>(
-                                value: 'compound',
-                                groupValue: _productType,
-                                onChanged: (String? value) {
-                                  setState(() {
-                                    _productType = value!;
-                                  });
-                                },
-                                activeColor: AppColors.primary,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Colors (Add/Remove chips)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(appLocalizations.colors, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8.0,
-                        runSpacing: 4.0,
-                        textDirection: TextDirection.rtl,
-                        children: [
-                          ..._colors.map((color) => Chip(
-                            label: Text(color),
-                            deleteIcon: const Icon(Icons.cancel, size: 18),
-                            onDeleted: () {
-                              setState(() {
-                                _colors.remove(color);
-                              });
-                            },
-                            backgroundColor: AppColors.lightGrey, // Custom chip color
-                          )),
-                          ActionChip(
-                            avatar: const Icon(Icons.add_circle_outline, color: AppColors.primary),
-                            label: Text(appLocalizations.add),
-                            onPressed: () async {
-                              final newColor = await _showTextInputDialog(context, appLocalizations.enterColorName);
-                              if (newColor != null && newColor.isNotEmpty && !_colors.contains(newColor)) {
-                                setState(() {
-                                  _colors.add(newColor);
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Additives (Add/Remove chips) - Similar to colors
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(appLocalizations.additives, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8.0,
-                        runSpacing: 4.0,
-                        textDirection: TextDirection.rtl,
-                        children: [
-                          ..._additives.map((additive) => Chip(
-                            label: Text(additive),
-                            deleteIcon: const Icon(Icons.cancel, size: 18),
-                            onDeleted: () {
-                              setState(() {
-                                _additives.remove(additive);
-                              });
-                            },
-                            backgroundColor: AppColors.lightGrey,
-                          )),
-                          ActionChip(
-                            avatar: const Icon(Icons.add_circle_outline, color: AppColors.primary),
-                            label: Text(appLocalizations.add),
-                            onPressed: () async {
-                              final newAdditive = await _showTextInputDialog(context, appLocalizations.enterAdditiveName);
-                              if (newAdditive != null && newAdditive.isNotEmpty && !_additives.contains(newAdditive)) {
-                                setState(() {
-                                  _additives.add(newAdditive);
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Bill of Materials
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      ),
-                      const SizedBox(height: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: _billOfMaterials.isEmpty
-                            ? [
-                          // Text(
-                          //   appLocalizations.noMaterialsAdded, // New localization key
-                          //   style: TextStyle(color: Colors.grey[600]),
-                          //   textAlign: TextAlign.right,
-                          // )
-                        ]
-                            : _billOfMaterials.asMap().entries.map((entry) {
-                          final int index = entry.key;
-                          final ProductMaterial bom = entry.value;
-                          final materialName = _rawMaterialNames[bom.materialId] ?? appLocalizations.unknownMaterial;
-                          return ListTile(
-                            visualDensity: VisualDensity.compact, // Compact list tile
-                            contentPadding: EdgeInsets.zero,
-                            title: Text(
-                              '${bom.quantityPerUnit} ${bom.unit} من $materialName',
-                              textAlign: TextAlign.right,
-                              textDirection: TextDirection.rtl,
-                              style: const TextStyle(fontSize: 15),
+            return Directionality(
+              textDirection: TextDirection.rtl,
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                title: Text(
+                  isEditing ? appLocalizations.editProduct : appLocalizations.addProduct,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                content: Form(
+                  key: _formKey,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Center(
+                          child: GestureDetector(
+                            onTap: () => _pickImage(setState),
+                            child: CircleAvatar(
+                              radius: 60,
+                              backgroundColor: Colors.grey[100],
+                              backgroundImage: _pickedImageBytes != null
+                                  ? MemoryImage(_pickedImageBytes!)
+                                  : (_pickedImage != null
+                                  ? FileImage(_pickedImage!)
+                                  : (_existingImageUrl != null
+                                  ? NetworkImage(_existingImageUrl!)
+                                  : null)) as ImageProvider?,
+                              child: _pickedImage == null &&
+                                  _pickedImageBytes == null &&
+                                  _existingImageUrl == null
+                                  ? Icon(Icons.add_a_photo,
+                                  size: 60,
+                                  color: AppColors.primary.withOpacity(0.7))
+                                  : null,
                             ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
-                              onPressed: () {
-                                setState(() {
-                                  _billOfMaterials.removeAt(index);
-                                });
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _productCodeController,
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.productCode,
+                            border: const OutlineInputBorder(),
+                            suffixIcon: const Icon(Icons.tag),
+                          ),
+                          validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.productName,
+                            border: const OutlineInputBorder(),
+                            suffixIcon: const Icon(Icons.title),
+                          ),
+                          validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: _descriptionController,
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.description,
+                            border: const OutlineInputBorder(),
+                            suffixIcon: const Icon(Icons.notes),
+                          ),
+                          maxLines: 3,
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: _packagingTypeController,
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.packagingType,
+                            border: const OutlineInputBorder(),
+                            suffixIcon: const Icon(Icons.backpack),
+                          ),
+                          validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                        ),
+                        const SizedBox(height: 12),
+                        TextFormField(
+                          controller: _expectedProductionTimeController,
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.expectedProductionTimePerUnit,
+                            border: const OutlineInputBorder(),
+                            suffixIcon: const Icon(Icons.schedule),
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value!.isEmpty) return appLocalizations.fieldRequired;
+                            if (double.tryParse(value) == null || double.parse(value) <= 0) return appLocalizations.invalidNumberPositive;
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        SwitchListTile(
+                          title: Text(appLocalizations.requiresPackaging),
+                          value: _requiresPackaging,
+                          onChanged: (bool newValue) {
+                            setState(() {
+                              _requiresPackaging = newValue;
+                            });
+                          },
+                          secondary: const Icon(Icons.archive_outlined),
+                          controlAffinity: ListTileControlAffinity.trailing,
+                        ),
+                        SwitchListTile(
+                          title: Text(appLocalizations.requiresSticker),
+                          value: _requiresSticker,
+                          onChanged: (bool newValue) {
+                            setState(() {
+                              _requiresSticker = newValue;
+                            });
+                          },
+                          secondary: const Icon(Icons.sticky_note_2_outlined),
+                          controlAffinity: ListTileControlAffinity.trailing,
+                        ),
+                        const SizedBox(height: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(appLocalizations.productType, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            Row(
+                              children: [
+                                Radio<String>(
+                                  value: 'compound',
+                                  groupValue: _productType,
+                                  onChanged: (String? value) {
+                                    setState(() { _productType = value!; });
+                                  },
+                                  activeColor: AppColors.primary,
+                                ),
+                                Text(appLocalizations.compound),
+                                const SizedBox(width: 16),
+                                Radio<String>(
+                                  value: 'single',
+                                  groupValue: _productType,
+                                  onChanged: (String? value) {
+                                    setState(() { _productType = value!; });
+                                  },
+                                  activeColor: AppColors.primary,
+                                ),
+                                Text(appLocalizations.single),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(appLocalizations.colors, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8.0,
+                          runSpacing: 4.0,
+                          alignment: WrapAlignment.start,
+                          children: [
+                            ..._colors.map((color) => Chip(
+                              label: Text(color),
+                              deleteIcon: const Icon(Icons.cancel, size: 18),
+                              onDeleted: () {
+                                setState(() { _colors.remove(color); });
+                              },
+                              backgroundColor: AppColors.lightGrey,
+                            )),
+                            ActionChip(
+                              avatar: const Icon(Icons.add_circle_outline, color: AppColors.primary),
+                              label: Text(appLocalizations.add),
+                              onPressed: () async {
+                                final newColor = await _showTextInputDialog(context, appLocalizations.enterColorName);
+                                if (newColor != null && newColor.isNotEmpty && !_colors.contains(newColor)) {
+                                  setState(() { _colors.add(newColor); });
+                                }
                               },
                             ),
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.add_shopping_cart,color: Colors.white,), // More specific icon
-                        label: Text(appLocalizations.addMaterial),
-                        onPressed: () async {
-                          final newBom = await _showAddBomMaterialDialog(context, useCases, appLocalizations);
-                          if (newBom != null) {
-                            setState(() {
-                              _billOfMaterials.add(newBom);
-                            });
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary, // Use secondary color
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text(appLocalizations.cancel),
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
-                ),
-                ElevatedButton.icon(
-                  icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white,),
-                  label: Text(isEditing ? appLocalizations.save : appLocalizations.add),
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      if (_billOfMaterials.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(appLocalizations.bomRequired)));
-                        return;
-                      }
-                      try {
-                        // Show loading indicator
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext loadingContext) {
-                            return const Center(child: CircularProgressIndicator());
-                          },
-                        );
-
-                        if (isEditing) {
-                          await useCases.updateProduct(
-                            id: product!.id,
-                            productCode: _productCodeController.text,
-                            name: _nameController.text,
-                            description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-                            newImageFile: _pickedImage,
-                            newImageBytes: _pickedImageBytes,
-                            existingImageUrl: _existingImageUrl,
-                            billOfMaterials: _billOfMaterials,
-                            colors: _colors,
-                            additives: _additives,
-                            packagingType: _packagingTypeController.text,
-                            requiresPackaging: _requiresPackaging,
-                            requiresSticker: _requiresSticker,
-                            productType: _productType,
-                            expectedProductionTimePerUnit: double.parse(_expectedProductionTimeController.text),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(appLocalizations.productUpdatedSuccessfully)));
-                        } else {
-                          await useCases.addProduct(
-                            productCode: _productCodeController.text,
-                            name: _nameController.text,
-                            description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-                            imageFile: _pickedImage,
-                            imageBytes: _pickedImageBytes,
-                            billOfMaterials: _billOfMaterials,
-                            colors: _colors,
-                            additives: _additives,
-                            packagingType: _packagingTypeController.text,
-                            requiresPackaging: _requiresPackaging,
-                            requiresSticker: _requiresSticker,
-                            productType: _productType,
-                            expectedProductionTimePerUnit: double.parse(_expectedProductionTimeController.text),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(appLocalizations.productAddedSuccessfully)));
-                        }
-                        Navigator.of(context).pop(); // Pop the loading indicator
-                        Navigator.of(dialogContext).pop(); // Pop the dialog
-                      } catch (e) {
-                        Navigator.of(context).pop(); // Pop the loading indicator
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${appLocalizations.errorSavingProduct}: ${e.toString()}')),
-                        );
-                        print('Error saving product: $e'); // For debugging
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(appLocalizations.additives, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8.0,
+                          runSpacing: 4.0,
+                          alignment: WrapAlignment.start,
+                          children: [
+                            ..._additives.map((additive) => Chip(
+                              label: Text(additive),
+                              deleteIcon: const Icon(Icons.cancel, size: 18),
+                              onDeleted: () {
+                                setState(() { _additives.remove(additive); });
+                              },
+                              backgroundColor: AppColors.lightGrey,
+                            )),
+                            ActionChip(
+                              avatar: const Icon(Icons.add_circle_outline, color: AppColors.primary),
+                              label: Text(appLocalizations.add),
+                              onPressed: () async {
+                                final newAdditive = await _showTextInputDialog(context, appLocalizations.enterAdditiveName);
+                                if (newAdditive != null && newAdditive.isNotEmpty && !_additives.contains(newAdditive)) {
+                                  setState(() { _additives.add(newAdditive); });
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        ),
+                        const SizedBox(height: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _billOfMaterials.asMap().entries.map((entry) {
+                            final int index = entry.key;
+                            final ProductMaterial bom = entry.value;
+                            final materialName = _rawMaterialNames[bom.materialId] ?? appLocalizations.unknownMaterial;
+                            return ListTile(
+                              visualDensity: VisualDensity.compact,
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(
+                                '${bom.quantityPerUnit} ${bom.unit} من $materialName',
+                                style: const TextStyle(fontSize: 15),
+                              ),
+                              leading: IconButton(
+                                icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                                onPressed: () {
+                                  setState(() { _billOfMaterials.removeAt(index); });
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 8),
+                        Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.add_shopping_cart,color: Colors.white,),
+                            label: Text(appLocalizations.addMaterial),
+                            onPressed: () async {
+                              final newBom = await _showAddBomMaterialDialog(context, useCases, appLocalizations, _billOfMaterials.map((e) => e.materialId).toList());
+                              if (newBom != null) {
+                                setState(() { _billOfMaterials.add(newBom); });
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
+                actions: <Widget>[
+                  TextButton(
+                    child: Text(appLocalizations.cancel),
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+                  ),
+                  Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: ElevatedButton.icon(
+                      icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white,),
+                      label: Text(isEditing ? appLocalizations.save : appLocalizations.add),
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          if (_billOfMaterials.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(appLocalizations.bomRequired)));
+                            return;
+                          }
+                          try {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext loadingContext) {
+                                return const Center(child: CircularProgressIndicator());
+                              },
+                            );
+                            if (isEditing) {
+                              await useCases.updateProduct(
+                                id: product!.id,
+                                productCode: _productCodeController.text,
+                                name: _nameController.text,
+                                description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+                                newImageFile: _pickedImage,
+                                newImageBytes: _pickedImageBytes,
+                                existingImageUrl: _existingImageUrl,
+                                billOfMaterials: _billOfMaterials,
+                                colors: _colors,
+                                additives: _additives,
+                                packagingType: _packagingTypeController.text,
+                                requiresPackaging: _requiresPackaging,
+                                requiresSticker: _requiresSticker,
+                                productType: _productType,
+                                expectedProductionTimePerUnit: double.parse(_expectedProductionTimeController.text),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(appLocalizations.productUpdatedSuccessfully)));
+                            } else {
+                              await useCases.addProduct(
+                                productCode: _productCodeController.text,
+                                name: _nameController.text,
+                                description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+                                imageFile: _pickedImage,
+                                imageBytes: _pickedImageBytes,
+                                billOfMaterials: _billOfMaterials,
+                                colors: _colors,
+                                additives: _additives,
+                                packagingType: _packagingTypeController.text,
+                                requiresPackaging: _requiresPackaging,
+                                requiresSticker: _requiresSticker,
+                                productType: _productType,
+                                expectedProductionTimePerUnit: double.parse(_expectedProductionTimeController.text),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(appLocalizations.productAddedSuccessfully)));
+                            }
+                            Navigator.of(context).pop();
+                            Navigator.of(dialogContext).pop();
+                          } catch (e) {
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${appLocalizations.errorSavingProduct}: ${e.toString()}')),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         );
@@ -880,121 +844,137 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
     );
   }
 
+  // **تعديل: ضمان RTL كامل**
   Future<String?> _showTextInputDialog(BuildContext context, String title) {
     TextEditingController controller = TextEditingController();
+    final appLocalizations = AppLocalizations.of(context)!;
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        final appLocalizations = AppLocalizations.of(context)!;
-        return AlertDialog(
-          title: Text(title, textAlign: TextAlign.right),
-          content: TextField(
-            controller: controller,
-            textAlign: TextAlign.right,
-            textDirection: TextDirection.rtl,
-            decoration: InputDecoration(hintText: title, border: const OutlineInputBorder()),
-            autofocus: true, // Auto focus for quick input
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: Text(title),
+            content: TextField(
+              controller: controller,
+              decoration: InputDecoration(hintText: title, border: const OutlineInputBorder()),
+              autofocus: true,
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(appLocalizations.cancel),
+                onPressed: () => Navigator.pop(context),
+              ),
+              ElevatedButton(
+                child: Text(appLocalizations.add),
+                onPressed: () => Navigator.pop(context, controller.text.trim()),
+              ),
+            ],
           ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(appLocalizations.cancel),
-              onPressed: () => Navigator.pop(context),
-            ),
-            ElevatedButton(
-              child: Text(appLocalizations.add),
-              onPressed: () => Navigator.pop(context, controller.text.trim()), // Trim whitespace
-            ),
-          ],
         );
       },
     );
   }
 
-  Future<ProductMaterial?> _showAddBomMaterialDialog(BuildContext context, InventoryUseCases useCases, AppLocalizations appLocalizations) async {
+  // **تعديل: ضمان RTL كامل**
+  Future<ProductMaterial?> _showAddBomMaterialDialog(BuildContext context, InventoryUseCases useCases, AppLocalizations appLocalizations, List<String> existingMaterialIds) async {
     final _quantityController = TextEditingController();
     RawMaterialModel? _selectedMaterial;
     final _formKey = GlobalKey<FormState>();
+    String? _unit;
 
     return await showDialog<ProductMaterial>(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(appLocalizations.addMaterialToBom, textAlign: TextAlign.right), // أضف هذا النص
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                StreamBuilder<List<RawMaterialModel>>(
-                  stream: useCases.getRawMaterials(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
-                    }
-                    if (snapshot.hasError) {
-                      return Text('خطأ في تحميل المواد: ${snapshot.error}');
-                    }
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Text('لا توجد مواد أولية متاحة.');
-                    }
-                    return DropdownButtonFormField<RawMaterialModel>(
-                      value: _selectedMaterial,
-                      decoration: InputDecoration(labelText: appLocalizations.rawMaterial, border: OutlineInputBorder()), // أضف هذا النص
-                      items: snapshot.data!.map((material) => DropdownMenuItem(
-                        value: material,
-                        child: Text(material.name, textDirection: TextDirection.rtl),
-                      )).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedMaterial = value;
-                        });
+        return StatefulBuilder(builder: (context, setState) {
+          return Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              title: Text(appLocalizations.addMaterialToBom),
+              content: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    StreamBuilder<List<RawMaterialModel>>(
+                      stream: useCases.getRawMaterials(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError) {
+                          return Text('${appLocalizations.errorLoadingMaterials}: ${snapshot.error}');
+                        }
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return Text(appLocalizations.noRawMaterialsAvailable);
+                        }
+                        final availableMaterials = snapshot.data!
+                            .where((material) => !existingMaterialIds.contains(material.id))
+                            .toList();
+
+                        return DropdownButtonFormField<RawMaterialModel>(
+                          value: _selectedMaterial,
+                          decoration: InputDecoration(labelText: appLocalizations.rawMaterial, border: const OutlineInputBorder()),
+                          isExpanded: true,
+                          items: availableMaterials.map((material) => DropdownMenuItem(
+                            value: material,
+                            child: Text(material.name),
+                          )).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedMaterial = value;
+                              _unit = value?.unit;
+                            });
+                          },
+                          validator: (value) => value == null ? appLocalizations.fieldRequired : null,
+                        );
                       },
-                      validator: (value) => value == null ? appLocalizations.fieldRequired : null,
-                    );
-                  },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: _quantityController,
+                      decoration: InputDecoration(
+                          labelText: appLocalizations.quantity,
+                          border: const OutlineInputBorder(),
+                          suffixText: _unit ?? ''
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: (value) {
+                        if (value!.isEmpty) return appLocalizations.fieldRequired;
+                        if (double.tryParse(value) == null || double.parse(value) <= 0) return appLocalizations.invalidNumberPositive;
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
-                SizedBox(height: 12),
-                TextFormField(
-                  controller: _quantityController,
-                  decoration: InputDecoration(labelText: appLocalizations.quantity, border: OutlineInputBorder()), // أضف هذا النص
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value!.isEmpty) return appLocalizations.fieldRequired;
-                    // Changed validator to use invalidNumberPositive
-                    if (double.tryParse(value) == null || double.parse(value)! <= 0) return appLocalizations.invalidNumberPositive;
-                    return null;
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(appLocalizations.cancel),
+                  onPressed: () => Navigator.pop(dialogContext),
+                ),
+                ElevatedButton(
+                  child: Text(appLocalizations.add),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate() && _selectedMaterial != null) {
+                      Navigator.pop(dialogContext, ProductMaterial(
+                        materialId: _selectedMaterial!.id,
+                        quantityPerUnit: double.parse(_quantityController.text),
+                        unit: _selectedMaterial!.unit,
+                      ));
+                    }
                   },
-                  textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                 ),
               ],
             ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(appLocalizations.cancel),
-              onPressed: () => Navigator.pop(dialogContext),
-            ),
-            ElevatedButton(
-              child: Text(appLocalizations.add),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  Navigator.pop(dialogContext, ProductMaterial(
-                    materialId: _selectedMaterial!.id,
-                    quantityPerUnit: double.parse(_quantityController.text),
-                    unit: _selectedMaterial!.unit, // استخدام وحدة المادة المختارة
-                  ));
-                }
-              },
-            ),
-          ],
-        );
+          );
+        });
       },
     );
   }
-
-
 }
 
+// **تعديل: ضمان RTL كامل**
 void _showDeleteProductConfirmationDialog(
     BuildContext context,
     InventoryUseCases useCases,
@@ -1005,54 +985,59 @@ void _showDeleteProductConfirmationDialog(
   showDialog(
     context: context,
     builder: (BuildContext dialogContext) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(appLocalizations.confirmDeletion, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-        content: Text(
-          '${appLocalizations.confirmDeleteProduct}: "$productName"?\n\n${appLocalizations.thisActionCannotBeUndone}',
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 16),
-        ),
-        actionsAlignment: MainAxisAlignment.spaceAround,
-        actions: <Widget>[
-          TextButton(
-            child: Text(appLocalizations.cancel),
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+      return Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.confirmDeletion, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text(
+            '${appLocalizations.confirmDeleteProduct}: "$productName"؟\n\n${appLocalizations.thisActionCannotBeUndone}',
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontSize: 16),
           ),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.delete_forever),
-            label: Text(appLocalizations.delete),
-            onPressed: () async {
-              try {
-                // Show loading indicator
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext loadingContext) {
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                );
-                await useCases.deleteProduct(productId);
-                Navigator.of(context).pop(); // Pop the loading indicator
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.productDeletedSuccessfully)));
-                Navigator.of(dialogContext).pop();
-              } catch (e) {
-                Navigator.of(context).pop(); // Pop the loading indicator
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${appLocalizations.errorDeletingProduct}: ${e.toString()}')),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          actionsAlignment: MainAxisAlignment.spaceAround,
+          actions: <Widget>[
+            TextButton(
+              child: Text(appLocalizations.cancel),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+            ),
+            Directionality(
+              textDirection: TextDirection.rtl,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.delete_forever, color: Colors.white,),
+                label: Text(appLocalizations.delete),
+                onPressed: () async {
+                  try {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext loadingContext) {
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    );
+                    await useCases.deleteProduct(productId);
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.productDeletedSuccessfully)));
+                    Navigator.of(dialogContext).pop();
+                  } catch (e) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${appLocalizations.errorDeletingProduct}: ${e.toString()}')),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     },
   );

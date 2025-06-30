@@ -362,7 +362,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     child: ListTile(
                       title: Text(item.productName, textDirection: TextDirection.rtl, style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: Text('${appLocalizations.quantity}: ${item.quantity} | ${appLocalizations.unitPrice}: ريال سعودي ${item.unitPrice.toStringAsFixed(2)}', textDirection: TextDirection.rtl, style: TextStyle(color: Colors.grey[700])),
+                      subtitle: Text('${appLocalizations.quantity}: ${item.quantity} | ${appLocalizations.unitPrice}:${item.unitPrice.toStringAsFixed(2)} ريال سعودي ', textDirection: TextDirection.rtl, style: TextStyle(color: Colors.grey[700])),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -401,7 +401,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  '${appLocalizations.totalAmount}: ريال سعودي ${_totalAmount.toStringAsFixed(2)}',                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary),
+                  '${appLocalizations.totalAmount} : ${_totalAmount.toStringAsFixed(2)} ريال سعودي ',                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary),
                   textDirection: TextDirection.rtl,
                 ),
               ),
