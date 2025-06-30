@@ -400,6 +400,15 @@ class AppLocalizations {
   String get clearFilter => _strings["clearFilter"] ?? "clearFilter";
   String get orderId => _strings["orderId"] ?? "orderId";
   String get unknown => _strings["unknown"] ?? "unknown";
+  String get addTemplate => _strings["addTemplate"] ?? "addTemplate";
+  String get editTemplate => _strings["editTemplate"] ?? "editTemplate";
+  String get templateCode => _strings["templateCode"] ?? "templateCode";
+  String get templateName => _strings["templateName"] ?? "templateName";
+  String get timeRequired => _strings["timeRequired"] ?? "timeRequired";
+  String get percentage => _strings["percentage"] ?? "percentage";
+  String get noTemplatesAvailable => _strings["noTemplatesAvailable"] ?? "noTemplatesAvailable";
+  String get tapToAddFirstTemplate => _strings["tapToAddFirstTemplate"] ?? "tapToAddFirstTemplate";
+
 
 }
 
