@@ -146,7 +146,7 @@ class SalesUseCases {
 
     // Notify production order preparers to assign warehouse
     final preparers =
-        await userUseCases.getUsersByRole(UserRole.productionOrderPreparer);
+        await userUseCases.getUsersByRole(UserRole.operationsOfficer);
     for (final p in preparers) {
       await notificationUseCases.sendNotification(
         userId: p.uid,

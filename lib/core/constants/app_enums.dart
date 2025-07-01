@@ -3,7 +3,7 @@
 enum UserRole {
   factoryManager, // مدير المصنع
   productionManager, // مدير الإنتاج
-  productionOrderPreparer, // مسؤول إعداد طلبات الإنتاج
+  operationsOfficer, // مسؤول العمليات
   moldInstallationSupervisor, // مشرف تركيب القوالب
   productionShiftSupervisor, // مشرف الوردية / مشرف الإنتاج
   machineOperator, // مشغل المكينة
@@ -23,8 +23,8 @@ extension UserRoleExtension on UserRole {
         return 'مدير المصنع';
       case UserRole.productionManager:
         return 'مدير الإنتاج';
-      case UserRole.productionOrderPreparer:
-        return 'مسؤول إعداد طلبات الإنتاج';
+      case UserRole.operationsOfficer:
+        return 'مسؤول العمليات';
       case UserRole.moldInstallationSupervisor:
         return 'مشرف تركيب القوالب';
       case UserRole.productionShiftSupervisor:
@@ -55,8 +55,8 @@ extension UserRoleExtension on UserRole {
         return UserRole.factoryManager;
       case 'production_manager':
         return UserRole.productionManager;
-      case 'production_order_preparer':
-        return UserRole.productionOrderPreparer;
+      case 'operations_officer':
+        return UserRole.operationsOfficer;
       case 'mold_installation_supervisor':
         return UserRole.moldInstallationSupervisor;
       case 'production_shift_supervisor':
@@ -85,8 +85,8 @@ extension UserRoleExtension on UserRole {
         return 'factory_manager';
       case UserRole.productionManager:
         return 'production_manager';
-      case UserRole.productionOrderPreparer:
-        return 'production_order_preparer';
+      case UserRole.operationsOfficer:
+        return 'operations_officer';
       case UserRole.moldInstallationSupervisor:
         return 'mold_installation_supervisor';
       case UserRole.productionShiftSupervisor:

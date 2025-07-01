@@ -8,7 +8,7 @@
   "loginErrorGeneric": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
   "factoryManager": "مدير المصنع",
   "productionManager": "مدير الإنتاج",
-  "productionOrderPreparer": "مسؤول إعداد طلبات الإنتاج",
+  "operationsOfficer": "مسؤول العمليات",
   "moldInstallationSupervisor": "مشرف تركيب القوالب",
   "productionShiftSupervisor": "مشرف الوردية / مشرف الإنتاج",
   "machineOperator": "مشغل المكينة",

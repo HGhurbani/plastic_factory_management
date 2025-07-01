@@ -112,10 +112,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       'name': 'مدير المصنع',
       'icon': '👨‍💼',
     },
-    UserRole.productionOrderPreparer: {
-      'email': 'orderpreparer@example.com',
+    UserRole.operationsOfficer: {
+      'email': 'operations@example.com',
       'password': 'password',
-      'name': 'مسؤول إعداد طلبات الإنتاج',
+      'name': 'مسؤول العمليات',
       'icon': '📋',
     },
     UserRole.moldInstallationSupervisor: {
