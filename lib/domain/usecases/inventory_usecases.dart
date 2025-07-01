@@ -3,7 +3,10 @@
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/template_model.dart';
+import 'package:plastic_factory_management/data/models/spare_part_model.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 import 'package:plastic_factory_management/domain/repositories/inventory_repository.dart';
+import 'package:plastic_factory_management/domain/usecases/notification_usecases.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart'; // لاستخدام Timestamp
@@ -202,5 +205,93 @@ class InventoryUseCases {
 
   Future<void> deleteProduct(String productId) async {
     await repository.deleteProduct(productId);
+  }
+
+  // --- Spare Parts Use Cases ---
+
+  Stream<List<SparePartModel>> getSpareParts() {
+    return repository.getSpareParts();
+  }
+
+  Future<void> addSparePart({
+    required String code,
+    required String name,
+    required String unit,
+  }) async {
+    final part = SparePartModel(
+      id: '',
+      code: code,
+      name: name,
+      unit: unit,
+      lastUpdated: Timestamp.now(),
+    );
+    await repository.addSparePart(part);
+  }
+
+  Future<void> updateSparePart({
+    required String id,
+    required String code,
+    required String name,
+    required String unit,
+  }) async {
+    final part = SparePartModel(
+      id: id,
+      code: code,
+      name: name,
+      unit: unit,
+      lastUpdated: Timestamp.now(),
+    );
+    await repository.updateSparePart(part);
+  }
+
+  Future<void> deleteSparePart(String id) async {
+    await repository.deleteSparePart(id);
+  }
+
+  // --- Inventory Balance Use Cases ---
+
+  Stream<List<InventoryBalanceModel>> getInventoryBalances(InventoryItemType type) {
+    return repository.getInventoryBalances(type);
+  }
+
+  Future<void> adjustInventory({
+    required String itemId,
+    required InventoryItemType type,
+    required double delta,
+  }) {
+    return repository.updateInventoryQuantity(
+      itemId: itemId,
+      type: type,
+      delta: delta,
+    );
+  }
+
+  Future<void> adjustInventoryWithNotification({
+    required String itemId,
+    required InventoryItemType type,
+    required double delta,
+    required String userId,
+    required String itemName,
+    required NotificationUseCases notificationUseCases,
+  }) async {
+    await adjustInventory(itemId: itemId, type: type, delta: delta);
+    final balances = await repository.getInventoryBalances(type).first;
+    final record = balances.firstWhere(
+      (b) => b.itemId == itemId,
+      orElse: () => InventoryBalanceModel(
+        id: '',
+        itemId: itemId,
+        type: type,
+        quantity: 0,
+        minQuantity: 0,
+      ),
+    );
+    if (record.quantity <= record.minQuantity) {
+      await notificationUseCases.sendNotification(
+        userId: userId,
+        title: 'Low Inventory',
+        message: '$itemName is below minimum quantity',
+      );
+    }
   }
 }
