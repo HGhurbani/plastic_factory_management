@@ -57,7 +57,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
       });
 
       try {
-        final createdOrder = await useCases.createProductionOrder(
+        await useCases.createProductionOrder(
           selectedProduct: _selectedProduct!,
           requiredQuantity: int.parse(_quantityController.text),
           batchNumber: _batchNumberController.text,
@@ -68,7 +68,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.orderCreatedSuccessfully)), // إضافة هذا النص في ARB
         );
-        Navigator.of(context).pop(createdOrder); // العودة بعد الإرسال الناجح مع الطلب الجديد
+        Navigator.of(context).pop(); // العودة بعد الإرسال الناجح
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${AppLocalizations.of(context)!.errorCreatingOrder}: $e')), // إضافة هذا النص في ARB
