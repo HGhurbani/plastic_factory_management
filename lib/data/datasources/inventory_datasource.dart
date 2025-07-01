@@ -5,6 +5,8 @@ import 'package:plastic_factory_management/core/services/file_upload_service.dar
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/template_model.dart';
+import 'package:plastic_factory_management/data/models/spare_part_model.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -119,5 +121,70 @@ class InventoryDatasource {
     final product = await getProductById(productId);
     // TODO: implement deletion of image from remote server if needed
     await _firestore.collection('products').doc(productId).delete();
+  }
+
+  // --- Spare Parts Operations ---
+  Stream<List<SparePartModel>> getSpareParts() {
+    return _firestore.collection('spare_parts').snapshots().map((snapshot) {
+      return snapshot.docs
+          .map((doc) => SparePartModel.fromDocumentSnapshot(doc))
+          .toList();
+    });
+  }
+
+  Future<void> addSparePart(SparePartModel part) async {
+    await _firestore.collection('spare_parts').add(part.toMap());
+  }
+
+  Future<void> updateSparePart(SparePartModel part) async {
+    await _firestore.collection('spare_parts').doc(part.id).update(part.toMap());
+  }
+
+  Future<void> deleteSparePart(String partId) async {
+    await _firestore.collection('spare_parts').doc(partId).delete();
+  }
+
+  // --- Inventory Balances ---
+  Stream<List<InventoryBalanceModel>> getInventoryBalances(InventoryItemType type) {
+    return _firestore
+        .collection('inventory_balances')
+        .where('type', isEqualTo: inventoryItemTypeToString(type))
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => InventoryBalanceModel.fromDocumentSnapshot(doc))
+            .toList());
+  }
+
+  Future<void> updateInventoryQuantity({
+    required String itemId,
+    required InventoryItemType type,
+    required double delta,
+  }) async {
+    final query = await _firestore
+        .collection('inventory_balances')
+        .where('itemId', isEqualTo: itemId)
+        .where('type', isEqualTo: inventoryItemTypeToString(type))
+        .limit(1)
+        .get();
+
+    if (query.docs.isEmpty) {
+      await _firestore.collection('inventory_balances').add(
+        InventoryBalanceModel(
+          id: '',
+          itemId: itemId,
+          type: type,
+          quantity: delta,
+          minQuantity: 0,
+          lastUpdated: Timestamp.now(),
+        ).toMap(),
+      );
+    } else {
+      final doc = query.docs.first;
+      final current = InventoryBalanceModel.fromDocumentSnapshot(doc);
+      await doc.reference.update({
+        'quantity': current.quantity + delta,
+        'lastUpdated': Timestamp.now(),
+      });
+    }
   }
 }

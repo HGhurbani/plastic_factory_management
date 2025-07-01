@@ -2,6 +2,8 @@ import 'package:plastic_factory_management/data/datasources/inventory_datasource
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/template_model.dart';
+import 'package:plastic_factory_management/data/models/spare_part_model.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 import 'package:plastic_factory_management/domain/repositories/inventory_repository.dart';
 import 'dart:io';
 import 'dart:typed_data';
@@ -86,5 +88,45 @@ class InventoryRepositoryImpl implements InventoryRepository {
   @override
   Future<void> deleteProduct(String productId) {
     return datasource.deleteProduct(productId);
+  }
+
+  // --- Spare Parts ---
+  @override
+  Stream<List<SparePartModel>> getSpareParts() {
+    return datasource.getSpareParts();
+  }
+
+  @override
+  Future<void> addSparePart(SparePartModel sparePart) {
+    return datasource.addSparePart(sparePart);
+  }
+
+  @override
+  Future<void> updateSparePart(SparePartModel sparePart) {
+    return datasource.updateSparePart(sparePart);
+  }
+
+  @override
+  Future<void> deleteSparePart(String sparePartId) {
+    return datasource.deleteSparePart(sparePartId);
+  }
+
+  // --- Inventory Balances ---
+  @override
+  Stream<List<InventoryBalanceModel>> getInventoryBalances(InventoryItemType type) {
+    return datasource.getInventoryBalances(type);
+  }
+
+  @override
+  Future<void> updateInventoryQuantity({
+    required String itemId,
+    required InventoryItemType type,
+    required double delta,
+  }) {
+    return datasource.updateInventoryQuantity(
+      itemId: itemId,
+      type: type,
+      delta: delta,
+    );
   }
 }

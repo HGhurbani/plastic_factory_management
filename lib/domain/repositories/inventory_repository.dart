@@ -3,6 +3,8 @@
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/template_model.dart';
+import 'package:plastic_factory_management/data/models/spare_part_model.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -26,4 +28,18 @@ abstract class InventoryRepository {
   Future<void> updateProduct(ProductModel product,
       {File? newImageFile, Uint8List? newImageBytes});
   Future<void> deleteProduct(String productId);
+
+  // --- Spare Parts ---
+  Stream<List<SparePartModel>> getSpareParts();
+  Future<void> addSparePart(SparePartModel sparePart);
+  Future<void> updateSparePart(SparePartModel sparePart);
+  Future<void> deleteSparePart(String sparePartId);
+
+  // --- Inventory Balances ---
+  Stream<List<InventoryBalanceModel>> getInventoryBalances(InventoryItemType type);
+  Future<void> updateInventoryQuantity({
+    required String itemId,
+    required InventoryItemType type,
+    required double delta,
+  });
 }
