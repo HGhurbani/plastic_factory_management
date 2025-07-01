@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
+import 'package:plastic_factory_management/data/models/template_model.dart';
+import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
 
 class CreateProductionOrderScreen extends StatefulWidget {
   @override
@@ -15,6 +19,8 @@ class CreateProductionOrderScreen extends StatefulWidget {
 class _CreateProductionOrderScreenState extends State<CreateProductionOrderScreen> {
   final _formKey = GlobalKey<FormState>();
   ProductModel? _selectedProduct;
+  TemplateModel? _selectedTemplate;
+  MachineModel? _selectedMachine;
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _batchNumberController = TextEditingController();
 
@@ -33,6 +39,18 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
         );
         return;
       }
+      if (_selectedTemplate == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.templateRequired)),
+        );
+        return;
+      }
+      if (_selectedMachine == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.machineRequired)),
+        );
+        return;
+      }
 
       setState(() {
         // يمكن إضافة مؤشر تحميل هنا
@@ -43,6 +61,8 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
           selectedProduct: _selectedProduct!,
           requiredQuantity: int.parse(_quantityController.text),
           batchNumber: _batchNumberController.text,
+          selectedTemplate: _selectedTemplate!,
+          selectedMachine: _selectedMachine!,
           orderPreparer: currentUser,
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -119,6 +139,78 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
                     },
                     validator: (value) =>
                     value == null ? appLocalizations.productRequired : null,
+                  );
+                },
+              ),
+              SizedBox(height: 16),
+              // Template Selection
+              StreamBuilder<List<TemplateModel>>(
+                stream: Provider.of<InventoryUseCases>(context, listen: false).getTemplates(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Text('خطأ في تحميل القوالب: ${snapshot.error}');
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Text('لا توجد قوالب متاحة.');
+                  }
+
+                  return DropdownButtonFormField<TemplateModel>(
+                    value: _selectedTemplate,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.selectTemplate,
+                      border: OutlineInputBorder(),
+                    ),
+                    items: snapshot.data!.map((template) {
+                      return DropdownMenuItem(
+                        value: template,
+                        child: Text(template.name, textDirection: TextDirection.rtl),
+                      );
+                    }).toList(),
+                    onChanged: (TemplateModel? newValue) {
+                      setState(() {
+                        _selectedTemplate = newValue;
+                      });
+                    },
+                    validator: (value) => value == null ? appLocalizations.templateRequired : null,
+                  );
+                },
+              ),
+              SizedBox(height: 16),
+              // Machine Selection
+              StreamBuilder<List<MachineModel>>(
+                stream: Provider.of<MachineryOperatorUseCases>(context, listen: false).getMachines(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Text('خطأ في تحميل الآلات: ${snapshot.error}');
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Text('لا توجد آلات متاحة.');
+                  }
+
+                  return DropdownButtonFormField<MachineModel>(
+                    value: _selectedMachine,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.selectMachineForOrder,
+                      border: OutlineInputBorder(),
+                    ),
+                    items: snapshot.data!.map((machine) {
+                      return DropdownMenuItem(
+                        value: machine,
+                        child: Text(machine.name, textDirection: TextDirection.rtl),
+                      );
+                    }).toList(),
+                    onChanged: (MachineModel? newValue) {
+                      setState(() {
+                        _selectedMachine = newValue;
+                      });
+                    },
+                    validator: (value) => value == null ? appLocalizations.machineRequired : null,
                   );
                 },
               ),
