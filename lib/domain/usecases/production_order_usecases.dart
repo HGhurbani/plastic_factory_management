@@ -68,7 +68,7 @@ class ProductionOrderUseCases {
   }
 
   // Use case to create a new production order
-  Future<void> createProductionOrder({
+  Future<ProductionOrderModel> createProductionOrder({
     required ProductModel selectedProduct,
     required int requiredQuantity,
     required String batchNumber,
@@ -130,6 +130,8 @@ class ProductionOrderUseCases {
         );
       }
     }
+
+    return createdOrder;
   }
 
   // Create production orders from a sales order (one per item)

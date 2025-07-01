@@ -23,6 +23,7 @@ class ProductionOrdersListScreen extends StatefulWidget {
 
 class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen> {
   String _selectedStatusFilter = 'all';
+  ProductionOrderModel? _newlyCreatedOrder;
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +78,16 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
           if (isPreparer)
             IconButton(
               icon: Icon(Icons.add, color: Colors.white), // White icon
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreateProductionOrderScreen()));
+              onPressed: () async {
+                final newOrder = await Navigator.of(context).push<ProductionOrderModel?>(
+                  MaterialPageRoute(builder: (_) => CreateProductionOrderScreen()),
+                );
+                if (newOrder != null) {
+                  setState(() {
+                    _newlyCreatedOrder = newOrder;
+                    _selectedStatusFilter = 'all';
+                  });
+                }
               },
               tooltip: appLocalizations.createOrder,
             ),
@@ -188,8 +197,16 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                           if (isPreparer) const SizedBox(height: 24),
                           if (isPreparer)
                             ElevatedButton.icon(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreateProductionOrderScreen()));
+                              onPressed: () async {
+                                final newOrder = await Navigator.of(context).push<ProductionOrderModel?>(
+                                  MaterialPageRoute(builder: (_) => CreateProductionOrderScreen()),
+                                );
+                                if (newOrder != null) {
+                                  setState(() {
+                                    _newlyCreatedOrder = newOrder;
+                                    _selectedStatusFilter = 'all';
+                                  });
+                                }
                               },
                               icon: const Icon(Icons.add),
                               label: Text(appLocalizations.createOrder),
@@ -212,6 +229,14 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                 List<ProductionOrderModel> orders = snapshot.data!
                     .where((order) => order.salesOrderId == null || order.salesOrderId!.isEmpty)
                     .toList();
+
+                if (_newlyCreatedOrder != null) {
+                  final exists = orders.any((o) => o.id == _newlyCreatedOrder!.id);
+                  if (!exists) {
+                    orders = [ _newlyCreatedOrder!, ...orders ];
+                  }
+                  orders = orders.where((o) => o.id == _newlyCreatedOrder!.id).toList();
+                }
 
                 List<ProductionOrderModel> filteredOrders = isPreparer
                     ? orders.where((order) => order.orderPreparerUid == currentUser.uid).toList()
