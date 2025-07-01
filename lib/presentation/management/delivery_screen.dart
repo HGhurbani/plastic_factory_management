@@ -14,7 +14,7 @@ class DeliveryScreen extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          'هنا إدارة عمليات التوصيل',
+          'هنا إدارة وحدة التوصيل',
           textDirection: TextDirection.rtl,
         ),
       ),

@@ -14,7 +14,7 @@ class ReportsScreen extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          'هنا عرض التقارير والإحصائيات',
+          'هنا عرض التقارير والتحليلات',
           textDirection: TextDirection.rtl,
         ),
       ),

@@ -367,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       modules.add(_buildModuleButton(
         context: context,
         title: appLocalizations.maintenanceProgram,
-        subtitle: "برنامج الصيانة",
+        subtitle: "وحدة الصيانة",
         icon: Icons.build,
         color: moduleColors['maintenance']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.maintenanceProgramRoute),
@@ -414,7 +414,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       modules.add(_buildModuleButton(
         context: context,
         title: appLocalizations.reports,
-        subtitle: "التقارير والإحصائيات",
+        subtitle: "التقارير والتحليلات",
         icon: Icons.bar_chart,
         color: moduleColors['reports']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.reportsRoute),
@@ -617,7 +617,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       modules.add(_buildModuleButton(
         context: context,
         title: appLocalizations.maintenanceProgram,
-        subtitle: "برنامج الصيانة",
+        subtitle: "وحدة الصيانة",
         icon: Icons.build,
         color: moduleColors['maintenance']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.maintenanceProgramRoute),
@@ -1064,7 +1064,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 _buildDrawerItem(
                   icon: Icons.analytics_rounded,
-                  title: "التقارير والإحصائيات",
+                  title: "التقارير والتحليلات",
                   onTap: () {
                     Navigator.pop(context);
                     // TODO: Navigate to reports
