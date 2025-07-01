@@ -8,7 +8,7 @@ abstract class ProductionOrderRepository {
   Stream<List<ProductionOrderModel>> getProductionOrders();
   Stream<List<ProductionOrderModel>> getPendingProductionOrders();
   Future<ProductionOrderModel?> getProductionOrderById(String orderId);
-  Future<void> createProductionOrder(ProductionOrderModel order);
+  Future<ProductionOrderModel> createProductionOrder(ProductionOrderModel order);
   Future<void> updateProductionOrder(ProductionOrderModel order);
   Future<void> deleteProductionOrder(String orderId);
 
