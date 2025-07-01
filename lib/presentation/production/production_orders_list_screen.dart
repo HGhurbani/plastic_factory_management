@@ -24,6 +24,7 @@ class ProductionOrdersListScreen extends StatefulWidget {
 class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen> {
   String _selectedStatusFilter = 'all';
   String _selectedSourceFilter = 'all';
+  String _selectedCreatorFilter = 'all';
 
   @override
   Widget build(BuildContext context) {
@@ -161,6 +162,28 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                 ),
               ),
             ),
+          if (isManager)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildFilterChip(appLocalizations.all, 'all', _selectedCreatorFilter, (value) {
+                      setState(() {
+                        _selectedCreatorFilter = value;
+                      });
+                    }),
+                    _buildFilterChip(appLocalizations.operationsOfficer, 'operations', _selectedCreatorFilter, (value) {
+                      setState(() {
+                        _selectedCreatorFilter = value;
+                      });
+                    }),
+                  ],
+                ),
+              ),
+            ),
           Expanded(
             child: StreamBuilder<List<ProductionOrderModel>>(
               stream: productionUseCases.getProductionOrders(),
@@ -254,6 +277,12 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                 } else if (_selectedSourceFilter == 'sales') {
                   orders = orders
                       .where((order) => order.salesOrderId != null && order.salesOrderId!.isNotEmpty)
+                      .toList();
+                }
+
+                if (_selectedCreatorFilter == 'operations') {
+                  orders = orders
+                      .where((order) => order.orderPreparerRole == UserRole.operationsOfficer.toFirestoreString())
                       .toList();
                 }
 
