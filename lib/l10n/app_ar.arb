@@ -63,7 +63,12 @@
   "timeRequired": "الوقت المستغرق",
   "percentage": "النسبة",
   "noTemplatesAvailable": "لا توجد قوالب متاحة.",
-    "tapToAddFirstTemplate": "اضغط على زر '+' لإضافة أول قالب.",
+  "tapToAddFirstTemplate": "اضغط على زر '+' لإضافة أول قالب.",
+
+  "productionBoard": "لوحة الإنتاج",
+  "issueProductionOrders": "إصدار أوامر الإنتاج وربطها بالقوالب والماكينات",
+  "trackDefectsShifts": "تتبع التالف والورديات ومراقبة الأداء",
+  "logMoldReceipt": "تسجيل استلام القوالب، التوجيه، التشغيل والتسليم",
 
   "selectTemplate": "اختر القالب",
   "packagingType": "نوع التعبئة",

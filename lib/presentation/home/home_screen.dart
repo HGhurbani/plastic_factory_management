@@ -357,6 +357,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       modules.add(_buildModuleButton(
         context: context,
+        title: appLocalizations.productionBoard,
+        subtitle: "وحدة الإنتاج",
+        icon: Icons.dashboard,
+        color: moduleColors['production']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionBoardRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
         title: appLocalizations.operatorProfiles,
         subtitle: "ملفات المشغلين",
         icon: Icons.people,

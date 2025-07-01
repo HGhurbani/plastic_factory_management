@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/presentation/auth/terms_of_use_screen
 import 'package:plastic_factory_management/presentation/home/home_screen.dart';
 import 'package:plastic_factory_management/presentation/production/create_production_order_screen.dart';
 import 'package:plastic_factory_management/presentation/production/production_orders_list_screen.dart';
+import 'package:plastic_factory_management/presentation/production/production_board_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/raw_materials_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/product_catalog_screen.dart'; // يمكن إعادة استخدامها
 import 'package:plastic_factory_management/presentation/inventory/templates_screen.dart';
@@ -35,6 +36,7 @@ class AppRouter {
   static const String termsRoute = '/terms';
   static const String createProductionOrderRoute = '/production/create';
   static const String productionOrdersListRoute = '/production/list';
+  static const String productionBoardRoute = '/production/board';
   static const String rawMaterialsRoute = '/inventory/raw_materials';
   static const String productCatalogRoute = '/inventory/product_catalog';
   static const String templatesRoute = '/inventory/templates';
@@ -67,6 +69,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => CreateProductionOrderScreen());
       case productionOrdersListRoute:
         return MaterialPageRoute(builder: (_) => ProductionOrdersListScreen());
+      case productionBoardRoute:
+        return MaterialPageRoute(builder: (_) => const ProductionBoardScreen());
       case rawMaterialsRoute:
         return MaterialPageRoute(builder: (_) => RawMaterialsScreen());
       case productCatalogRoute:

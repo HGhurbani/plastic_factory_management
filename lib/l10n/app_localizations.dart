@@ -409,6 +409,10 @@ class AppLocalizations {
   String get percentage => _strings["percentage"] ?? "percentage";
   String get noTemplatesAvailable => _strings["noTemplatesAvailable"] ?? "noTemplatesAvailable";
   String get tapToAddFirstTemplate => _strings["tapToAddFirstTemplate"] ?? "tapToAddFirstTemplate";
+  String get productionBoard => _strings["productionBoard"] ?? "productionBoard";
+  String get issueProductionOrders => _strings["issueProductionOrders"] ?? "issueProductionOrders";
+  String get trackDefectsShifts => _strings["trackDefectsShifts"] ?? "trackDefectsShifts";
+  String get logMoldReceipt => _strings["logMoldReceipt"] ?? "logMoldReceipt";
   String get returns => _strings["returns"] ?? "returns";
   String get delivery => _strings["delivery"] ?? "delivery";
   String get reports => _strings["reports"] ?? "reports";
