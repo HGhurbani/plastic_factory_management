@@ -428,4 +428,7 @@
   "reports": "التقارير والتحليلات",
   "procurement": "وحدة المشتريات",
   "documentCenter": "مركز الوثائق والسياسات"
+  "addInventoryEntry": "إضافة حركة مخزون",
+  "selectInventoryType": "اختر نوع المخزون",
+  "selectItem": "اختر الصنف",
 }

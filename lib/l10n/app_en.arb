@@ -29,6 +29,9 @@
               "machineRequired": "Machine is required.",
               "enterActualTimeRequired": "Please enter the actual time spent.",
               "approvedBy": "by",
+  "addInventoryEntry": "إضافة حركة مخزون",
+  "selectInventoryType": "اختر نوع المخزون",
+  "selectItem": "اختر الصنف",
               "unknown": "Unknown",
   "loginTitle": "تسجيل الدخول",
   "emailHint": "البريد الإلكتروني",
@@ -434,5 +437,8 @@
   "reports": "Reports & Analytics",
   "procurement": "Procurement Module",
   "documentCenter": "Documents & Policies",
+  "addInventoryEntry": "إضافة حركة مخزون",
+  "selectInventoryType": "اختر نوع المخزون",
+  "selectItem": "اختر الصنف",
   "unknown": "Unknown"
 }
