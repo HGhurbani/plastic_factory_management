@@ -69,7 +69,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         currentUser.userRoleEnum == UserRole.productionManager ||
         currentUser.userRoleEnum == UserRole.accountant;
     final bool isAccountant = currentUser.userRoleEnum == UserRole.accountant;
-    final bool isProductionOrderPreparer = currentUser.userRoleEnum == UserRole.operationsOfficer;
+    final bool isProductionOrderPreparer = currentUser.userRoleEnum == UserRole.operationsOfficer ||
+        currentUser.userRoleEnum == UserRole.productionOrderPreparer;
     final bool isInventoryManager = currentUser.userRoleEnum == UserRole.inventoryManager;
     final bool isMoldInstallationSupervisor = currentUser.userRoleEnum == UserRole.moldInstallationSupervisor;
 

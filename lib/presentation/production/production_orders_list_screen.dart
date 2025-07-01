@@ -64,7 +64,8 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
 
     final bool isManager = currentUser.userRoleEnum == UserRole.factoryManager ||
         currentUser.userRoleEnum == UserRole.productionManager;
-    final bool isPreparer = currentUser.userRoleEnum == UserRole.operationsOfficer;
+    final bool isPreparer = currentUser.userRoleEnum == UserRole.operationsOfficer ||
+        currentUser.userRoleEnum == UserRole.productionOrderPreparer;
 
     return Scaffold(
       appBar: AppBar(
