@@ -468,23 +468,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.rawMaterialsRoute),
       ));
 
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.finishedProducts,
-        subtitle: "الإنتاج التام",
-        icon: Icons.inventory_2,
-        color: moduleColors['inventory']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.finishedProductsRoute),
-      ));
-
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.spareParts,
-        subtitle: "قطع الغيار",
-        icon: Icons.build_circle_outlined,
-        color: moduleColors['inventory']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.sparePartsRoute),
-      ));
 
       modules.add(_buildModuleButton(
         context: context,
