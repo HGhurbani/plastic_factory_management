@@ -104,6 +104,7 @@
   "logMoldReceipt": "Log mold receipt, orientation, operation and delivery",
 
   "selectTemplate": "اختر القالب",
+  "templateRequired": "Template is required.",
   "packagingType": "نوع التعبئة",
   "requiresPackaging": "هل يحتاج تغليف؟",
   "requiresSticker": "هل يحتاج ستيكر؟",

@@ -71,6 +71,7 @@
   "logMoldReceipt": "تسجيل استلام القوالب، التوجيه، التشغيل والتسليم",
 
   "selectTemplate": "اختر القالب",
+  "templateRequired": "القالب مطلوب.",
   "packagingType": "نوع التعبئة",
   "requiresPackaging": "هل يحتاج تغليف؟",
   "requiresSticker": "هل يحتاج ستيكر؟",

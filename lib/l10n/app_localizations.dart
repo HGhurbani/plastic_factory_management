@@ -135,6 +135,7 @@ class AppLocalizations {
   String get productionOrder => _strings["productionOrder"] ?? "productionOrder";
   String get approveRejectOrder => _strings["approveRejectOrder"] ?? "approveRejectOrder";
   String get productRequired => _strings["productRequired"] ?? "productRequired";
+  String get templateRequired => _strings["templateRequired"] ?? "templateRequired";
   String get orderCreatedSuccessfully => _strings["orderCreatedSuccessfully"] ?? "orderCreatedSuccessfully";
   String get errorCreatingOrder => _strings["errorCreatingOrder"] ?? "errorCreatingOrder";
   String get fieldRequired => _strings["fieldRequired"] ?? "fieldRequired";

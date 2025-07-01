@@ -155,6 +155,10 @@ class ProductionOrderModel {
   final String productName; // Redundant: Product Name (for easier display)
   final int requiredQuantity;
   final String batchNumber;
+  final String? templateId; // القالب المستخدم
+  final String? templateName;
+  final String? machineId; // الآلة المستخدمة
+  final String? machineName;
   final String? salesOrderId; // If this order was generated from a sales order
   final String orderPreparerUid; // UID of the user who prepared the order
   final String orderPreparerName;
@@ -173,6 +177,10 @@ class ProductionOrderModel {
     required this.productName,
     required this.requiredQuantity,
     required this.batchNumber,
+    this.templateId,
+    this.templateName,
+    this.machineId,
+    this.machineName,
     this.salesOrderId,
     required this.orderPreparerUid,
     required this.orderPreparerName,
@@ -194,6 +202,10 @@ class ProductionOrderModel {
       productName: data['productName'] ?? '',
       requiredQuantity: data['requiredQuantity'] ?? 0,
       batchNumber: data['batchNumber'] ?? '',
+      templateId: data['templateId'],
+      templateName: data['templateName'],
+      machineId: data['machineId'],
+      machineName: data['machineName'],
       salesOrderId: data['salesOrderId'],
       orderPreparerUid: data['orderPreparerUid'] ?? '',
       orderPreparerName: data['orderPreparerName'] ?? '',
@@ -217,6 +229,10 @@ class ProductionOrderModel {
       'productName': productName,
       'requiredQuantity': requiredQuantity,
       'batchNumber': batchNumber,
+      'templateId': templateId,
+      'templateName': templateName,
+      'machineId': machineId,
+      'machineName': machineName,
       'salesOrderId': salesOrderId,
       'orderPreparerUid': orderPreparerUid,
       'orderPreparerName': orderPreparerName,
@@ -238,6 +254,10 @@ class ProductionOrderModel {
     String? productName,
     int? requiredQuantity,
     String? batchNumber,
+    String? templateId,
+    String? templateName,
+    String? machineId,
+    String? machineName,
     String? salesOrderId,
     String? orderPreparerUid,
     String? orderPreparerName,
@@ -256,6 +276,10 @@ class ProductionOrderModel {
       productName: productName ?? this.productName,
       requiredQuantity: requiredQuantity ?? this.requiredQuantity,
       batchNumber: batchNumber ?? this.batchNumber,
+      templateId: templateId ?? this.templateId,
+      templateName: templateName ?? this.templateName,
+      machineId: machineId ?? this.machineId,
+      machineName: machineName ?? this.machineName,
       salesOrderId: salesOrderId ?? this.salesOrderId,
       orderPreparerUid: orderPreparerUid ?? this.orderPreparerUid,
       orderPreparerName: orderPreparerName ?? this.orderPreparerName,
