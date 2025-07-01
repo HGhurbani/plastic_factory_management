@@ -903,7 +903,7 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
                             ),
                           ],
                         ),
-                      ], // end isEditing
+                       // end isEditing
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,

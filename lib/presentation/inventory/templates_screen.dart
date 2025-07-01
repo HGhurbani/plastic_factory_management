@@ -362,7 +362,7 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                           final newMat = await _showAddMaterialDialog(context, useCases, appLocalizations, _materials.map((e) => e.materialId).toList());
                           if (newMat != null) setState(() { _materials.add(newMat); });
                         },
-                        icon: const Icon(Icons.add),
+                        icon: const Icon(Icons.add, color: Colors.white,),
                         label: Text(appLocalizations.addMaterial),
                       ),
                       const SizedBox(height: 12),
