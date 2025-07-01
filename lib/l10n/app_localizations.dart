@@ -420,6 +420,9 @@ class AppLocalizations {
   String get reports => _strings["reports"] ?? "reports";
   String get procurement => _strings["procurement"] ?? "procurement";
   String get documentCenter => _strings["documentCenter"] ?? "documentCenter";
+  String get addInventoryEntry => _strings["addInventoryEntry"] ?? "addInventoryEntry";
+  String get selectInventoryType => _strings["selectInventoryType"] ?? "selectInventoryType";
+  String get selectItem => _strings["selectItem"] ?? "selectItem";
 
 
 }
