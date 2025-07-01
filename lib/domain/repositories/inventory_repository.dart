@@ -17,6 +17,7 @@ abstract class InventoryRepository {
   Future<void> addTemplate(TemplateModel template);
   Future<void> updateTemplate(TemplateModel template);
   Future<void> deleteTemplate(String templateId);
+  Future<TemplateModel?> getTemplateById(String templateId);
 
   Stream<List<ProductModel>> getProducts();
   Future<ProductModel?> getProductById(String productId);

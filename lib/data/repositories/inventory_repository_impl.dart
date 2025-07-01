@@ -53,6 +53,11 @@ class InventoryRepositoryImpl implements InventoryRepository {
     return datasource.deleteTemplate(templateId);
   }
 
+  @override
+  Future<TemplateModel?> getTemplateById(String templateId) {
+    return datasource.getTemplateById(templateId);
+  }
+
   // --- Products ---
   @override
   Stream<List<ProductModel>> getProducts() {

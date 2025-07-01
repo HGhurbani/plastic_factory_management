@@ -60,6 +60,10 @@ class MachineryOperatorUseCases {
     await repository.deleteMachine(machineId);
   }
 
+  Future<MachineModel?> getMachineById(String machineId) {
+    return repository.getMachineById(machineId);
+  }
+
   // --- Operator Use Cases ---
 
   Stream<List<OperatorModel>> getOperators() {

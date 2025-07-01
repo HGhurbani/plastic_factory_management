@@ -9,6 +9,10 @@ import 'package:plastic_factory_management/data/models/production_order_model.da
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
+import 'package:plastic_factory_management/data/models/template_model.dart';
+import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:image_picker/image_picker.dart'; // لإرفاق الصور
 import 'package:signature/signature.dart'; // للتوقيع الرقمي
@@ -37,6 +41,30 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     exportBackgroundColor: Colors.white,
   );
   String? _rejectionReason; // For delay justification
+  TemplateModel? _template;
+  MachineModel? _machine;
+
+  @override
+  void initState() {
+    super.initState();
+    final inventoryUseCases =
+        Provider.of<InventoryUseCases>(context, listen: false);
+    final machineryUseCases =
+        Provider.of<MachineryOperatorUseCases>(context, listen: false);
+
+    if (widget.order.templateId != null) {
+      inventoryUseCases
+          .getTemplateById(widget.order.templateId!)
+          .then((value) {
+        if (mounted) setState(() => _template = value);
+      });
+    }
+    if (widget.order.machineId != null) {
+      machineryUseCases.getMachineById(widget.order.machineId!).then((value) {
+        if (mounted) setState(() => _machine = value);
+      });
+    }
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
@@ -195,6 +223,31 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                 icon: Icons.confirmation_number),
             _buildDetailRow(appLocalizations.orderPreparer, widget.order.orderPreparerName,
                 icon: Icons.person),
+            if (_template != null) ...[
+              const SizedBox(height: 8),
+              Text(appLocalizations.templateDetails,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              _buildDetailRow(appLocalizations.templateName, _template!.name,
+                  icon: Icons.dashboard_customize_outlined),
+              _buildSubDetailRow(appLocalizations.templateCode, _template!.code),
+              _buildSubDetailRow(appLocalizations.timeRequired,
+                  _template!.timeRequired.toString()),
+              _buildSubDetailRow(appLocalizations.percentage,
+                  _template!.percentage.toString()),
+            ],
+            if (_machine != null) ...[
+              const SizedBox(height: 8),
+              Text(appLocalizations.machineDetails,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              _buildDetailRow(appLocalizations.machineName, _machine!.name,
+                  icon: Icons.precision_manufacturing_outlined),
+              _buildSubDetailRow(appLocalizations.machineID, _machine!.machineId),
+              if (_machine!.details != null && _machine!.details!.isNotEmpty)
+                _buildSubDetailRow(
+                    appLocalizations.machineDetails, _machine!.details!),
+            ],
             _buildDetailRow(appLocalizations.status, widget.order.status.toArabicString(),
                 textColor: _getStatusColor(widget.order.status), isBold: true, icon: Icons.info_outline),
             _buildDetailRow('تاريخ الإنشاء',
