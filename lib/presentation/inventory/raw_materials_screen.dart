@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
+import 'package:plastic_factory_management/data/models/product_model.dart';
+import 'package:plastic_factory_management/data/models/spare_part_model.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
-import 'package:plastic_factory_management/theme/app_colors.dart'; // Assuming this defines your app's color scheme
+import 'package:plastic_factory_management/core/constants/app_enums.dart';
+import 'package:plastic_factory_management/presentation/routes/app_router.dart';
+import 'package:plastic_factory_management/theme/app_colors.dart';
 
 class RawMaterialsScreen extends StatefulWidget {
   const RawMaterialsScreen({super.key});
@@ -15,6 +19,7 @@ class RawMaterialsScreen extends StatefulWidget {
 }
 
 class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
+  InventoryItemType _selectedType = InventoryItemType.rawMaterial;
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
@@ -24,165 +29,184 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
       appBar: AppBar(
         title: Text(appLocalizations.rawMaterials),
         centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor, // Consistent theme color
-        foregroundColor: Colors.white, // White text for better contrast
-        elevation: 0, // No shadow for a cleaner look
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_circle_outline), // More descriptive icon
+            icon: const Icon(Icons.add_circle_outline),
             onPressed: () {
-              _showAddEditMaterialDialog(context, inventoryUseCases, appLocalizations);
+              Navigator.of(context).pushNamed(AppRouter.inventoryAddItemRoute);
             },
-            tooltip: appLocalizations.addRawMaterial,
+            tooltip: appLocalizations.addInventoryItem,
           ),
         ],
       ),
-      body: StreamBuilder<List<RawMaterialModel>>(
-        stream: inventoryUseCases.getRawMaterials(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            // Enhanced error message
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, color: Colors.red, size: 60),
-                    const SizedBox(height: 16),
-                    Text(
-                      appLocalizations.errorLoadingMaterials, // New localization key
-                      style: const TextStyle(fontSize: 18, color: Colors.red),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${appLocalizations.technicalDetails}: ${snapshot.error}', // New localization key
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: DropdownButton<InventoryItemType>(
+              value: _selectedType,
+              onChanged: (val) {
+                if (val != null) setState(() => _selectedType = val);
+              },
+              items: const [
+                DropdownMenuItem(
+                  value: InventoryItemType.rawMaterial,
+                  child: Text('مواد خام', textDirection: TextDirection.rtl),
                 ),
-              ),
-            );
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            // Enhanced empty state message
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.widgets_outlined, color: Colors.grey[400], size: 80),
-                    const SizedBox(height: 16),
-                    Text(
-                      appLocalizations.noRawMaterialsAvailable, // New localization key
-                      style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      appLocalizations.tapToAddFirstMaterial, // New localization key
-                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        _showAddEditMaterialDialog(context, inventoryUseCases, appLocalizations);
-                      },
-                      icon: const Icon(Icons.add),
-                      label: Text(appLocalizations.addRawMaterial),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        textStyle: const TextStyle(fontSize: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                DropdownMenuItem(
+                  value: InventoryItemType.finishedProduct,
+                  child: Text('منتج تام', textDirection: TextDirection.rtl),
+                ),
+                DropdownMenuItem(
+                  value: InventoryItemType.sparePart,
+                  child: Text('قطع غيار', textDirection: TextDirection.rtl),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<List<dynamic>>(
+              stream: _itemsStream(inventoryUseCases),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.red, size: 60),
+                          const SizedBox(height: 16),
+                          Text(
+                            appLocalizations.errorLoadingMaterials,
+                            style: const TextStyle(fontSize: 18, color: Colors.red),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${appLocalizations.technicalDetails}: ${snapshot.error}',
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            itemBuilder: (context, index) {
-              final material = snapshot.data![index];
-              const bool isBelowMin = false; // quantities not tracked
-
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                elevation: 1, // Slightly increased elevation for better prominence
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // Rounded corners for a softer look
-                  side: isBelowMin ? const BorderSide(color: Colors.red, width: 2) : BorderSide.none, // Red border for low stock
-                ),
-                color: isBelowMin ? Colors.red.shade50 : Theme.of(context).cardColor, // Use theme's card color
-                child: Padding(
+                  );
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text(appLocalizations.noData));
+                }
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: isBelowMin ? Colors.red : AppColors.primary, // Dynamic leading icon color
-                      child: Icon(
-                        isBelowMin ? Icons.warning_amber : Icons.inventory_2_outlined, // More relevant icon
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: Text(
-                      '${material.code} - ${material.name}',
-                      textDirection: TextDirection.rtl,
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                    subtitle: const SizedBox.shrink(),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: AppColors.primary), // Use secondary color for edit
-                          onPressed: () {
-                            _showAddEditMaterialDialog(context, inventoryUseCases, appLocalizations, material: material);
-                          },
-                          tooltip: appLocalizations.edit,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.redAccent), // A slightly softer red for delete
-                          onPressed: () {
-                            _showDeleteConfirmationDialog(context, inventoryUseCases, appLocalizations, material.id, material.name);
-                          },
-                          tooltip: appLocalizations.delete,
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      // Optional: Navigate to a detail screen for the raw material
-                      // Navigator.of(context).push(MaterialPageRoute(builder: (_) => RawMaterialDetailScreen(material: material)));
-                    },
-                  ),
-                ),
-              );
-            },
-          );
-        },
+                  itemBuilder: (context, index) {
+                    final item = snapshot.data![index];
+                    return _buildListItem(item, inventoryUseCases, appLocalizations);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddEditMaterialDialog(context, inventoryUseCases, appLocalizations);
+          Navigator.of(context).pushNamed(AppRouter.inventoryAddItemRoute);
         },
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        tooltip: appLocalizations.addRawMaterial,
+        tooltip: appLocalizations.addInventoryItem,
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Stream<List<dynamic>> _itemsStream(InventoryUseCases useCases) {
+    switch (_selectedType) {
+      case InventoryItemType.rawMaterial:
+        return useCases.getRawMaterials();
+      case InventoryItemType.finishedProduct:
+        return useCases.getProducts();
+      case InventoryItemType.sparePart:
+        return useCases.getSpareParts();
+    }
+  }
+
+  Widget _buildListItem(
+      dynamic item, InventoryUseCases useCases, AppLocalizations loc) {
+    if (_selectedType == InventoryItemType.finishedProduct) {
+      final product = item as ProductModel;
+      return ListTile(
+        leading: const Icon(Icons.inventory_2),
+        title: Text('${product.productCode} - ${product.name}',
+            textDirection: TextDirection.rtl,
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+      );
+    }
+
+    final code = _selectedType == InventoryItemType.rawMaterial
+        ? (item as RawMaterialModel).code
+        : (item as SparePartModel).code;
+    final name = _selectedType == InventoryItemType.rawMaterial
+        ? (item as RawMaterialModel).name
+        : (item as SparePartModel).name;
+    final id = _selectedType == InventoryItemType.rawMaterial
+        ? (item as RawMaterialModel).id
+        : (item as SparePartModel).id;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: ListTile(
+          leading: const CircleAvatar(child: Icon(Icons.inventory_2_outlined)),
+          title: Text(
+            '$code - $name',
+            textDirection: TextDirection.rtl,
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit, color: AppColors.primary),
+                onPressed: () {
+                  if (_selectedType == InventoryItemType.rawMaterial) {
+                    _showAddEditMaterialDialog(context, useCases, loc,
+                        material: item as RawMaterialModel);
+                  } else {
+                    _showAddEditSparePartDialog(context, useCases, loc,
+                        part: item as SparePartModel);
+                  }
+                },
+                tooltip: loc.edit,
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.redAccent),
+                onPressed: () {
+                  if (_selectedType == InventoryItemType.rawMaterial) {
+                    _showDeleteConfirmationDialog(context, useCases, loc, id, name);
+                  } else {
+                    _showDeletePartConfirmationDialog(context, useCases, loc, id, name);
+                  }
+                },
+                tooltip: loc.delete,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -351,6 +375,149 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddEditSparePartDialog(
+      BuildContext context,
+      InventoryUseCases useCases,
+      AppLocalizations appLocalizations, {
+        SparePartModel? part,
+      }) {
+    final isEditing = part != null;
+    final _codeController = TextEditingController(text: part?.code);
+    final _nameController = TextEditingController(text: part?.name);
+    final _unitController = TextEditingController(text: part?.unit);
+    final _formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(
+            isEditing ? appLocalizations.editRawMaterial : appLocalizations.addRawMaterial,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.materialName,
+                      border: const OutlineInputBorder(),
+                    ),
+                    validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _codeController,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.materialCode,
+                      border: const OutlineInputBorder(),
+                    ),
+                    validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _unitController,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.unitOfMeasurement,
+                      border: const OutlineInputBorder(),
+                    ),
+                    validator: (value) => value!.isEmpty ? appLocalizations.fieldRequired : null,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(appLocalizations.cancel),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            ElevatedButton.icon(
+              icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white),
+              label: Text(isEditing ? appLocalizations.save : appLocalizations.add),
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  if (isEditing) {
+                    await useCases.updateSparePart(
+                      id: part!.id,
+                      code: _codeController.text,
+                      name: _nameController.text,
+                      unit: _unitController.text,
+                    );
+                  } else {
+                    await useCases.addSparePart(
+                      code: _codeController.text,
+                      name: _nameController.text,
+                      unit: _unitController.text,
+                    );
+                  }
+                  if (context.mounted) Navigator.of(dialogContext).pop();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeletePartConfirmationDialog(
+      BuildContext context,
+      InventoryUseCases useCases,
+      AppLocalizations appLocalizations,
+      String partId,
+      String partName,
+      ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(appLocalizations.confirmDeletion,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Text(
+            '${appLocalizations.confirmDeleteMaterial}: "$partName"?\n\n${appLocalizations.thisActionCannotBeUndone}',
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
+          actions: <Widget>[
+            TextButton(
+              child: Text(appLocalizations.cancel),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.delete_forever),
+              label: Text(appLocalizations.delete),
+              onPressed: () async {
+                await useCases.deleteSparePart(partId);
+                if (context.mounted) Navigator.of(dialogContext).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
               ),
             ),
           ],
