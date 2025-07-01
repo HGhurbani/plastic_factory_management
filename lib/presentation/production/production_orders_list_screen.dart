@@ -22,6 +22,7 @@ class ProductionOrdersListScreen extends StatefulWidget {
 }
 
 class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen> {
+  String _selectedStatusFilter = 'all';
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +86,52 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildFilterChip(appLocalizations.all, 'all', _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                  _buildFilterChip(appLocalizations.pending, ProductionOrderStatus.pending.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                  _buildFilterChip(appLocalizations.approved, ProductionOrderStatus.approved.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                  _buildFilterChip(appLocalizations.inProduction, ProductionOrderStatus.inProduction.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                  _buildFilterChip(appLocalizations.completed, ProductionOrderStatus.completed.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                  _buildFilterChip(appLocalizations.canceled, ProductionOrderStatus.canceled.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                  _buildFilterChip(appLocalizations.rejected, ProductionOrderStatus.rejected.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: StreamBuilder<List<ProductionOrderModel>>(
               stream: productionUseCases.getProductionOrders(),
@@ -163,14 +210,18 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                 }
 
                 List<ProductionOrderModel> orders = snapshot.data!
-                    .where((order) =>
-                        order.orderPreparerRole ==
-                        UserRole.operationsOfficer.toFirestoreString())
+                    .where((order) => order.salesOrderId == null || order.salesOrderId!.isEmpty)
                     .toList();
 
-                final List<ProductionOrderModel> filteredOrders = isPreparer
+                List<ProductionOrderModel> filteredOrders = isPreparer
                     ? orders.where((order) => order.orderPreparerUid == currentUser.uid).toList()
                     : orders;
+
+                if (_selectedStatusFilter != 'all') {
+                  filteredOrders = filteredOrders
+                      .where((order) => order.status.toFirestoreString() == _selectedStatusFilter)
+                      .toList();
+                }
 
                 if (filteredOrders.isEmpty) {
                   return Center(
@@ -318,6 +369,38 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
       default:
         return Colors.grey.shade600;
     }
+  }
+
+  Widget _buildFilterChip(String label, String value, String selectedValue, Function(String) onSelected) {
+    final bool isSelected = selectedValue == value;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: ChoiceChip(
+        showCheckmark: false,
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected) Icon(Icons.check, size: 18, color: AppColors.primary),
+            if (isSelected) const SizedBox(width: 4),
+            Text(label),
+          ],
+        ),
+        selected: isSelected,
+        onSelected: (bool selected) {
+          if (selected) {
+            onSelected(value);
+          }
+        },
+        selectedColor: AppColors.primary.withOpacity(0.2),
+        labelStyle: TextStyle(
+          color: isSelected ? AppColors.primary : Colors.black87,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+        elevation: isSelected ? 0 : 1,
+        side: !isSelected ? BorderSide(color: AppColors.primary, width: 0.5) : BorderSide.none,
+      ),
+    );
   }
 
   Widget _buildInfoRow(String label, String value, {Color? textColor, bool isBold = false, IconData? icon}) {
