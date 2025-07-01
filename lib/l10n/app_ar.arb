@@ -9,6 +9,7 @@
   "factoryManager": "مدير المصنع",
   "productionManager": "مدير الإنتاج",
   "operationsOfficer": "مسؤول العمليات",
+  "productionOrderPreparer": "مسؤول إعداد طلبات الإنتاج",
   "moldInstallationSupervisor": "مشرف تركيب القوالب",
   "productionShiftSupervisor": "مشرف الوردية / مشرف الإنتاج",
   "machineOperator": "مشغل المكينة",
