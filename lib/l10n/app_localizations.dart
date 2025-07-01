@@ -406,6 +406,7 @@ class AppLocalizations {
   String get editTemplate => _strings["editTemplate"] ?? "editTemplate";
   String get templateCode => _strings["templateCode"] ?? "templateCode";
   String get templateName => _strings["templateName"] ?? "templateName";
+  String get templateDetails => _strings["templateDetails"] ?? "templateDetails";
   String get timeRequired => _strings["timeRequired"] ?? "timeRequired";
   String get percentage => _strings["percentage"] ?? "percentage";
   String get noTemplatesAvailable => _strings["noTemplatesAvailable"] ?? "noTemplatesAvailable";
