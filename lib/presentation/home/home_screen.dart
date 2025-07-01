@@ -664,8 +664,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       modules.add(_buildModuleButton(
         context: context,
-        title: appLocalizations.createSalesOrder,
-        subtitle: "إنشاء طلب مبيعات",
+        title: appLocalizations.salesModule,
+        subtitle: "وحدة المبيعات",
         icon: Icons.add_shopping_cart,
         color: moduleColors['sales']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.createSalesOrderRoute),
