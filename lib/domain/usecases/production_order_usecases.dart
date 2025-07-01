@@ -105,7 +105,22 @@ class ProductionOrderUseCases {
       currentStage: 'انتظار الموافقة', // المرحلة النشطة الحالية
       workflowStages: initialWorkflow,
     );
-    await repository.createProductionOrder(newOrder);
+    final createdOrder = await repository.createProductionOrder(newOrder);
+
+    if (orderPreparer.userRoleEnum == UserRole.operationsOfficer) {
+      await approveProductionOrder(createdOrder, orderPreparer);
+
+      final storekeepers =
+          await userUseCases.getUsersByRole(UserRole.inventoryManager);
+      for (final sk in storekeepers) {
+        await notificationUseCases.sendNotification(
+          userId: sk.uid,
+          title: 'تم إنشاء طلب إنتاج',
+          message:
+              'يرجى تجهيز المواد للطلب رقم ${createdOrder.batchNumber}',
+        );
+      }
+    }
   }
 
   // Create production orders from a sales order (one per item)

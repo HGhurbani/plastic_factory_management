@@ -25,7 +25,7 @@ class ProductionOrderRepositoryImpl implements ProductionOrderRepository {
   }
 
   @override
-  Future<void> createProductionOrder(ProductionOrderModel order) {
+  Future<ProductionOrderModel> createProductionOrder(ProductionOrderModel order) {
     return datasource.createProductionOrder(order);
   }
 

@@ -35,9 +35,12 @@ class ProductionOrderDatasource {
     return null;
   }
 
-  // Create a new production order
-  Future<void> createProductionOrder(ProductionOrderModel order) async {
-    await _firestore.collection('production_orders').add(order.toMap());
+  // Create a new production order and return it with generated ID
+  Future<ProductionOrderModel> createProductionOrder(
+      ProductionOrderModel order) async {
+    final docRef =
+        await _firestore.collection('production_orders').add(order.toMap());
+    return order.copyWith(id: docRef.id);
   }
 
   // Update an existing production order
