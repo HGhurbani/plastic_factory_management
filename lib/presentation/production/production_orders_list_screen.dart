@@ -22,9 +22,6 @@ class ProductionOrdersListScreen extends StatefulWidget {
 }
 
 class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen> {
-  String _selectedStatusFilter = 'all';
-  String _selectedSourceFilter = 'all';
-  String _selectedCreatorFilter = 'all';
 
   @override
   Widget build(BuildContext context) {
@@ -88,102 +85,6 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
       ),
       body: Column(
         children: [
-          if (isManager)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildFilterChip(appLocalizations.all, 'all', _selectedStatusFilter, (value) {
-                      setState(() {
-                        _selectedStatusFilter = value;
-                      });
-                    }),
-                    _buildFilterChip(appLocalizations.pending, ProductionOrderStatus.pending.toFirestoreString(), _selectedStatusFilter, (value) {
-                      setState(() {
-                        _selectedStatusFilter = value;
-                      });
-                    }),
-                    _buildFilterChip(appLocalizations.approved, ProductionOrderStatus.approved.toFirestoreString(), _selectedStatusFilter, (value) {
-                      setState(() {
-                        _selectedStatusFilter = value;
-                      });
-                    }),
-                    _buildFilterChip(appLocalizations.inProduction, ProductionOrderStatus.inProduction.toFirestoreString(), _selectedStatusFilter, (value) {
-                      setState(() {
-                        _selectedStatusFilter = value;
-                      });
-                    }),
-                    _buildFilterChip(appLocalizations.completed, ProductionOrderStatus.completed.toFirestoreString(), _selectedStatusFilter, (value) {
-                      setState(() {
-                        _selectedStatusFilter = value;
-                      });
-                    }),
-                    _buildFilterChip(appLocalizations.reject, ProductionOrderStatus.rejected.toFirestoreString(), _selectedStatusFilter, (value) {
-                      setState(() {
-                        _selectedStatusFilter = value;
-                      });
-                    }),
-                    _buildFilterChip(appLocalizations.canceled, ProductionOrderStatus.canceled.toFirestoreString(), _selectedStatusFilter, (value) {
-                      setState(() {
-                        _selectedStatusFilter = value;
-                      });
-                    }),
-                  ],
-                ),
-              ),
-            ),
-          if (isManager)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildFilterChip(appLocalizations.all, 'all', _selectedSourceFilter, (value) {
-                      setState(() {
-                        _selectedSourceFilter = value;
-                      });
-                    }),
-                    _buildFilterChip(appLocalizations.directProductionOrders, 'direct', _selectedSourceFilter, (value) {
-                      setState(() {
-                        _selectedSourceFilter = value;
-                      });
-                    }),
-                    _buildFilterChip(appLocalizations.productionOrdersFromSales, 'sales', _selectedSourceFilter, (value) {
-                      setState(() {
-                        _selectedSourceFilter = value;
-                      });
-                    }),
-                  ],
-                ),
-              ),
-            ),
-          if (isManager)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildFilterChip(appLocalizations.all, 'all', _selectedCreatorFilter, (value) {
-                      setState(() {
-                        _selectedCreatorFilter = value;
-                      });
-                    }),
-                    _buildFilterChip(appLocalizations.operationsOfficer, 'operations', _selectedCreatorFilter, (value) {
-                      setState(() {
-                        _selectedCreatorFilter = value;
-                      });
-                    }),
-                  ],
-                ),
-              ),
-            ),
           Expanded(
             child: StreamBuilder<List<ProductionOrderModel>>(
               stream: productionUseCases.getProductionOrders(),
@@ -261,30 +162,11 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                   );
                 }
 
-                List<ProductionOrderModel> orders = snapshot.data!;
-
-                if (_selectedStatusFilter != 'all') {
-                  orders = orders
-                      .where((order) =>
-                          order.status.toFirestoreString() == _selectedStatusFilter)
-                      .toList();
-                }
-
-                if (_selectedSourceFilter == 'direct') {
-                  orders = orders
-                      .where((order) => order.salesOrderId == null || order.salesOrderId!.isEmpty)
-                      .toList();
-                } else if (_selectedSourceFilter == 'sales') {
-                  orders = orders
-                      .where((order) => order.salesOrderId != null && order.salesOrderId!.isNotEmpty)
-                      .toList();
-                }
-
-                if (_selectedCreatorFilter == 'operations') {
-                  orders = orders
-                      .where((order) => order.orderPreparerRole == UserRole.operationsOfficer.toFirestoreString())
-                      .toList();
-                }
+                List<ProductionOrderModel> orders = snapshot.data!
+                    .where((order) =>
+                        order.orderPreparerRole ==
+                        UserRole.operationsOfficer.toFirestoreString())
+                    .toList();
 
                 final List<ProductionOrderModel> filteredOrders = isPreparer
                     ? orders.where((order) => order.orderPreparerUid == currentUser.uid).toList()
@@ -419,26 +301,6 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
     );
   }
 
-  Widget _buildFilterChip(String label, String value, String selectedValue, Function(String) onSelected) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: selectedValue == value,
-        onSelected: (bool selected) {
-          if (selected) {
-            onSelected(value);
-          }
-        },
-        selectedColor: AppColors.primary.withOpacity(0.2), // Use AppColors for selected color
-        labelStyle: TextStyle(
-          color: selectedValue == value ? AppColors.primary : Colors.black87,
-          fontWeight: selectedValue == value ? FontWeight.bold : FontWeight.normal,
-        ),
-        elevation: selectedValue == value ? 0 : 1, // Add elevation when selected
-      ),
-    );
-  }
 
   Color _getStatusColor(ProductionOrderStatus status) {
     switch (status) {
