@@ -158,6 +158,7 @@ class ProductionOrderModel {
   final String? salesOrderId; // If this order was generated from a sales order
   final String orderPreparerUid; // UID of the user who prepared the order
   final String orderPreparerName;
+  final String orderPreparerRole; // Role of the user who prepared the order
   final ProductionOrderStatus status; // Current overall status of the order (enum)
   final Timestamp createdAt;
   final String? approvedByUid; // UID of the manager who approved/rejected the order
@@ -175,6 +176,7 @@ class ProductionOrderModel {
     this.salesOrderId,
     required this.orderPreparerUid,
     required this.orderPreparerName,
+    required this.orderPreparerRole,
     required this.status,
     required this.createdAt,
     this.approvedByUid,
@@ -195,6 +197,7 @@ class ProductionOrderModel {
       salesOrderId: data['salesOrderId'],
       orderPreparerUid: data['orderPreparerUid'] ?? '',
       orderPreparerName: data['orderPreparerName'] ?? '',
+      orderPreparerRole: data['orderPreparerRole'] ?? 'unknown',
       status: ProductionOrderStatusExtension.fromString(data['status'] ?? 'pending'),
       createdAt: data['createdAt'] ?? Timestamp.now(),
       approvedByUid: data['approvedByUid'],
@@ -217,6 +220,7 @@ class ProductionOrderModel {
       'salesOrderId': salesOrderId,
       'orderPreparerUid': orderPreparerUid,
       'orderPreparerName': orderPreparerName,
+      'orderPreparerRole': orderPreparerRole,
       'status': status.toFirestoreString(),
       'createdAt': createdAt,
       'approvedByUid': approvedByUid,
@@ -237,6 +241,7 @@ class ProductionOrderModel {
     String? salesOrderId,
     String? orderPreparerUid,
     String? orderPreparerName,
+    String? orderPreparerRole,
     ProductionOrderStatus? status,
     Timestamp? createdAt,
     String? approvedByUid,
@@ -254,6 +259,7 @@ class ProductionOrderModel {
       salesOrderId: salesOrderId ?? this.salesOrderId,
       orderPreparerUid: orderPreparerUid ?? this.orderPreparerUid,
       orderPreparerName: orderPreparerName ?? this.orderPreparerName,
+      orderPreparerRole: orderPreparerRole ?? this.orderPreparerRole,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       approvedByUid: approvedByUid ?? this.approvedByUid,
