@@ -408,6 +408,11 @@ class AppLocalizations {
   String get percentage => _strings["percentage"] ?? "percentage";
   String get noTemplatesAvailable => _strings["noTemplatesAvailable"] ?? "noTemplatesAvailable";
   String get tapToAddFirstTemplate => _strings["tapToAddFirstTemplate"] ?? "tapToAddFirstTemplate";
+  String get returns => _strings["returns"] ?? "returns";
+  String get delivery => _strings["delivery"] ?? "delivery";
+  String get reports => _strings["reports"] ?? "reports";
+  String get procurement => _strings["procurement"] ?? "procurement";
+  String get documentCenter => _strings["documentCenter"] ?? "documentCenter";
 
 
 }

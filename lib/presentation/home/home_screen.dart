@@ -282,6 +282,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'management': const Color(0xFF5D4037),
       'quality': const Color(0xFF0097A7),
       'accounting': const Color(0xFF455A64),
+      'returns': const Color(0xFF795548),
+      'delivery': const Color(0xFF00838F),
+      'reports': const Color(0xFF512DA8),
+      'procurement': const Color(0xFF388E3C),
+      'documents': const Color(0xFF283593),
     };
 
     // Modules for Factory Manager (مدير المصنع) - Full Access
@@ -377,6 +382,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         icon: Icons.manage_accounts,
         color: moduleColors['management']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.userManagementRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.returns,
+        subtitle: "إدارة المرتجعات",
+        icon: Icons.assignment_return,
+        color: moduleColors['returns']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.returnsRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.delivery,
+        subtitle: "شحن المنتجات",
+        icon: Icons.local_shipping,
+        color: moduleColors['delivery']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.deliveryRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.reports,
+        subtitle: "التقارير والإحصائيات",
+        icon: Icons.bar_chart,
+        color: moduleColors['reports']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.reportsRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.procurement,
+        subtitle: "إدارة المشتريات",
+        icon: Icons.shopping_bag,
+        color: moduleColors['procurement']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.procurementRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.documentCenter,
+        subtitle: "توثيق وسياسات",
+        icon: Icons.policy,
+        color: moduleColors['documents']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.documentsCenterRoute),
       ));
     }
 

@@ -22,6 +22,11 @@ import 'package:plastic_factory_management/presentation/inventory/warehouse_requ
 import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
 import 'package:plastic_factory_management/presentation/notifications/notifications_screen.dart';
 import 'package:plastic_factory_management/presentation/management/user_management_screen.dart';
+import 'package:plastic_factory_management/presentation/management/returns_screen.dart';
+import 'package:plastic_factory_management/presentation/management/delivery_screen.dart';
+import 'package:plastic_factory_management/presentation/management/reports_screen.dart';
+import 'package:plastic_factory_management/presentation/management/procurement_screen.dart';
+import 'package:plastic_factory_management/presentation/management/documents_center_screen.dart';
 
 
 class AppRouter {
@@ -45,6 +50,11 @@ class AppRouter {
   static const String warehouseRequestsRoute = '/inventory/warehouse_requests';
   static const String accountingRoute = '/accounting';
   static const String userManagementRoute = '/management/users';
+  static const String returnsRoute = '/management/returns';
+  static const String deliveryRoute = '/management/delivery';
+  static const String reportsRoute = '/management/reports';
+  static const String procurementRoute = '/management/procurement';
+  static const String documentsCenterRoute = '/management/documents';
   static const String notificationsRoute = '/notifications';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -87,6 +97,16 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => AccountingScreen());
       case userManagementRoute:
         return MaterialPageRoute(builder: (_) => UserManagementScreen());
+      case returnsRoute:
+        return MaterialPageRoute(builder: (_) => ReturnsScreen());
+      case deliveryRoute:
+        return MaterialPageRoute(builder: (_) => DeliveryScreen());
+      case reportsRoute:
+        return MaterialPageRoute(builder: (_) => ReportsScreen());
+      case procurementRoute:
+        return MaterialPageRoute(builder: (_) => ProcurementScreen());
+      case documentsCenterRoute:
+        return MaterialPageRoute(builder: (_) => DocumentsCenterScreen());
       case termsRoute:
         final uid = settings.arguments as String;
         return MaterialPageRoute(

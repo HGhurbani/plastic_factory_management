@@ -421,5 +421,10 @@
   "tryAgain": "Try Again",
   "clearFilter": "Clear Filter",
   "orderId": "Order ID",
+  "returns": "Returns",
+  "delivery": "Delivery",
+  "reports": "Reports",
+  "procurement": "Procurement",
+  "documentCenter": "Documents & Policies",
   "unknown": "Unknown"
 }

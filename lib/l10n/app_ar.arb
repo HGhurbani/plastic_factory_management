@@ -414,5 +414,10 @@
   "login": "تسجيل الدخول",
   "tryAgain": "حاول مرة أخرى",
   "clearFilter": "مسح الفلتر",
-  "orderId": "رقم الطلب"
+  "orderId": "رقم الطلب",
+  "returns": "المرتجع",
+  "delivery": "التوصيل",
+  "reports": "التقارير",
+  "procurement": "المشتريات",
+  "documentCenter": "مركز الوثائق والسياسات"
 }
