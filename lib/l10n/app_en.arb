@@ -93,6 +93,7 @@
   "editTemplate": "تعديل قالب",
   "templateCode": "كود القالب",
   "templateName": "اسم القالب",
+  "templateDetails": "تفاصيل القالب",
   "timeRequired": "الوقت المستغرق",
   "percentage": "النسبة",
   "noTemplatesAvailable": "لا توجد قوالب متاحة.",

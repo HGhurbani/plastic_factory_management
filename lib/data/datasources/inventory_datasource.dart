@@ -36,6 +36,14 @@ class InventoryDatasource {
     await _firestore.collection('templates').doc(templateId).delete();
   }
 
+  Future<TemplateModel?> getTemplateById(String templateId) async {
+    final doc = await _firestore.collection('templates').doc(templateId).get();
+    if (doc.exists) {
+      return TemplateModel.fromDocumentSnapshot(doc);
+    }
+    return null;
+  }
+
   // --- Raw Materials Operations ---
 
   Stream<List<RawMaterialModel>> getRawMaterials() {

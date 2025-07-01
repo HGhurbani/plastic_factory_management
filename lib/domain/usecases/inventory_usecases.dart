@@ -108,6 +108,10 @@ class InventoryUseCases {
     await repository.deleteTemplate(templateId);
   }
 
+  Future<TemplateModel?> getTemplateById(String templateId) {
+    return repository.getTemplateById(templateId);
+  }
+
   Future<List<TemplateModel>> getTemplatesByIds(List<String> ids) async {
     final all = await repository.getTemplates().first;
     return all.where((t) => ids.contains(t.id)).toList();
