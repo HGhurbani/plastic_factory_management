@@ -438,6 +438,7 @@
   "procurement": "Procurement Module",
   "documentCenter": "Documents & Policies",
   "addInventoryEntry": "إضافة حركة مخزون",
+  "addInventoryItem": "إضافة صنف مخزون",
   "selectInventoryType": "اختر نوع المخزون",
   "selectItem": "اختر الصنف",
   "unknown": "Unknown"
