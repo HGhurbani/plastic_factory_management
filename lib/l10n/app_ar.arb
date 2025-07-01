@@ -66,7 +66,7 @@
   "noTemplatesAvailable": "لا توجد قوالب متاحة.",
   "tapToAddFirstTemplate": "اضغط على زر '+' لإضافة أول قالب.",
 
-  "productionBoard": "لوحة الإنتاج",
+  "productionBoard": "وحدة الإنتاج",
   "issueProductionOrders": "إصدار أوامر الإنتاج وربطها بالقوالب والماكينات",
   "trackDefectsShifts": "تتبع التالف والورديات ومراقبة الأداء",
   "logMoldReceipt": "تسجيل استلام القوالب، التوجيه، التشغيل والتسليم",
@@ -105,7 +105,7 @@
   "salesModule": "وحدة المبيعات",
   "inventoryModule": "وحدة المخزون",
   "qualityModule": "وحدة مراقبة الجودة",
-  "accountingModule": "المالية",
+  "accountingModule": "وحدة المالية",
   "customerManagement": "إدارة العملاء",
   "registerNewCustomer": "تسجيل بيانات عميل جديد",
   "enterCustomerCode": "إدخال كود العميل",
