@@ -134,6 +134,7 @@ class MyApp extends StatelessWidget {
             Provider.of<ProductionOrderRepositoryImpl>(context, listen: false),
             Provider.of<NotificationUseCases>(context, listen: false),
             Provider.of<UserUseCases>(context, listen: false),
+            Provider.of<InventoryUseCases>(context, listen: false),
           ),
         ),
         // توفير Inventory Dependencies
@@ -148,6 +149,8 @@ class MyApp extends StatelessWidget {
         Provider<InventoryUseCases>(
           create: (context) => InventoryUseCases(
             Provider.of<InventoryRepositoryImpl>(context, listen: false),
+            Provider.of<NotificationUseCases>(context, listen: false),
+            Provider.of<UserUseCases>(context, listen: false),
           ),
         ),
         // توفير Machinery & Operator Dependencies

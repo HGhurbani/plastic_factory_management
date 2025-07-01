@@ -26,59 +26,18 @@ class InventoryManagementScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
+              icon: const Icon(Icons.inventory_2_outlined),
+              label: Text(appLocalizations.finishedProducts),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRouter.finishedProductsRoute),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
               icon: const Icon(Icons.build_circle_outlined),
-              label: const Text('قطع الغيار', textDirection: TextDirection.rtl),
+              label: Text(appLocalizations.spareParts),
               onPressed: () =>
                   Navigator.of(context).pushNamed(AppRouter.sparePartsRoute),
             ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.category),
-              label: Text(appLocalizations.productCatalog),
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRouter.productCatalogRoute),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.view_module),
-              label: Text(appLocalizations.templates),
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRouter.templatesRoute),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.local_shipping),
-              label: Text(appLocalizations.warehouseRequests),
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRouter.warehouseRequestsRoute),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.add_circle_outline),
-              label: Text(appLocalizations.addInventoryItem),
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRouter.inventoryAddItemRoute),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.add),
-              label: Text(appLocalizations.addInventoryEntry),
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(AppRouter.inventoryAdjustmentRoute),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.inventory_2_outlined),
-              label: const Text('استلام المنتجات الجاهزة', textDirection: TextDirection.rtl),
-              onPressed: () {},
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.local_shipping_outlined),
-              label: const Text('صرف طلبات المبيعات', textDirection: TextDirection.rtl),
-              onPressed: () {},
-            ),
-
           ],
         ),
       ),

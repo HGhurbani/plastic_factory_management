@@ -12,6 +12,8 @@ import 'notification_usecases.dart';
 import 'user_usecases.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/core/services/file_upload_service.dart';
+import 'inventory_usecases.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 
 class SalesUseCases {
   final SalesRepository repository;
@@ -236,7 +238,8 @@ class SalesUseCases {
   }
 
   // Production manager approves supply
-  Future<void> approveSupply(SalesOrderModel order, UserModel manager) async {
+  Future<void> approveSupply(SalesOrderModel order, UserModel manager,
+      InventoryUseCases inventoryUseCases) async {
     final updated = order.copyWith(
       status: SalesOrderStatus.fulfilled,
       productionManagerUid: manager.uid,
@@ -251,6 +254,15 @@ class SalesUseCases {
         userId: rep.uid,
         title: 'تم اعتماد توريد الطلب',
         message: 'تم اعتماد توريد طلب العميل ${order.customerName}',
+      );
+    }
+
+    for (final item in order.orderItems) {
+      await inventoryUseCases.adjustInventoryWithNotification(
+        itemId: item.productId,
+        itemName: item.productName,
+        type: InventoryItemType.finishedProduct,
+        delta: -item.quantity.toDouble(),
       );
     }
   }

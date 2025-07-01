@@ -9,21 +9,24 @@ import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 import 'package:plastic_factory_management/data/repositories/production_order_repository.dart';
 import 'package:plastic_factory_management/core/services/file_upload_service.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'notification_usecases.dart';
 import 'user_usecases.dart';
+import 'inventory_usecases.dart';
 import 'dart:io'; // لاستخدام File
 
 class ProductionOrderUseCases {
   final ProductionOrderRepository repository;
   final NotificationUseCases notificationUseCases;
   final UserUseCases userUseCases;
+  final InventoryUseCases inventoryUseCases;
   final FileUploadService _uploadService = FileUploadService();
 
   ProductionOrderUseCases(
-      this.repository, this.notificationUseCases, this.userUseCases);
+      this.repository, this.notificationUseCases, this.userUseCases, this.inventoryUseCases);
 
   Stream<List<ProductionOrderModel>> getProductionOrders() {
     return repository.getProductionOrders();
@@ -478,6 +481,12 @@ class ProductionOrderUseCases {
     } else if (stageName == 'تسليم للمخزون') {
       newOverallStatus = ProductionOrderStatus.completed;
       nextStageName = 'مكتمل'; // No further stages
+      await inventoryUseCases.adjustInventoryWithNotification(
+        itemId: order.productId,
+        itemName: order.productName,
+        type: InventoryItemType.finishedProduct,
+        delta: order.requiredQuantity.toDouble(),
+      );
     }
 
     final updatedOrder = order.copyWith(

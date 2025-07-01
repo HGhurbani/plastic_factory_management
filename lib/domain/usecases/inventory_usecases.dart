@@ -7,14 +7,18 @@ import 'package:plastic_factory_management/data/models/spare_part_model.dart';
 import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 import 'package:plastic_factory_management/domain/repositories/inventory_repository.dart';
 import 'package:plastic_factory_management/domain/usecases/notification_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
+import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart'; // لاستخدام Timestamp
 
 class InventoryUseCases {
   final InventoryRepository repository;
+  final NotificationUseCases notificationUseCases;
+  final UserUseCases userUseCases;
 
-  InventoryUseCases(this.repository);
+  InventoryUseCases(this.repository, this.notificationUseCases, this.userUseCases);
 
   // --- Raw Materials Use Cases ---
 
@@ -270,9 +274,7 @@ class InventoryUseCases {
     required String itemId,
     required InventoryItemType type,
     required double delta,
-    required String userId,
     required String itemName,
-    required NotificationUseCases notificationUseCases,
   }) async {
     await adjustInventory(itemId: itemId, type: type, delta: delta);
     final balances = await repository.getInventoryBalances(type).first;
@@ -287,11 +289,22 @@ class InventoryUseCases {
       ),
     );
     if (record.quantity <= record.minQuantity) {
-      await notificationUseCases.sendNotification(
-        userId: userId,
-        title: 'Low Inventory',
-        message: '$itemName is below minimum quantity',
-      );
+      final roles = [
+        UserRole.productionManager,
+        UserRole.salesRepresentative,
+        UserRole.maintenanceManager,
+        UserRole.inventoryManager,
+      ];
+      for (final role in roles) {
+        final users = await userUseCases.getUsersByRole(role);
+        for (final u in users) {
+          await notificationUseCases.sendNotification(
+            userId: u.uid,
+            title: 'نقص المخزون',
+            message: '$itemName أقل من الحد المسموح',
+          );
+        }
+      }
     }
   }
 }

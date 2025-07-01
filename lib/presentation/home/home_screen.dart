@@ -462,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       modules.add(_buildModuleButton(
         context: context,
         title: appLocalizations.rawMaterials,
-        subtitle: "المواد الخام",
+        subtitle: "إدارة المواد الخام",
         icon: Icons.warehouse,
         color: moduleColors['inventory']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.rawMaterialsRoute),
@@ -470,11 +470,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       modules.add(_buildModuleButton(
         context: context,
-        title: appLocalizations.productCatalog,
-        subtitle: "كتالوج المنتجات",
-        icon: Icons.category,
+        title: appLocalizations.finishedProducts,
+        subtitle: "الإنتاج التام",
+        icon: Icons.inventory_2,
         color: moduleColors['inventory']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productCatalogRoute),
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.finishedProductsRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.spareParts,
+        subtitle: "قطع الغيار",
+        icon: Icons.build_circle_outlined,
+        color: moduleColors['inventory']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.sparePartsRoute),
       ));
 
       modules.add(_buildModuleButton(
