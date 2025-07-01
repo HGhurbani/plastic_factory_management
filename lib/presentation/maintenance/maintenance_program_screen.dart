@@ -48,7 +48,7 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
         ),
-        body: Center(child: Text('لا يمكن عرض برنامج الصيانة بدون بيانات المستخدم.')),
+        body: Center(child: Text('لا يمكن عرض وحدة الصيانة بدون بيانات المستخدم.')),
       );
     }
 

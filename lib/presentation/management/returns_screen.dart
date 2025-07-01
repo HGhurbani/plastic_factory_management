@@ -14,7 +14,7 @@ class ReturnsScreen extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-          'هنا يمكن إدارة عمليات المرتجع',
+          'هنا يمكن إدارة وحدة المرتجع',
           textDirection: TextDirection.rtl,
         ),
       ),
