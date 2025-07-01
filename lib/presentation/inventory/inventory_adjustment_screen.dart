@@ -17,6 +17,7 @@ class InventoryAdjustmentScreen extends StatefulWidget {
 class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
   InventoryItemType? _type;
   String? _itemId;
+  String? _itemName;
   final TextEditingController _qtyController = TextEditingController();
 
   @override
@@ -69,15 +70,20 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
+                  final items = snapshot.data!;
                   return DropdownButtonFormField<String>(
                     decoration: InputDecoration(labelText: appLocalizations.selectItem),
                     value: _itemId,
-                    items: snapshot.data!
+                    items: items
                         .map<DropdownMenuItem<String>>(
                           (e) => DropdownMenuItem(value: _getId(e), child: Text(_getName(e))),
                         )
                         .toList(),
-                    onChanged: (value) => setState(() => _itemId = value),
+                    onChanged: (value) => setState(() {
+                      _itemId = value;
+                      final itm = items.firstWhere((e) => _getId(e) == value);
+                      _itemName = _getName(itm);
+                    }),
                   );
                 },
               ),
@@ -92,7 +98,12 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
               onPressed: _type != null && _itemId != null && _qtyController.text.isNotEmpty
                   ? () async {
                       final qty = double.tryParse(_qtyController.text) ?? 0;
-                      await useCases.adjustInventory(itemId: _itemId!, type: _type!, delta: qty);
+                      await useCases.adjustInventoryWithNotification(
+                        itemId: _itemId!,
+                        itemName: _itemName ?? '',
+                        type: _type!,
+                        delta: qty,
+                      );
                       if (mounted) Navigator.of(context).pop();
                     }
                   : null,

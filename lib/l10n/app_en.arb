@@ -441,5 +441,8 @@
   "addInventoryItem": "إضافة صنف مخزون",
   "selectInventoryType": "اختر نوع المخزون",
   "selectItem": "اختر الصنف",
+  "finishedProducts": "Finished Products",
+  "spareParts": "Spare Parts",
+  "noData": "No data",
   "unknown": "Unknown"
 }
