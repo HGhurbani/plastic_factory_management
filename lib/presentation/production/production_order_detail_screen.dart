@@ -15,6 +15,7 @@ import 'package:signature/signature.dart'; // للتوقيع الرقمي
 import 'dart:io'; // لاستخدام File
 import 'dart:typed_data'; // لاستخدام Uint8List
 import 'package:flutter/foundation.dart';
+import 'package:plastic_factory_management/theme/app_colors.dart';
 
 // شاشة تفاصيل طلب الإنتاج
 class ProductionOrderDetailScreen extends StatefulWidget {
@@ -179,22 +180,31 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
         title: Text('${appLocalizations.productionOrder}: ${widget.order.batchNumber}'),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+      body: Directionality(
+        textDirection: TextDirection.rtl,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow(appLocalizations.product, widget.order.productName),
-            _buildDetailRow(appLocalizations.requiredQuantity, widget.order.requiredQuantity.toString()),
-            _buildDetailRow(appLocalizations.batchNumber, widget.order.batchNumber),
-            _buildDetailRow(appLocalizations.orderPreparer, widget.order.orderPreparerName),
+            _buildDetailRow(appLocalizations.product, widget.order.productName,
+                icon: Icons.inventory_2),
+            _buildDetailRow(appLocalizations.requiredQuantity, widget.order.requiredQuantity.toString(),
+                icon: Icons.format_list_numbered),
+            _buildDetailRow(appLocalizations.batchNumber, widget.order.batchNumber,
+                icon: Icons.confirmation_number),
+            _buildDetailRow(appLocalizations.orderPreparer, widget.order.orderPreparerName,
+                icon: Icons.person),
             _buildDetailRow(appLocalizations.status, widget.order.status.toArabicString(),
-                textColor: _getStatusColor(widget.order.status), isBold: true),
+                textColor: _getStatusColor(widget.order.status), isBold: true, icon: Icons.info_outline),
             _buildDetailRow('تاريخ الإنشاء',
-                intl.DateFormat('yyyy-MM-dd HH:mm').format(widget.order.createdAt.toDate())),
+                intl.DateFormat('yyyy-MM-dd HH:mm').format(widget.order.createdAt.toDate()),
+                icon: Icons.date_range),
             if (widget.order.rejectionReason != null && widget.order.rejectionReason!.isNotEmpty)
-              _buildDetailRow(appLocalizations.rejectionReason, widget.order.rejectionReason!, textColor: Colors.red),
-            _buildDetailRow(appLocalizations.currentStage, widget.order.currentStage),
+              _buildDetailRow(appLocalizations.rejectionReason, widget.order.rejectionReason!,
+                  textColor: Colors.red, icon: Icons.cancel),
+            _buildDetailRow(appLocalizations.currentStage, widget.order.currentStage,
+                icon: Icons.engineering),
 
             Divider(height: 32),
             Text(
@@ -209,7 +219,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         stage.stageName,
@@ -237,7 +247,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('التوقيع:', style: TextStyle(fontWeight: FontWeight.w600)),
                                 SizedBox(height: 4),
@@ -257,7 +267,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('المرفقات:', style: TextStyle(fontWeight: FontWeight.w600)),
                                 SizedBox(height: 4),
@@ -303,31 +313,39 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {Color? textColor, bool isBold = false}) {
+  Widget _buildDetailRow(String label, String value,
+      {Color? textColor, bool isBold = false, IconData? icon}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16,
-              color: textColor,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            ),
-            textAlign: TextAlign.right,
-            textDirection: TextDirection.rtl,
-          ),
-          SizedBox(width: 8),
+          if (icon != null) ...[
+            const SizedBox(width: 8),
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+          ],
+          const SizedBox(width: 8),
           Text(
             '$label:',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                color: textColor ?? Colors.black87,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
+              textAlign: TextAlign.right,
+              textDirection: TextDirection.rtl,
+            ),
           ),
         ],
       ),
@@ -433,7 +451,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                     ),
                     _pickedImages.isNotEmpty
                         ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 8),
                         Text(appLocalizations.attachedImages, style: TextStyle(fontWeight: FontWeight.bold)), // Add to ARB
@@ -472,7 +490,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                     SizedBox(height: 16),
                     if (requiresSignature)
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(appLocalizations.customerSignature, style: TextStyle(fontWeight: FontWeight.bold)), // Reuse text
                           SizedBox(height: 8),
@@ -803,7 +821,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                     ),
                     _pickedImages.isNotEmpty
                         ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 8),
                         Text(appLocalizations.attachedImages, style: TextStyle(fontWeight: FontWeight.bold)),
@@ -842,7 +860,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                     SizedBox(height: 16),
                     if (requiresSignature)
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(appLocalizations.customerSignature, style: TextStyle(fontWeight: FontWeight.bold)),
                           SizedBox(height: 8),
