@@ -497,8 +497,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ));
     }
 
-    // Modules for Production Order Preparer (مسؤول إعداد طلبات الإنتاج)
-    if (role == UserRole.productionOrderPreparer) {
+    // Modules for Operations Officer (مسؤول العمليات)
+    if (role == UserRole.operationsOfficer) {
       modules.add(_buildModuleButton(
         context: context,
         title: appLocalizations.createOrder,

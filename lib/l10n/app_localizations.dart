@@ -25,7 +25,7 @@ class AppLocalizations {
   String get loginErrorGeneric => _strings["loginErrorGeneric"] ?? "loginErrorGeneric";
   String get factoryManager => _strings["factoryManager"] ?? "factoryManager";
   String get productionManager => _strings["productionManager"] ?? "productionManager";
-  String get productionOrderPreparer => _strings["productionOrderPreparer"] ?? "productionOrderPreparer";
+  String get operationsOfficer => _strings["operationsOfficer"] ?? "operationsOfficer";
   String get moldInstallationSupervisor => _strings["moldInstallationSupervisor"] ?? "moldInstallationSupervisor";
   String get productionShiftSupervisor => _strings["productionShiftSupervisor"] ?? "productionShiftSupervisor";
   String get machineOperator => _strings["machineOperator"] ?? "machineOperator";

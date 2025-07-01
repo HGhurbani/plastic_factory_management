@@ -242,7 +242,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         return Colors.orange.shade700;
       case UserRole.inventoryManager:
         return Colors.teal.shade700;
-      case UserRole.productionOrderPreparer:
+      case UserRole.operationsOfficer:
         return Colors.indigo.shade700;
       case UserRole.moldInstallationSupervisor:
         return Colors.brown.shade700;
