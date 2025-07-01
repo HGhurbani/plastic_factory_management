@@ -190,11 +190,8 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
             _buildDetailRow(appLocalizations.orderPreparer, widget.order.orderPreparerName),
             _buildDetailRow(appLocalizations.status, widget.order.status.toArabicString(),
                 textColor: _getStatusColor(widget.order.status), isBold: true),
-            _buildDetailRow('تاريخ الإنشاء', intl.DateFormat('yyyy-MM-dd HH:mm').format(widget.order.createdAt.toDate())),
-            if (widget.order.approvedAt != null)
-              _buildDetailRow(
-                  'تاريخ الاعتماد',
-                  '${intl.DateFormat('yyyy-MM-dd HH:mm').format(widget.order.approvedAt!.toDate())} بواسطة ${widget.order.approvedByUid ?? 'مجهول'}'),
+            _buildDetailRow('تاريخ الإنشاء',
+                intl.DateFormat('yyyy-MM-dd HH:mm').format(widget.order.createdAt.toDate())),
             if (widget.order.rejectionReason != null && widget.order.rejectionReason!.isNotEmpty)
               _buildDetailRow(appLocalizations.rejectionReason, widget.order.rejectionReason!, textColor: Colors.red),
             _buildDetailRow(appLocalizations.currentStage, widget.order.currentStage),
