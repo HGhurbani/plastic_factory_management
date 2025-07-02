@@ -502,5 +502,8 @@
   "importTemplates": "استيراد القوالب",
   "importMachines": "استيراد ملفات المكائن",
   "importOperators": "استيراد ملفات المشغلين",
-  "fileImportedSuccessfully": "تم استيراد الملف بنجاح"
+  "fileImportedSuccessfully": "تم استيراد الملف بنجاح",
+  "mapColumnsTitle": "تعيين أعمدة إكسل",
+  "selectColumnForField": "اختر العمود لحقل {field}",
+  "importAction": "استيراد"
 }
