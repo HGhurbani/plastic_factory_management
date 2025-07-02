@@ -47,6 +47,9 @@ import 'package:plastic_factory_management/domain/usecases/financial_usecases.da
 import 'package:plastic_factory_management/data/datasources/quality_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/quality_repository_impl.dart';
 import 'package:plastic_factory_management/domain/usecases/quality_usecases.dart';
+import 'package:plastic_factory_management/data/datasources/procurement_datasource.dart';
+import 'package:plastic_factory_management/data/repositories/procurement_repository_impl.dart';
+import 'package:plastic_factory_management/domain/usecases/procurement_usecases.dart';
 // استيرادات Notifications
 import 'package:plastic_factory_management/data/datasources/notification_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/notification_repository_impl.dart';
@@ -217,6 +220,21 @@ class MyApp extends StatelessWidget {
           create: (context) => FinancialUseCases(
             Provider.of<FinancialRepositoryImpl>(context, listen: false),
             Provider.of<SalesRepositoryImpl>(context, listen: false),
+          ),
+        ),
+        // Procurement dependencies
+        Provider<ProcurementDatasource>(
+          create: (_) => ProcurementDatasource(),
+        ),
+        Provider<ProcurementRepositoryImpl>(
+          create: (context) => ProcurementRepositoryImpl(
+            Provider.of<ProcurementDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<ProcurementUseCases>(
+          create: (context) => ProcurementUseCases(
+            Provider.of<ProcurementRepositoryImpl>(context, listen: false),
+            Provider.of<InventoryUseCases>(context, listen: false),
           ),
         ),
         // Quality Control dependencies
