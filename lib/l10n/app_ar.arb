@@ -441,5 +441,8 @@
   "noData": "لا توجد بيانات",
   "creditLimit": "الحد الائتماني",
   "currentDebt": "المديونية الحالية",
-  "creditLimitExceeded": "لا يمكن اعتماد الطلب لتجاوز المديونية الحد الائتماني"
+  "creditLimitExceeded": "لا يمكن اعتماد الطلب لتجاوز المديونية الحد الائتماني",
+  "paymentsManagement": "إدارة الدفعات",
+  "purchasesManagement": "إدارة المشتريات",
+  "sparePartRequests": "طلبات قطع الغيار",
 }
