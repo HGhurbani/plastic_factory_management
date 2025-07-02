@@ -438,6 +438,11 @@ class AppLocalizations {
   String get paymentsManagement => _strings["paymentsManagement"] ?? "paymentsManagement";
   String get purchasesManagement => _strings["purchasesManagement"] ?? "purchasesManagement";
   String get sparePartRequests => _strings["sparePartRequests"] ?? "sparePartRequests";
+  String get purchaseRequests => _strings["purchaseRequests"] ?? "purchaseRequests";
+  String get addPurchaseRequest => _strings["addPurchaseRequest"] ?? "addPurchaseRequest";
+  String get inventoryReview => _strings["inventoryReview"] ?? "inventoryReview";
+  String get sendToSuppliers => _strings["sendToSuppliers"] ?? "sendToSuppliers";
+  String get financialApproval => _strings["financialApproval"] ?? "financialApproval";
   String get recordPayment => _strings["recordPayment"] ?? "recordPayment";
   String get addPurchase => _strings["addPurchase"] ?? "addPurchase";
   String get selectCustomer => _strings["selectCustomer"] ?? "selectCustomer";
