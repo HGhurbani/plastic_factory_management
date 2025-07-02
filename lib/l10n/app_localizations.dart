@@ -458,6 +458,14 @@ class AppLocalizations {
   String get defectAnalysis => _strings["defectAnalysis"] ?? "defectAnalysis";
   String get qualityChecks => _strings["qualityChecks"] ?? "qualityChecks";
   String get defectPhotos => _strings["defectPhotos"] ?? "defectPhotos";
+  String get productionDashboard => _strings["productionDashboard"] ?? "productionDashboard";
+  String get maintenanceDashboard => _strings["maintenanceDashboard"] ?? "maintenanceDashboard";
+  String get salesDashboard => _strings["salesDashboard"] ?? "salesDashboard";
+  String get inventoryDashboard => _strings["inventoryDashboard"] ?? "inventoryDashboard";
+  String get keyPerformanceIndicators => _strings["keyPerformanceIndicators"] ?? "keyPerformanceIndicators";
+  String get rootCauseAnalysis => _strings["rootCauseAnalysis"] ?? "rootCauseAnalysis";
+  String get openRootCauseAnalysis => _strings["openRootCauseAnalysis"] ?? "openRootCauseAnalysis";
+  String get totalOrders => _strings["totalOrders"] ?? "totalOrders";
 
 
 }

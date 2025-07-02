@@ -465,5 +465,13 @@
   "shiftSupervisor": "مشرف الوردية",
   "defectAnalysis": "تحليل التالف",
   "qualityChecks": "سجلات الجودة",
-  "defectPhotos": "صور التالف"
+  "defectPhotos": "صور التالف",
+  "productionDashboard": "لوحة الإنتاج",
+  "maintenanceDashboard": "لوحة الصيانة",
+  "salesDashboard": "لوحة المبيعات",
+  "inventoryDashboard": "لوحة المخزون",
+  "keyPerformanceIndicators": "مؤشرات الأداء",
+  "rootCauseAnalysis": "تحليل الجذور",
+  "openRootCauseAnalysis": "فتح تحليلات الجذور",
+  "totalOrders": "إجمالي الطلبات"
 }

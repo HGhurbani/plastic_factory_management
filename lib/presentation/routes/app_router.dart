@@ -31,6 +31,7 @@ import 'package:plastic_factory_management/presentation/management/user_manageme
 import 'package:plastic_factory_management/presentation/management/returns_screen.dart';
 import 'package:plastic_factory_management/presentation/management/delivery_screen.dart';
 import 'package:plastic_factory_management/presentation/management/reports_screen.dart';
+import 'package:plastic_factory_management/presentation/management/root_cause_analysis_screen.dart';
 import 'package:plastic_factory_management/presentation/management/procurement_screen.dart';
 import 'package:plastic_factory_management/presentation/management/documents_center_screen.dart';
 
@@ -67,6 +68,7 @@ class AppRouter {
   static const String reportsRoute = '/management/reports';
   static const String procurementRoute = '/management/procurement';
   static const String documentsCenterRoute = '/management/documents';
+  static const String rootCauseAnalysisRoute = '/management/root_cause';
   static const String notificationsRoute = '/notifications';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -127,6 +129,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => DeliveryScreen());
       case reportsRoute:
         return MaterialPageRoute(builder: (_) => ReportsScreen());
+      case rootCauseAnalysisRoute:
+        return MaterialPageRoute(builder: (_) => RootCauseAnalysisScreen());
       case procurementRoute:
         return MaterialPageRoute(builder: (_) => ProcurementScreen());
       case documentsCenterRoute:
