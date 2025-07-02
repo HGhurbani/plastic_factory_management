@@ -439,6 +439,14 @@ class AppLocalizations {
   String get purchasesManagement => _strings["purchasesManagement"] ?? "purchasesManagement";
   String get sparePartRequests => _strings["sparePartRequests"] ?? "sparePartRequests";
   String get purchaseRequests => _strings["purchaseRequests"] ?? "purchaseRequests";
+  String get returnRequests => _strings["returnRequests"] ?? "returnRequests";
+  String get addReturnRequest => _strings["addReturnRequest"] ?? "addReturnRequest";
+  String get operationsReview => _strings["operationsReview"] ?? "operationsReview";
+  String get salesApproval => _strings["salesApproval"] ?? "salesApproval";
+  String get schedulePickup => _strings["schedulePickup"] ?? "schedulePickup";
+  String get driver => _strings["driver"] ?? "driver";
+  String get warehouseKeeper => _strings["warehouseKeeper"] ?? "warehouseKeeper";
+  String get complete => _strings["complete"] ?? "complete";
   String get addPurchaseRequest => _strings["addPurchaseRequest"] ?? "addPurchaseRequest";
   String get inventoryReview => _strings["inventoryReview"] ?? "inventoryReview";
   String get sendToSuppliers => _strings["sendToSuppliers"] ?? "sendToSuppliers";
