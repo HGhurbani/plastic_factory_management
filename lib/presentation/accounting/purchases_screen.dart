@@ -173,7 +173,7 @@ class PurchasesScreen extends StatelessWidget {
 
   void _showAddPurchaseDialog(BuildContext context, FinancialUseCases useCases,
       UserModel currentUser, AppLocalizations appLocalizations) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     final descController = TextEditingController();
     final categoryController = TextEditingController();
     final amountController = TextEditingController();
@@ -184,94 +184,130 @@ class PurchasesScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(appLocalizations.addPurchase, textAlign: TextAlign.center),
-          content: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: descController,
-                    decoration: InputDecoration(labelText: appLocalizations.description),
-                    validator: (v) => v == null || v.isEmpty ? appLocalizations.fieldRequired : null,
-                    textDirection: TextDirection.rtl,
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: categoryController,
-                    decoration: InputDecoration(labelText: appLocalizations.category),
-                    textDirection: TextDirection.rtl,
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: amountController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: appLocalizations.amount),
-                    validator: (v) => v == null || v.isEmpty ? appLocalizations.fieldRequired : null,
-                    textDirection: TextDirection.rtl,
-                  ),
-                  const SizedBox(height: 8),
-                  TextButton.icon(
-                    icon: const Icon(Icons.calendar_today),
-                    label: Text(intl.DateFormat.yMd().format(selectedDate)),
-                    onPressed: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                      );
-                      if (picked != null) {
-                        selectedDate = picked;
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: maintenanceController,
-                    decoration:
-                        InputDecoration(labelText: appLocalizations.linkedMaintenanceLog),
-                    textDirection: TextDirection.rtl,
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: productionController,
-                    decoration:
-                        InputDecoration(labelText: appLocalizations.linkedProductionOrder),
-                    textDirection: TextDirection.rtl,
-                  ),
-                ],
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(appLocalizations.addPurchase, textAlign: TextAlign.center),
+            content: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: descController,
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.description,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.description),
+                      ),
+                      validator: (v) => v == null || v.isEmpty ? appLocalizations.fieldRequired : null,
+                      textAlign: TextAlign.right,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: categoryController,
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.category,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.category_outlined),
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: amountController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.amount,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.currency_exchange),
+                      ),
+                      validator: (v) => v == null || v.isEmpty ? appLocalizations.fieldRequired : null,
+                      textAlign: TextAlign.right,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      readOnly: true,
+                      controller: TextEditingController(text: intl.DateFormat.yMd().format(selectedDate)),
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.paymentDate,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.calendar_today),
+                      ),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null) {
+                          selectedDate = picked;
+                          // Rebuild to show the selected date
+                          (context as Element).markNeedsBuild();
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: maintenanceController,
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.linkedMaintenanceLog,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.build_outlined),
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: productionController,
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.linkedProductionOrder,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.work_outline),
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                  ],
+                ),
               ),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(appLocalizations.cancel),
+                style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.save, color: Colors.white),
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    final purchase = PurchaseModel(
+                      id: '',
+                      description: descController.text,
+                      category: categoryController.text,
+                      amount: double.tryParse(amountController.text) ?? 0.0,
+                      purchaseDate: Timestamp.fromDate(selectedDate),
+                      maintenanceLogId: maintenanceController.text.isEmpty ? null : maintenanceController.text,
+                      productionOrderId: productionController.text.isEmpty ? null : productionController.text,
+                      createdByUid: currentUser.uid,
+                      createdByName: currentUser.name,
+                    );
+                    await useCases.recordPurchase(purchase);
+                    Navigator.pop(context);
+                  }
+                },
+                label: Text(appLocalizations.save),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(appLocalizations.cancel),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  final purchase = PurchaseModel(
-                    id: '',
-                    description: descController.text,
-                    category: categoryController.text,
-                    amount: double.tryParse(amountController.text) ?? 0.0,
-                    purchaseDate: Timestamp.fromDate(selectedDate),
-                    maintenanceLogId: maintenanceController.text.isEmpty ? null : maintenanceController.text,
-                    productionOrderId: productionController.text.isEmpty ? null : productionController.text,
-                    createdByUid: currentUser.uid,
-                    createdByName: currentUser.name,
-                  );
-                  await useCases.recordPurchase(purchase);
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(appLocalizations.save),
-            ),
-          ],
         );
       },
     );
