@@ -24,6 +24,7 @@
               "approvalDate": "Approval Date",
               "signatureColon": "Signature:",
               "attachmentsColon": "Attachments:",
+              "statusColon": "Status:",
               "selectStorekeeper": "Select Storekeeper",
               "selectMachineForOrder": "Select the machine to operate for this order:",
               "machineRequired": "Machine is required.",

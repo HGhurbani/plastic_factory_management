@@ -340,6 +340,7 @@ class AppLocalizations {
   String get approvalDate => _strings["approvalDate"] ?? "approvalDate";
   String get signatureColon => _strings["signatureColon"] ?? "signatureColon";
   String get attachmentsColon => _strings["attachmentsColon"] ?? "attachmentsColon";
+  String get statusColon => _strings["statusColon"] ?? "statusColon";
   String get selectStorekeeper => _strings["selectStorekeeper"] ?? "selectStorekeeper";
   String get selectMachineForOrder => _strings["selectMachineForOrder"] ?? "selectMachineForOrder";
   String get machineRequired => _strings["machineRequired"] ?? "machineRequired";
