@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:plastic_factory_management/core/constants/app_enums.dart'; // Import app_enums for SalesOrderStatusExtension
 import 'package:plastic_factory_management/theme/app_colors.dart'; // Ensure this defines your app's color scheme
+import 'package:plastic_factory_management/core/extensions/string_extensions.dart';
 
 class SalesOrderDetailPage extends StatefulWidget {
   final SalesOrderModel order;
@@ -23,7 +24,7 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${appLocalizations.salesOrder} #${widget.order.id.substring(0, 6)}...'),
+        title: Text('${appLocalizations.salesOrder} #${widget.order.id.shortId()}...'),
         centerTitle: true,
         backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,

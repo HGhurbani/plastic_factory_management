@@ -14,6 +14,7 @@ import 'dart:io';
 import 'create_production_order_screen.dart';
 import 'production_order_detail_screen.dart';
 import '../../theme/app_colors.dart'; // Import AppColors
+import '../../core/extensions/string_extensions.dart';
 
 // شاشة عرض طلبات الإنتاج
 class ProductionOrdersListScreen extends StatefulWidget {
@@ -314,7 +315,7 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                               _buildInfoRow(appLocalizations.requiredQuantity, order.requiredQuantity.toString(), icon: Icons.production_quantity_limits_outlined),
                               _buildInfoRow(appLocalizations.batchNumber, order.batchNumber, icon: Icons.batch_prediction_outlined),
                               if (order.salesOrderId != null && order.salesOrderId!.isNotEmpty)
-                                _buildInfoRow(appLocalizations.salesOrder, '#${order.salesOrderId!.substring(0, 6)}', icon: Icons.shopping_cart_outlined),
+                                _buildInfoRow(appLocalizations.salesOrder, '#${order.salesOrderId!.shortId()}', icon: Icons.shopping_cart_outlined),
                               _buildInfoRow(appLocalizations.orderPreparer, order.orderPreparerName, icon: Icons.person_outline),
                               _buildInfoRow(
                                 'تاريخ الإنشاء',

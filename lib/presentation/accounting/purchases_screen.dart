@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/data/models/purchase_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/financial_usecases.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
+import 'package:plastic_factory_management/core/extensions/string_extensions.dart';
 
 class PurchasesScreen extends StatelessWidget {
   const PurchasesScreen({super.key});
@@ -151,13 +152,13 @@ class PurchasesScreen extends StatelessWidget {
                           p.maintenanceLogId!.isNotEmpty)
                         _buildInfoRow(
                             appLocalizations.linkedMaintenanceLog,
-                            '#${p.maintenanceLogId!.substring(0, 6)}',
+                            '#${p.maintenanceLogId!.shortId()}',
                             icon: Icons.build_outlined),
                       if (p.productionOrderId != null &&
                           p.productionOrderId!.isNotEmpty)
                         _buildInfoRow(
                             appLocalizations.linkedProductionOrder,
-                            '#${p.productionOrderId!.substring(0, 6)}',
+                            '#${p.productionOrderId!.shortId()}',
                             icon: Icons.work_outline),
                     ],
                   ),
