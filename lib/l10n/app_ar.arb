@@ -457,5 +457,13 @@
   "linkedProductionOrder": "أمر الإنتاج المرتبط",
   "sparePartRequestDetails": "تفاصيل طلب قطع الغيار",
   "rejectRequest": "رفض الطلب",
-  "reason": "السبب"
+  "reason": "السبب",
+  "addQualityCheck": "إضافة فحص جودة",
+  "inspectProductDelivery": "فحص المنتجات عند التسليم",
+  "rejectedQuantity": "الكمية المرفوضة",
+  "acceptedQuantity": "الكمية المقبولة",
+  "shiftSupervisor": "مشرف الوردية",
+  "defectAnalysis": "تحليل التالف",
+  "qualityChecks": "سجلات الجودة",
+  "defectPhotos": "صور التالف"
 }
