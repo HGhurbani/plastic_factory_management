@@ -423,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       modules.add(_buildModuleButton(
         context: context,
         title: appLocalizations.reports,
-        subtitle: "التقارير والتحليلات",
+        subtitle: appLocalizations.reports,
         icon: Icons.bar_chart,
         color: moduleColors['reports']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.reportsRoute),
@@ -1065,7 +1065,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 _buildDrawerItem(
                   icon: Icons.analytics_rounded,
-                  title: "التقارير والتحليلات",
+                  title: appLocalizations.reports,
                   onTap: () {
                     Navigator.pop(context);
                     // TODO: Navigate to reports

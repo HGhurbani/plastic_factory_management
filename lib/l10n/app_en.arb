@@ -454,6 +454,8 @@
   "creditLimitExceeded": "Cannot approve order: credit limit exceeded",
   "paymentsManagement": "Payments",
   "purchasesManagement": "Purchases",
+  "budgetReview": "Budget Review",
+  "accountingOverview": "The accountant can review and approve sales orders and monitor financial reports.",
   "sparePartRequests": "Spare Part Requests",
   "purchaseRequests": "Purchase Requests",
   "addPurchaseRequest": "Add Purchase Request",

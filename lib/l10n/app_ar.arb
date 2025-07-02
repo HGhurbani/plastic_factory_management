@@ -445,6 +445,8 @@
   "creditLimitExceeded": "لا يمكن اعتماد الطلب لتجاوز المديونية الحد الائتماني",
   "paymentsManagement": "إدارة الدفعات",
   "purchasesManagement": "إدارة المشتريات",
+  "budgetReview": "التحقق من الموازنات",
+  "accountingOverview": "يمكن للمحاسب هنا مراجعة واعتماد طلبات المبيعات ومتابعة التقارير المالية.",
   "sparePartRequests": "طلبات قطع الغيار",
   "purchaseRequests": "طلبات الشراء",
   "addPurchaseRequest": "إضافة طلب شراء",

@@ -22,7 +22,7 @@ class AccountingScreen extends StatelessWidget {
       ),
       _AccountingOption(
         icon: Icons.account_balance_wallet_outlined,
-        label: 'التحقق من الموازنات',
+        label: appLocalizations.budgetReview,
         route: null,
       ),
       _AccountingOption(
@@ -49,7 +49,7 @@ class AccountingScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         children: [
           Text(
-            'يمكن للمحاسب هنا مراجعة واعتماد طلبات المبيعات ومتابعة التقارير المالية.',
+            appLocalizations.accountingOverview,
             style: const TextStyle(fontSize: 16),
             textAlign: TextAlign.center,
             textDirection: TextDirection.rtl,

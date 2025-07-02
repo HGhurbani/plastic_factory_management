@@ -437,6 +437,8 @@ class AppLocalizations {
   String get creditLimitExceeded => _strings["creditLimitExceeded"] ?? "creditLimitExceeded";
   String get paymentsManagement => _strings["paymentsManagement"] ?? "paymentsManagement";
   String get purchasesManagement => _strings["purchasesManagement"] ?? "purchasesManagement";
+  String get budgetReview => _strings["budgetReview"] ?? "budgetReview";
+  String get accountingOverview => _strings["accountingOverview"] ?? "accountingOverview";
   String get sparePartRequests => _strings["sparePartRequests"] ?? "sparePartRequests";
   String get purchaseRequests => _strings["purchaseRequests"] ?? "purchaseRequests";
   String get returnRequests => _strings["returnRequests"] ?? "returnRequests";
