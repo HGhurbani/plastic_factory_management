@@ -434,5 +434,8 @@
   "selectItem": "اختر الصنف",
   "finishedProducts": "الإنتاج التام",
   "spareParts": "قطع الغيار",
-  "noData": "لا توجد بيانات"
+  "noData": "لا توجد بيانات",
+  "creditLimit": "الحد الائتماني",
+  "currentDebt": "المديونية الحالية",
+  "creditLimitExceeded": "لا يمكن اعتماد الطلب لتجاوز المديونية الحد الائتماني"
 }

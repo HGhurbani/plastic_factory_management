@@ -256,6 +256,10 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
     final _phoneController = TextEditingController(text: customer?.phone);
     final _emailController = TextEditingController(text: customer?.email);
     final _addressController = TextEditingController(text: customer?.address);
+    final _creditLimitController =
+        TextEditingController(text: customer?.creditLimit.toString());
+    final _currentDebtController =
+        TextEditingController(text: customer?.currentDebt.toString());
 
     showDialog(
       context: context,
@@ -348,6 +352,50 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                     maxLines: 3,
                     textAlign: TextAlign.right, textDirection: TextDirection.rtl,
                   ),
+                  SizedBox(height: 12),
+                  TextFormField(
+                    controller: _creditLimitController,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.creditLimit,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      prefixIcon: const Icon(Icons.credit_score_outlined),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                      ),
+                    ),
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return appLocalizations.fieldRequired;
+                      final n = double.tryParse(value);
+                      if (n == null) return appLocalizations.invalidNumber;
+                      return null;
+                    },
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                  ),
+                  SizedBox(height: 12),
+                  TextFormField(
+                    controller: _currentDebtController,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.currentDebt,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      prefixIcon: const Icon(Icons.account_balance_wallet_outlined),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                      ),
+                    ),
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) return appLocalizations.fieldRequired;
+                      final n = double.tryParse(value);
+                      if (n == null) return appLocalizations.invalidNumber;
+                      return null;
+                    },
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                  ),
                 ],
               ),
             ),
@@ -380,6 +428,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                         phone: _phoneController.text,
                         email: _emailController.text.isEmpty ? null : _emailController.text,
                         address: _addressController.text.isEmpty ? null : _addressController.text,
+                        creditLimit: double.parse(_creditLimitController.text),
+                        currentDebt: double.parse(_currentDebtController.text),
                       );
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.customerUpdatedSuccessfully)));
                     } else {
@@ -389,6 +439,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                         phone: _phoneController.text,
                         email: _emailController.text.isEmpty ? null : _emailController.text,
                         address: _addressController.text.isEmpty ? null : _addressController.text,
+                        creditLimit: double.parse(_creditLimitController.text),
+                        currentDebt: double.parse(_currentDebtController.text),
                       );
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(appLocalizations.customerAddedSuccessfully)));
                     }

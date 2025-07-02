@@ -444,5 +444,8 @@
   "finishedProducts": "Finished Products",
   "spareParts": "Spare Parts",
   "noData": "No data",
+  "creditLimit": "Credit Limit",
+  "currentDebt": "Current Debt",
+  "creditLimitExceeded": "Cannot approve order: credit limit exceeded",
   "unknown": "Unknown"
 }

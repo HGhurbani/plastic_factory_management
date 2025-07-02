@@ -9,6 +9,8 @@ class CustomerModel {
   final String phone; // رقم الهاتف
   final String? email; // البريد الإلكتروني (اختياري)
   final String? address; // العنوان الكامل (اختياري)
+  final double creditLimit; // الحد الائتماني
+  final double currentDebt; // المديونية الحالية
   final Timestamp createdAt; // تاريخ إنشاء حساب العميل
 
   CustomerModel({
@@ -18,6 +20,8 @@ class CustomerModel {
     required this.phone,
     this.email,
     this.address,
+    this.creditLimit = 0.0,
+    this.currentDebt = 0.0,
     required this.createdAt,
   });
 
@@ -30,6 +34,8 @@ class CustomerModel {
       phone: data['phone'] ?? '',
       email: data['email'],
       address: data['address'],
+      creditLimit: (data['creditLimit'] as num?)?.toDouble() ?? 0.0,
+      currentDebt: (data['currentDebt'] as num?)?.toDouble() ?? 0.0,
       createdAt: data['createdAt'] ?? Timestamp.now(),
     );
   }
@@ -41,6 +47,8 @@ class CustomerModel {
       'phone': phone,
       'email': email,
       'address': address,
+      'creditLimit': creditLimit,
+      'currentDebt': currentDebt,
       'createdAt': createdAt,
     };
   }
@@ -52,6 +60,8 @@ class CustomerModel {
     String? phone,
     String? email,
     String? address,
+    double? creditLimit,
+    double? currentDebt,
     Timestamp? createdAt,
   }) {
     return CustomerModel(
@@ -61,6 +71,8 @@ class CustomerModel {
       phone: phone ?? this.phone,
       email: email ?? this.email,
       address: address ?? this.address,
+      creditLimit: creditLimit ?? this.creditLimit,
+      currentDebt: currentDebt ?? this.currentDebt,
       createdAt: createdAt ?? this.createdAt,
     );
   }
