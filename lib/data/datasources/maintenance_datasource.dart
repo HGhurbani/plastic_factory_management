@@ -16,7 +16,7 @@ class MaintenanceDatasource {
   }
 
   Stream<List<MaintenanceLogModel>> getScheduledMaintenance({String? machineId, String? responsibleUid}) {
-    Query query = _firestore.collection('maintenance_logs').where('status', isEqualTo: 'scheduled');
+    Query query = _firestore.collection('maintenance_logs').where('status', whereIn: ['scheduled', 'in_progress']);
     if (machineId != null) {
       query = query.where('machineId', isEqualTo: machineId);
     }
