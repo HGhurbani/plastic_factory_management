@@ -5,6 +5,7 @@ import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/purchase_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/financial_usecases.dart';
+import 'package:plastic_factory_management/theme/app_colors.dart';
 
 class PurchasesScreen extends StatelessWidget {
   const PurchasesScreen({super.key});
@@ -18,11 +19,27 @@ class PurchasesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(appLocalizations.purchasesManagement),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          if (currentUser != null)
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => _showAddPurchaseDialog(
+                  context, financialUseCases, currentUser, appLocalizations),
+              tooltip: appLocalizations.addPurchase,
+            ),
+        ],
       ),
       floatingActionButton: currentUser != null
           ? FloatingActionButton(
-              onPressed: () =>
-                  _showAddPurchaseDialog(context, financialUseCases, currentUser, appLocalizations),
+              onPressed: () => _showAddPurchaseDialog(
+                  context, financialUseCases, currentUser, appLocalizations),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              tooltip: appLocalizations.addPurchase,
               child: const Icon(Icons.add),
             )
           : null,
@@ -32,19 +49,118 @@ class PurchasesScreen extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red, size: 60),
+                    const SizedBox(height: 16),
+                    Text(
+                      appLocalizations.somethingWentWrong,
+                      style: const TextStyle(fontSize: 18, color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${appLocalizations.technicalDetails}: ${snapshot.error}',
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
           final purchases = snapshot.data ?? [];
           if (purchases.isEmpty) {
-            return Center(child: Text(appLocalizations.noData));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.shopping_cart_outlined,
+                        color: Colors.grey[400], size: 80),
+                    const SizedBox(height: 16),
+                    Text(
+                      appLocalizations.noData,
+                      style:
+                          TextStyle(fontSize: 18, color: Colors.grey[600]),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             itemCount: purchases.length,
             itemBuilder: (context, index) {
               final p = purchases[index];
-              return ListTile(
-                title: Text(p.description, textDirection: TextDirection.rtl),
-                subtitle: Text(
-                  '${intl.DateFormat.yMd().format(p.purchaseDate.toDate())} - ${p.amount}',
-                  textDirection: TextDirection.rtl,
+              return Card(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            textDirection: TextDirection.rtl,
+                            children: [
+                              const Icon(Icons.shopping_cart_outlined,
+                                  color: AppColors.primary, size: 28),
+                              const SizedBox(width: 8),
+                              Text(
+                                p.description,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            intl.DateFormat('yyyy-MM-dd')
+                                .format(p.purchaseDate.toDate()),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(color: Colors.grey[600]),
+                            textDirection: TextDirection.rtl,
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 16),
+                      _buildInfoRow(appLocalizations.category, p.category,
+                          icon: Icons.category_outlined),
+                      _buildInfoRow(appLocalizations.amount,
+                          '﷼${p.amount.toStringAsFixed(2)}',
+                          icon: Icons.currency_exchange, isBold: true),
+                      if (p.maintenanceLogId != null &&
+                          p.maintenanceLogId!.isNotEmpty)
+                        _buildInfoRow(
+                            appLocalizations.linkedMaintenanceLog,
+                            '#${p.maintenanceLogId!.substring(0, 6)}',
+                            icon: Icons.build_outlined),
+                      if (p.productionOrderId != null &&
+                          p.productionOrderId!.isNotEmpty)
+                        _buildInfoRow(
+                            appLocalizations.linkedProductionOrder,
+                            '#${p.productionOrderId!.substring(0, 6)}',
+                            icon: Icons.work_outline),
+                    ],
+                  ),
                 ),
               );
             },
@@ -157,6 +273,43 @@ class PurchasesScreen extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value,
+      {bool isBold = false, IconData? icon}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            '$label:',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+            textDirection: TextDirection.rtl,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.black87,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
