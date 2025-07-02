@@ -485,6 +485,11 @@
   ,"salesApproval": "اعتماد المبيعات"
   ,"schedulePickup": "تنسيق الاستلام"
   ,"driver": "السائق"
-  ,"warehouseKeeper": "أمين المخزن"
-  ,"complete": "إكمال"
+  ,"warehouseKeeper": "أمين المخزن",
+  ,"complete": "إكمال",
+  "scheduleDelivery": "جدولة التوصيل",
+  "transportMode": "وسيلة النقل",
+  "companyTransport": "سيارة الشركة",
+  "externalTransport": "خارجي",
+  "deliverySchedule": "جدول التوصيل"
 }

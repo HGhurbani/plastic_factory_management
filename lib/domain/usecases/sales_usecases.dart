@@ -255,6 +255,22 @@ class SalesUseCases {
     await repository.updateSalesOrder(updated);
   }
 
+  Future<void> scheduleDelivery({
+    required SalesOrderModel order,
+    required DateTime deliveryTime,
+    required TransportMode transportMode,
+    String? driverUid,
+    String? driverName,
+  }) async {
+    final updated = order.copyWith(
+      deliveryTime: Timestamp.fromDate(deliveryTime),
+      transportMode: transportMode,
+      driverUid: driverUid,
+      driverName: driverName,
+    );
+    await repository.updateSalesOrder(updated);
+  }
+
   // Production manager approves supply
   Future<void> approveSupply(SalesOrderModel order, UserModel manager,
       InventoryUseCases inventoryUseCases) async {

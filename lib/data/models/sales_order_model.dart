@@ -1,6 +1,7 @@
 // plastic_factory_management/lib/data/models/sales_order_model.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:plastic_factory_management/core/constants/app_enums.dart';
 
 // Enum for Sales Order Status
 enum SalesOrderStatus {
@@ -114,6 +115,9 @@ class SalesOrderModel {
   final String? warehouseManagerUid; // UID أمين المخزن المسؤول
   final String? warehouseManagerName; // اسم أمين المخزن المسؤول
   final Timestamp? deliveryTime; // موعد التسليم المحدد من أمين المخزن
+  final TransportMode? transportMode; // وسيلة النقل
+  final String? driverUid; // UID السائق
+  final String? driverName; // اسم السائق
   final String? productionManagerUid; // UID مسؤول الإنتاج
   final String? productionManagerName; // اسم مسؤول الإنتاج
   final String? productionRejectionReason; // سبب رفض الإنتاج
@@ -144,6 +148,9 @@ class SalesOrderModel {
     this.warehouseManagerUid,
     this.warehouseManagerName,
     this.deliveryTime,
+    this.transportMode,
+    this.driverUid,
+    this.driverName,
     this.productionManagerUid,
     this.productionManagerName,
     this.productionRejectionReason,
@@ -180,6 +187,11 @@ class SalesOrderModel {
       warehouseManagerUid: data['warehouseManagerUid'],
       warehouseManagerName: data['warehouseManagerName'],
       deliveryTime: data['deliveryTime'],
+      transportMode: data['transportMode'] != null
+          ? TransportModeExtension.fromString(data['transportMode'])
+          : null,
+      driverUid: data['driverUid'],
+      driverName: data['driverName'],
       productionManagerUid: data['productionManagerUid'],
       productionManagerName: data['productionManagerName'],
       productionRejectionReason: data['productionRejectionReason'],
@@ -212,6 +224,9 @@ class SalesOrderModel {
       'warehouseManagerUid': warehouseManagerUid,
       'warehouseManagerName': warehouseManagerName,
       'deliveryTime': deliveryTime,
+      'transportMode': transportMode?.toFirestoreString(),
+      'driverUid': driverUid,
+      'driverName': driverName,
       'productionManagerUid': productionManagerUid,
       'productionManagerName': productionManagerName,
       'productionRejectionReason': productionRejectionReason,
@@ -244,6 +259,9 @@ class SalesOrderModel {
     String? warehouseManagerUid,
     String? warehouseManagerName,
     Timestamp? deliveryTime,
+    TransportMode? transportMode,
+    String? driverUid,
+    String? driverName,
     String? productionManagerUid,
     String? productionManagerName,
     String? productionRejectionReason,
@@ -274,6 +292,9 @@ class SalesOrderModel {
       warehouseManagerUid: warehouseManagerUid ?? this.warehouseManagerUid,
       warehouseManagerName: warehouseManagerName ?? this.warehouseManagerName,
       deliveryTime: deliveryTime ?? this.deliveryTime,
+      transportMode: transportMode ?? this.transportMode,
+      driverUid: driverUid ?? this.driverUid,
+      driverName: driverName ?? this.driverName,
       productionManagerUid: productionManagerUid ?? this.productionManagerUid,
       productionManagerName: productionManagerName ?? this.productionManagerName,
       productionRejectionReason: productionRejectionReason ?? this.productionRejectionReason,
