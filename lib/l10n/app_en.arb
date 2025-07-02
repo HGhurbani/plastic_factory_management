@@ -451,5 +451,8 @@
   "creditLimit": "Credit Limit",
   "currentDebt": "Current Debt",
   "creditLimitExceeded": "Cannot approve order: credit limit exceeded",
+  "paymentsManagement": "Payments",
+  "purchasesManagement": "Purchases",
+  "sparePartRequests": "Spare Part Requests",
   "unknown": "Unknown"
 }

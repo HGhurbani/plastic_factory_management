@@ -434,6 +434,9 @@ class AppLocalizations {
   String get creditLimit => _strings["creditLimit"] ?? "creditLimit";
   String get currentDebt => _strings["currentDebt"] ?? "currentDebt";
   String get creditLimitExceeded => _strings["creditLimitExceeded"] ?? "creditLimitExceeded";
+  String get paymentsManagement => _strings["paymentsManagement"] ?? "paymentsManagement";
+  String get purchasesManagement => _strings["purchasesManagement"] ?? "purchasesManagement";
+  String get sparePartRequests => _strings["sparePartRequests"] ?? "sparePartRequests";
 
 
 }
