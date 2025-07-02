@@ -134,16 +134,19 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
           TextFormField(
             controller: _nameController,
             decoration: InputDecoration(labelText: loc.materialName),
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _codeController,
             decoration: InputDecoration(labelText: loc.materialCode),
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _unitController,
             decoration: InputDecoration(labelText: loc.unitOfMeasurement),
+            onChanged: (_) => setState(() {}),
           ),
         ];
       case InventoryItemType.finishedProduct:
@@ -151,16 +154,19 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
           TextFormField(
             controller: _nameController,
             decoration: InputDecoration(labelText: loc.productName),
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _codeController,
             decoration: InputDecoration(labelText: loc.productCode),
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _packagingController,
             decoration: InputDecoration(labelText: loc.packagingType),
+            onChanged: (_) => setState(() {}),
           ),
         ];
       case InventoryItemType.sparePart:
@@ -168,16 +174,19 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
           TextFormField(
             controller: _nameController,
             decoration: InputDecoration(labelText: loc.materialName),
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _codeController,
             decoration: InputDecoration(labelText: loc.materialCode),
+            onChanged: (_) => setState(() {}),
           ),
           const SizedBox(height: 12),
           TextFormField(
             controller: _unitController,
             decoration: InputDecoration(labelText: loc.unitOfMeasurement),
+            onChanged: (_) => setState(() {}),
           ),
         ];
       default:
