@@ -493,5 +493,14 @@
   "transportMode": "وسيلة النقل",
   "companyTransport": "سيارة الشركة",
   "externalTransport": "خارجي",
-  "deliverySchedule": "جدول التوصيل"
+  "deliverySchedule": "جدول التوصيل",
+  "excelImport": "استيراد اكسل",
+  "excelImportTitle": "استيراد بيانات من اكسل",
+  "importRawMaterials": "استيراد المواد الخام",
+  "importCustomers": "استيراد العملاء",
+  "importProducts": "استيراد كتالوج المنتجات",
+  "importTemplates": "استيراد القوالب",
+  "importMachines": "استيراد ملفات المكائن",
+  "importOperators": "استيراد ملفات المشغلين",
+  "fileImportedSuccessfully": "تم استيراد الملف بنجاح"
 }

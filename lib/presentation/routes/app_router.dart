@@ -34,6 +34,7 @@ import 'package:plastic_factory_management/presentation/management/reports_scree
 import 'package:plastic_factory_management/presentation/management/root_cause_analysis_screen.dart';
 import 'package:plastic_factory_management/presentation/management/procurement_screen.dart';
 import 'package:plastic_factory_management/presentation/management/documents_center_screen.dart';
+import 'package:plastic_factory_management/presentation/management/excel_import_screen.dart';
 
 
 class AppRouter {
@@ -68,6 +69,7 @@ class AppRouter {
   static const String reportsRoute = '/management/reports';
   static const String procurementRoute = '/management/procurement';
   static const String documentsCenterRoute = '/management/documents';
+  static const String excelImportRoute = '/management/excel_import';
   static const String rootCauseAnalysisRoute = '/management/root_cause';
   static const String notificationsRoute = '/notifications';
 
@@ -135,6 +137,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => ProcurementScreen());
       case documentsCenterRoute:
         return MaterialPageRoute(builder: (_) => DocumentsCenterScreen());
+      case excelImportRoute:
+        return MaterialPageRoute(builder: (_) => const ExcelImportScreen());
       case termsRoute:
         final uid = settings.arguments as String;
         return MaterialPageRoute(

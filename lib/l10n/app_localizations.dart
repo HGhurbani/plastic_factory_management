@@ -454,6 +454,15 @@ class AppLocalizations {
   String get companyTransport => _strings["companyTransport"] ?? "companyTransport";
   String get externalTransport => _strings["externalTransport"] ?? "externalTransport";
   String get deliverySchedule => _strings["deliverySchedule"] ?? "deliverySchedule";
+  String get excelImport => _strings["excelImport"] ?? "excelImport";
+  String get excelImportTitle => _strings["excelImportTitle"] ?? "excelImportTitle";
+  String get importRawMaterials => _strings["importRawMaterials"] ?? "importRawMaterials";
+  String get importCustomers => _strings["importCustomers"] ?? "importCustomers";
+  String get importProducts => _strings["importProducts"] ?? "importProducts";
+  String get importTemplates => _strings["importTemplates"] ?? "importTemplates";
+  String get importMachines => _strings["importMachines"] ?? "importMachines";
+  String get importOperators => _strings["importOperators"] ?? "importOperators";
+  String get fileImportedSuccessfully => _strings["fileImportedSuccessfully"] ?? "fileImportedSuccessfully";
   String get addPurchaseRequest => _strings["addPurchaseRequest"] ?? "addPurchaseRequest";
   String get inventoryReview => _strings["inventoryReview"] ?? "inventoryReview";
   String get sendToSuppliers => _strings["sendToSuppliers"] ?? "sendToSuppliers";

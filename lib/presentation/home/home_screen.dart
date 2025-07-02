@@ -348,6 +348,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       modules.add(_buildModuleButton(
         context: context,
+        title: appLocalizations.excelImport,
+        subtitle: "استيراد بيانات",
+        icon: Icons.upload_file,
+        color: moduleColors['management']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.excelImportRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
         title: appLocalizations.productionOrderManagement,
         subtitle: "إدارة وتتبع الطلبات",
         icon: Icons.factory,
