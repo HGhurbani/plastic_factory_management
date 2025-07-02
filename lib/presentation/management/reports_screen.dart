@@ -11,6 +11,7 @@ import 'package:plastic_factory_management/domain/usecases/inventory_usecases.da
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import '../routes/app_router.dart';
+import '../theme/app_colors.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -77,17 +78,36 @@ class _ReportsScreenState extends State<ReportsScreen>
     );
   }
 
-  Widget _buildKpi(String label, int value) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          value.toString(),
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  Widget _buildKpi(String label, int value, IconData icon) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          textDirection: TextDirection.rtl,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  value.toString(),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text(label, textDirection: TextDirection.rtl),
+              ],
+            ),
+            CircleAvatar(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              child: Icon(icon),
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(label, textDirection: TextDirection.rtl, textAlign: TextAlign.center),
-      ],
+      ),
     );
   }
 
@@ -106,16 +126,13 @@ class _ReportsScreenState extends State<ReportsScreen>
         final inProd = orders
             .where((o) => o.status == ProductionOrderStatus.inProduction)
             .length;
-        return Padding(
+        return ListView(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildKpi(loc.totalOrders, orders.length),
-              _buildKpi(loc.completed, completed),
-              _buildKpi(loc.inProduction, inProd),
-            ],
-          ),
+          children: [
+            _buildKpi(loc.totalOrders, orders.length, Icons.format_list_numbered),
+            _buildKpi(loc.completed, completed, Icons.check_circle_outline),
+            _buildKpi(loc.inProduction, inProd, Icons.factory_outlined),
+          ],
         );
       },
     );
@@ -137,15 +154,12 @@ class _ReportsScreenState extends State<ReportsScreen>
               return const Center(child: CircularProgressIndicator());
             }
             final completed = completedSnap.data ?? [];
-            return Padding(
+            return ListView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKpi(loc.scheduledMaintenance, scheduled.length),
-                  _buildKpi(loc.completedMaintenance, completed.length),
-                ],
-              ),
+              children: [
+                _buildKpi(loc.scheduledMaintenance, scheduled.length, Icons.schedule),
+                _buildKpi(loc.completedMaintenance, completed.length, Icons.build_outlined),
+              ],
             );
           },
         );
@@ -163,15 +177,12 @@ class _ReportsScreenState extends State<ReportsScreen>
         final orders = snapshot.data ?? [];
         final fulfilled =
             orders.where((o) => o.status == SalesOrderStatus.fulfilled).length;
-        return Padding(
+        return ListView(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildKpi(loc.totalOrders, orders.length),
-              _buildKpi(loc.fulfilled, fulfilled),
-            ],
-          ),
+          children: [
+            _buildKpi(loc.totalOrders, orders.length, Icons.shopping_cart_outlined),
+            _buildKpi(loc.fulfilled, fulfilled, Icons.done_all_outlined),
+          ],
         );
       },
     );
@@ -192,15 +203,12 @@ class _ReportsScreenState extends State<ReportsScreen>
               return const Center(child: CircularProgressIndicator());
             }
             final products = prodSnap.data ?? [];
-            return Padding(
+            return ListView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKpi(loc.rawMaterials, materials.length),
-                  _buildKpi(loc.productCatalog, products.length),
-                ],
-              ),
+              children: [
+                _buildKpi(loc.rawMaterials, materials.length, Icons.warehouse_outlined),
+                _buildKpi(loc.productCatalog, products.length, Icons.category_outlined),
+              ],
             );
           },
         );
