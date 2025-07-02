@@ -488,7 +488,7 @@
   ,"schedulePickup": "تنسيق الاستلام"
   ,"driver": "السائق"
   ,"warehouseKeeper": "أمين المخزن",
-  ,"complete": "إكمال",
+  "complete": "إكمال",
   "scheduleDelivery": "جدولة التوصيل",
   "transportMode": "وسيلة النقل",
   "companyTransport": "سيارة الشركة",

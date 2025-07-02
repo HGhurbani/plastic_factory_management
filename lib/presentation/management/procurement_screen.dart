@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/purchase_request_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
@@ -108,7 +109,7 @@ class ProcurementScreen extends StatelessWidget {
                         _buildInfoRow(appLocalizations.orderDate,
                             intl.DateFormat('yyyy-MM-dd').format(r.createdAt.toDate()),
                             icon: Icons.calendar_today_outlined),
-                        _buildInfoRow(appLocalizations.items, r.items.length.toString(), icon: Icons.list_alt),
+                        _buildInfoRow(appLocalizations.quantity, r.items.length.toString(), icon: Icons.list_alt),
                       ],
                     ),
                   ),

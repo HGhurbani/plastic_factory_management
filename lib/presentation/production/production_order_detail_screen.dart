@@ -363,7 +363,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
           ],
         ),
       ),
-    );
+      ), );
   }
 
   Widget _buildDetailRow(String label, String value,

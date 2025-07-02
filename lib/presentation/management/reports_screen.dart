@@ -10,8 +10,8 @@ import 'package:plastic_factory_management/domain/usecases/production_order_usec
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
+import '../../theme/app_colors.dart';
 import '../routes/app_router.dart';
-import '../theme/app_colors.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -45,7 +45,7 @@ class _ReportsScreenState extends State<ReportsScreen>
     final inventoryUseCases = Provider.of<InventoryUseCases>(context);
 
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: TextDirection.rtl, // هذا صحيح وموجود
       child: Scaffold(
         appBar: AppBar(
           title: Text(loc.reports),
@@ -96,23 +96,25 @@ class _ReportsScreenState extends State<ReportsScreen>
         padding: const EdgeInsets.all(12.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          textDirection: TextDirection.rtl,
+          textDirection: TextDirection.rtl, // احتفظ بهذا لضمان اتجاه الصف RTL
           children: [
+            // الأيقونة ستظهر الآن على اليمين
+            CircleAvatar(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              child: Icon(icon),
+            ),
+            // الأرقام والنصوص ستظهر الآن على اليسار
             Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end, // غيّر هذا إلى .start ليكون محاذيًا لليسار
               children: [
                 Text(
                   value.toString(),
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
-                Text(label, textDirection: TextDirection.rtl),
+                Text(label),
               ],
-            ),
-            CircleAvatar(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              child: Icon(icon),
             ),
           ],
         ),

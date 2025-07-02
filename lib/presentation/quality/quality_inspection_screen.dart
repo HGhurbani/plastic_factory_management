@@ -19,6 +19,9 @@ class QualityInspectionScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(loc.qualityChecks),
         centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

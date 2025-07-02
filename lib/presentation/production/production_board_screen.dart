@@ -42,13 +42,13 @@ class ProductionBoardScreen extends StatelessWidget {
           if (index == options.length) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: Text(
-                  'هنا يمكن لمدير المصنع متابعة مهام الإنتاج وإصدار الأوامر.',
-                  textAlign: TextAlign.center,
-                  textDirection: TextDirection.rtl,
-                ),
-              ),
+              // child: Center(
+              //   child: Text(
+              //     'هنا يمكن لمدير المصنع متابعة مهام الإنتاج وإصدار الأوامر.',
+              //     textAlign: TextAlign.center,
+              //     textDirection: TextDirection.rtl,
+              //   ),
+              // ),
             );
           }
 

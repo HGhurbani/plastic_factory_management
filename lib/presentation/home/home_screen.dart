@@ -303,6 +303,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       modules.add(_buildModuleButton(
         context: context,
+        title: appLocalizations.createSalesOrder,
+        subtitle: "إنشاء طلب مبيعات",
+        icon: Icons.add_shopping_cart,
+        color: moduleColors['sales']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.createSalesOrderRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
         title: appLocalizations.salesOrders,
         subtitle: "إدارة المبيعات",
         icon: Icons.shopping_cart,
@@ -371,6 +380,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         icon: Icons.dashboard,
         color: moduleColors['production']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionBoardRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.qualityModule,
+        subtitle: "فحص الجودة",
+        icon: Icons.verified,
+        color: moduleColors['quality']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.qualityInspectionRoute),
       ));
 
       modules.add(_buildModuleButton(

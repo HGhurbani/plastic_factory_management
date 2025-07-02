@@ -92,7 +92,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                       onPressed: () {
                         _showAddEditCustomerDialog(context, salesUseCases, appLocalizations);
                       },
-                      icon: const Icon(Icons.add),
+                      icon: const Icon(Icons.add, color: Colors.white,),
                       label: Text(appLocalizations.addCustomer),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,

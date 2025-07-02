@@ -22,7 +22,7 @@ class AccountingScreen extends StatelessWidget {
       ),
       _AccountingOption(
         icon: Icons.account_balance_wallet_outlined,
-        label: appLocalizations.budgetReview,
+        label: 'التحقق من الموازنات',
         route: null,
       ),
       _AccountingOption(
@@ -48,13 +48,13 @@ class AccountingScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          Text(
-            appLocalizations.accountingOverview,
-            style: const TextStyle(fontSize: 16),
-            textAlign: TextAlign.center,
-            textDirection: TextDirection.rtl,
-          ),
-          const SizedBox(height: 24),
+          // Text(
+          //   'يمكن للمحاسب هنا مراجعة واعتماد طلبات المبيعات ومتابعة التقارير المالية.',
+          //   style: const TextStyle(fontSize: 16),
+          //   textAlign: TextAlign.center,
+          //   textDirection: TextDirection.rtl,
+          // ),
+          // const SizedBox(height: 24),
           ...options.map((o) => _buildOptionCard(context, o)).toList(),
         ],
       ),
