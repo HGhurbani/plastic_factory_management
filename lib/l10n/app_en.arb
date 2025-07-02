@@ -496,5 +496,10 @@
   "driver": "Driver",
   "warehouseKeeper": "Warehouse Keeper",
   "complete": "Complete",
+  "scheduleDelivery": "Schedule Delivery",
+  "transportMode": "Transport Mode",
+  "companyTransport": "Company Vehicle",
+  "externalTransport": "External",
+  "deliverySchedule": "Delivery Schedule",
   "unknown": "Unknown"
 }

@@ -13,6 +13,7 @@ enum UserRole {
   qualityInspector, // مراقب الجودة
   inventoryManager, // أمين المخزن
   accountant, // المحاسب
+  driver, // سائق التوصيل
   unknown, // دور غير معروف
 }
 
@@ -44,6 +45,8 @@ extension UserRoleExtension on UserRole {
         return 'أمين المخزن';
       case UserRole.accountant:
         return 'المحاسب';
+      case UserRole.driver:
+        return 'سائق التوصيل';
       case UserRole.unknown:
       default:
         return 'غير معروف';
@@ -78,6 +81,8 @@ extension UserRoleExtension on UserRole {
         return UserRole.inventoryManager;
       case 'accountant':
         return UserRole.accountant;
+      case 'driver':
+        return UserRole.driver;
       default:
         return UserRole.unknown;
     }
@@ -110,9 +115,33 @@ extension UserRoleExtension on UserRole {
         return 'inventory_manager';
       case UserRole.accountant:
         return 'accountant';
+      case UserRole.driver:
+        return 'driver';
       case UserRole.unknown:
       default:
         return 'unknown';
     }
+  }
+}
+
+enum TransportMode { company, external }
+
+extension TransportModeExtension on TransportMode {
+  String toArabicString() {
+    switch (this) {
+      case TransportMode.company:
+        return 'شركة';
+      case TransportMode.external:
+        return 'خارجي';
+    }
+  }
+
+  String toFirestoreString() => name;
+
+  static TransportMode fromString(String value) {
+    return TransportMode.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => TransportMode.company,
+    );
   }
 }
