@@ -35,7 +35,8 @@ class AccountingScreen extends StatelessWidget {
             ElevatedButton.icon(
               icon: const Icon(Icons.check_circle_outline),
               label: Text(appLocalizations.sparePartRequests),
-              onPressed: () {},
+              onPressed: () => Navigator.of(context)
+                  .pushNamed(AppRouter.sparePartRequestsRoute),
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
@@ -47,13 +48,15 @@ class AccountingScreen extends StatelessWidget {
             ElevatedButton.icon(
               icon: const Icon(Icons.payments_outlined),
               label: Text(appLocalizations.paymentsManagement),
-              onPressed: () {},
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRouter.paymentsRoute),
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               icon: const Icon(Icons.shopping_cart_checkout),
               label: Text(appLocalizations.purchasesManagement),
-              onPressed: () {},
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRouter.purchasesRoute),
             ),
           ],
         ),

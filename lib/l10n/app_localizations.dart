@@ -437,6 +437,18 @@ class AppLocalizations {
   String get paymentsManagement => _strings["paymentsManagement"] ?? "paymentsManagement";
   String get purchasesManagement => _strings["purchasesManagement"] ?? "purchasesManagement";
   String get sparePartRequests => _strings["sparePartRequests"] ?? "sparePartRequests";
+  String get recordPayment => _strings["recordPayment"] ?? "recordPayment";
+  String get addPurchase => _strings["addPurchase"] ?? "addPurchase";
+  String get selectCustomer => _strings["selectCustomer"] ?? "selectCustomer";
+  String get amount => _strings["amount"] ?? "amount";
+  String get method => _strings["method"] ?? "method";
+  String get paymentDate => _strings["paymentDate"] ?? "paymentDate";
+  String get category => _strings["category"] ?? "category";
+  String get linkedMaintenanceLog => _strings["linkedMaintenanceLog"] ?? "linkedMaintenanceLog";
+  String get linkedProductionOrder => _strings["linkedProductionOrder"] ?? "linkedProductionOrder";
+  String get sparePartRequestDetails => _strings["sparePartRequestDetails"] ?? "sparePartRequestDetails";
+  String get rejectRequest => _strings["rejectRequest"] ?? "rejectRequest";
+  String get reason => _strings["reason"] ?? "reason";
 
 
 }

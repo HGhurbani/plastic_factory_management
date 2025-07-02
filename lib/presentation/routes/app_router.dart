@@ -23,6 +23,9 @@ import 'package:plastic_factory_management/presentation/inventory/inventory_adju
 import 'package:plastic_factory_management/presentation/inventory/inventory_add_item_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/warehouse_requests_screen.dart';
 import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
+import 'package:plastic_factory_management/presentation/accounting/payments_screen.dart';
+import 'package:plastic_factory_management/presentation/accounting/purchases_screen.dart';
+import 'package:plastic_factory_management/presentation/accounting/spare_part_requests_screen.dart';
 import 'package:plastic_factory_management/presentation/notifications/notifications_screen.dart';
 import 'package:plastic_factory_management/presentation/management/user_management_screen.dart';
 import 'package:plastic_factory_management/presentation/management/returns_screen.dart';
@@ -55,6 +58,9 @@ class AppRouter {
   static const String inventoryAddItemRoute = '/inventory/add_item';
   static const String warehouseRequestsRoute = '/inventory/warehouse_requests';
   static const String accountingRoute = '/accounting';
+  static const String paymentsRoute = '/accounting/payments';
+  static const String purchasesRoute = '/accounting/purchases';
+  static const String sparePartRequestsRoute = '/accounting/spare_requests';
   static const String userManagementRoute = '/management/users';
   static const String returnsRoute = '/management/returns';
   static const String deliveryRoute = '/management/delivery';
@@ -107,6 +113,12 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => WarehouseRequestsScreen());
       case accountingRoute:
         return MaterialPageRoute(builder: (_) => AccountingScreen());
+      case paymentsRoute:
+        return MaterialPageRoute(builder: (_) => const PaymentsScreen());
+      case purchasesRoute:
+        return MaterialPageRoute(builder: (_) => const PurchasesScreen());
+      case sparePartRequestsRoute:
+        return MaterialPageRoute(builder: (_) => const SparePartRequestsScreen());
       case userManagementRoute:
         return MaterialPageRoute(builder: (_) => UserManagementScreen());
       case returnsRoute:
