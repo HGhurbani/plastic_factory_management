@@ -8,54 +8,96 @@ class ProductionBoardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
+
+    final List<_BoardOption> options = [
+      _BoardOption(
+        title: appLocalizations.issueProductionOrders,
+        icon: Icons.add_circle_outline,
+        routeName: AppRouter.createProductionOrderRoute,
+      ),
+      _BoardOption(
+        title: appLocalizations.trackDefectsShifts,
+        icon: Icons.analytics_outlined,
+        routeName: AppRouter.productionOrdersListRoute,
+      ),
+      _BoardOption(
+        title: appLocalizations.logMoldReceipt,
+        icon: Icons.assignment_turned_in_outlined,
+        routeName: AppRouter.productionOrdersListRoute,
+      ),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(appLocalizations.productionBoard),
         centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          ListTile(
-            leading: const Icon(Icons.add_circle_outline),
-            title: Text(
-              appLocalizations.issueProductionOrders,
-              textDirection: TextDirection.rtl,
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: options.length + 1,
+        itemBuilder: (context, index) {
+          if (index == options.length) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: Text(
+                  'هنا يمكن لمدير المصنع متابعة مهام الإنتاج وإصدار الأوامر.',
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl,
+                ),
+              ),
+            );
+          }
+
+          final option = options[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            onTap: () {
-              Navigator.of(context).pushNamed(AppRouter.createProductionOrderRoute);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.analytics_outlined),
-            title: Text(
-              appLocalizations.trackDefectsShifts,
-              textDirection: TextDirection.rtl,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => Navigator.of(context).pushNamed(option.routeName),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Icon(option.icon, color: Theme.of(context).primaryColor),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        option.title,
+                        textDirection: TextDirection.rtl,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.chevron_left),
+                  ],
+                ),
+              ),
             ),
-            onTap: () {
-              Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.assignment_turned_in_outlined),
-            title: Text(
-              appLocalizations.logMoldReceipt,
-              textDirection: TextDirection.rtl,
-            ),
-            onTap: () {
-              Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute);
-            },
-          ),
-          const SizedBox(height: 20),
-          Center(
-            child: Text(
-              'هنا يمكن لمدير المصنع متابعة مهام الإنتاج وإصدار الأوامر.',
-              textAlign: TextAlign.center,
-              textDirection: TextDirection.rtl,
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
+}
+
+class _BoardOption {
+  final String title;
+  final IconData icon;
+  final String routeName;
+
+  const _BoardOption({
+    required this.title,
+    required this.icon,
+    required this.routeName,
+  });
 }
