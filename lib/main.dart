@@ -120,6 +120,22 @@ class MyApp extends StatelessWidget {
             Provider.of<UserRepositoryImpl>(context, listen: false),
           ),
         ),
+        // توفير Inventory Dependencies
+        Provider<InventoryDatasource>(
+          create: (_) => InventoryDatasource(),
+        ),
+        Provider<InventoryRepositoryImpl>(
+          create: (context) => InventoryRepositoryImpl(
+            Provider.of<InventoryDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<InventoryUseCases>(
+          create: (context) => InventoryUseCases(
+            Provider.of<InventoryRepositoryImpl>(context, listen: false),
+            Provider.of<NotificationUseCases>(context, listen: false),
+            Provider.of<UserUseCases>(context, listen: false),
+          ),
+        ),
         // توفير Production Order Dependencies
         Provider<ProductionOrderDatasource>(
           create: (_) => ProductionOrderDatasource(),
@@ -135,22 +151,6 @@ class MyApp extends StatelessWidget {
             Provider.of<NotificationUseCases>(context, listen: false),
             Provider.of<UserUseCases>(context, listen: false),
             Provider.of<InventoryUseCases>(context, listen: false),
-          ),
-        ),
-        // توفير Inventory Dependencies
-        Provider<InventoryDatasource>(
-          create: (_) => InventoryDatasource(),
-        ),
-        Provider<InventoryRepositoryImpl>(
-          create: (context) => InventoryRepositoryImpl(
-            Provider.of<InventoryDatasource>(context, listen: false),
-          ),
-        ),
-        Provider<InventoryUseCases>(
-          create: (context) => InventoryUseCases(
-            Provider.of<InventoryRepositoryImpl>(context, listen: false),
-            Provider.of<NotificationUseCases>(context, listen: false),
-            Provider.of<UserUseCases>(context, listen: false),
           ),
         ),
         // توفير Machinery & Operator Dependencies
