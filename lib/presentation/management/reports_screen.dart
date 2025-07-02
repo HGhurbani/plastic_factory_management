@@ -44,36 +44,45 @@ class _ReportsScreenState extends State<ReportsScreen>
     final salesUseCases = Provider.of<SalesUseCases>(context);
     final inventoryUseCases = Provider.of<InventoryUseCases>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.reports),
-        centerTitle: true,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: loc.productionDashboard),
-            Tab(text: loc.maintenanceDashboard),
-            Tab(text: loc.salesDashboard),
-            Tab(text: loc.inventoryDashboard),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(loc.reports),
+          centerTitle: true,
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          bottom: TabBar(
+            controller: _tabController,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            indicatorColor: Colors.white,
+            tabs: [
+              Tab(text: loc.productionDashboard),
+              Tab(text: loc.maintenanceDashboard),
+              Tab(text: loc.salesDashboard),
+              Tab(text: loc.inventoryDashboard),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.analytics_outlined),
+              tooltip: loc.rootCauseAnalysis,
+              onPressed: () => Navigator.of(context)
+                  .pushNamed(AppRouter.rootCauseAnalysisRoute),
+            ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.analytics_outlined),
-            tooltip: loc.rootCauseAnalysis,
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AppRouter.rootCauseAnalysisRoute),
-          ),
-        ],
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildProductionTab(productionUseCases, loc),
-          _buildMaintenanceTab(maintenanceUseCases, loc),
-          _buildSalesTab(salesUseCases, loc),
-          _buildInventoryTab(inventoryUseCases, loc),
-        ],
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildProductionTab(productionUseCases, loc),
+            _buildMaintenanceTab(maintenanceUseCases, loc),
+            _buildSalesTab(salesUseCases, loc),
+            _buildInventoryTab(inventoryUseCases, loc),
+          ],
+        ),
       ),
     );
   }
