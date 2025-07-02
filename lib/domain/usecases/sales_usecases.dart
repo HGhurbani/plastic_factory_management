@@ -34,6 +34,8 @@ class SalesUseCases {
     required String phone,
     String? email,
     String? address,
+    double creditLimit = 0.0,
+    double currentDebt = 0.0,
   }) async {
     final newCustomer = CustomerModel(
       id: '', // Firestore will generate
@@ -42,6 +44,8 @@ class SalesUseCases {
       phone: phone,
       email: email,
       address: address,
+      creditLimit: creditLimit,
+      currentDebt: currentDebt,
       createdAt: Timestamp.now(),
     );
     await repository.addCustomer(newCustomer);
@@ -54,7 +58,10 @@ class SalesUseCases {
     required String phone,
     String? email,
     String? address,
+    double? creditLimit,
+    double? currentDebt,
   }) async {
+    final existing = await repository.getCustomerById(id);
     final updatedCustomer = CustomerModel(
       id: id,
       name: name,
@@ -62,7 +69,9 @@ class SalesUseCases {
       phone: phone,
       email: email,
       address: address,
-      createdAt: (await repository.getCustomerById(id))?.createdAt ?? Timestamp.now(), // Preserve creation date
+      creditLimit: creditLimit ?? existing?.creditLimit ?? 0.0,
+      currentDebt: currentDebt ?? existing?.currentDebt ?? 0.0,
+      createdAt: existing?.createdAt ?? Timestamp.now(), // Preserve creation date
     );
     await repository.updateCustomer(updatedCustomer);
   }
@@ -127,6 +136,15 @@ class SalesUseCases {
 
   // Accountant approves a sales order
   Future<void> approveSalesOrder(SalesOrderModel order, UserModel accountant) async {
+    final customer = await repository.getCustomerById(order.customerId);
+    if (customer != null) {
+      final newDebt = customer.currentDebt + order.totalAmount;
+      if (customer.creditLimit > 0 && newDebt > customer.creditLimit) {
+        throw Exception('CREDIT_LIMIT_EXCEEDED');
+      }
+      await repository.updateCustomer(customer.copyWith(currentDebt: newDebt));
+    }
+
     final updatedOrder = order.copyWith(
       status: SalesOrderStatus.pendingFulfillment,
       approvedByUid: accountant.uid,

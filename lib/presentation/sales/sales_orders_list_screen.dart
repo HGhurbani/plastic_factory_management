@@ -795,9 +795,11 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 );
               } catch (e) {
                 Navigator.of(context).pop(); // Pop the loading indicator
+                final msg = e.toString().contains('CREDIT_LIMIT_EXCEEDED')
+                    ? appLocalizations.creditLimitExceeded
+                    : '${appLocalizations.errorApprovingOrder}: ${e.toString()}';
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text('${appLocalizations.errorApprovingOrder}: ${e.toString()}')),
+                  SnackBar(content: Text(msg)),
                 );
               }
             },

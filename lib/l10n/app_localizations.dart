@@ -427,6 +427,9 @@ class AppLocalizations {
   String get finishedProducts => _strings["finishedProducts"] ?? "finishedProducts";
   String get spareParts => _strings["spareParts"] ?? "spareParts";
   String get noData => _strings["noData"] ?? "noData";
+  String get creditLimit => _strings["creditLimit"] ?? "creditLimit";
+  String get currentDebt => _strings["currentDebt"] ?? "currentDebt";
+  String get creditLimitExceeded => _strings["creditLimitExceeded"] ?? "creditLimitExceeded";
 
 
 }
