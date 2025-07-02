@@ -5,6 +5,11 @@ import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/purchase_request_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/procurement_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
+import 'package:plastic_factory_management/data/models/raw_material_model.dart';
+import 'package:plastic_factory_management/data/models/product_model.dart';
+import 'package:plastic_factory_management/data/models/spare_part_model.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
 
 class ProcurementScreen extends StatelessWidget {
@@ -127,74 +132,131 @@ class ProcurementScreen extends StatelessWidget {
 
   void _showAddDialog(BuildContext context, ProcurementUseCases useCases, UserModel user,
       AppLocalizations appLocalizations) {
-    final descController = TextEditingController();
+    final inventoryUseCases = Provider.of<InventoryUseCases>(context, listen: false);
+    InventoryItemType? type;
+    dynamic selectedItem;
     final qtyController = TextEditingController(text: '1');
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(appLocalizations.addPurchaseRequest, textAlign: TextAlign.center),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: descController,
-              decoration: InputDecoration(
-                labelText: appLocalizations.description,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.description_outlined),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(appLocalizations.addPurchaseRequest, textAlign: TextAlign.center),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<InventoryItemType>(
+                    value: type,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.selectInventoryType,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: InventoryItemType.rawMaterial,
+                        child: Text('المادة الأولية', textDirection: TextDirection.rtl),
+                      ),
+                      DropdownMenuItem(
+                        value: InventoryItemType.finishedProduct,
+                        child: Text('الإنتاج التام', textDirection: TextDirection.rtl),
+                      ),
+                      DropdownMenuItem(
+                        value: InventoryItemType.sparePart,
+                        child: Text('قطع الغيار', textDirection: TextDirection.rtl),
+                      ),
+                    ],
+                    onChanged: (val) => setState(() {
+                      type = val;
+                      selectedItem = null;
+                    }),
+                  ),
+                  const SizedBox(height: 8),
+                  if (type != null)
+                    StreamBuilder<List<dynamic>>(
+                      stream: _itemsStream(inventoryUseCases, type!),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final items = snapshot.data!;
+                        if (items.isEmpty) {
+                          return Text(appLocalizations.noData);
+                        }
+                        return DropdownButtonFormField<dynamic>(
+                          value: selectedItem,
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.selectItem,
+                            border: const OutlineInputBorder(),
+                          ),
+                          items: items
+                              .map(
+                                (e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(_getName(e), textDirection: TextDirection.rtl),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (val) => setState(() => selectedItem = val),
+                        );
+                      },
+                    ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: qtyController,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.quantity,
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.confirmation_num_outlined),
+                    ),
+                    keyboardType: TextInputType.number,
+                    textDirection: TextDirection.rtl,
+                  ),
+                ],
               ),
-              textDirection: TextDirection.rtl,
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: qtyController,
-              decoration: InputDecoration(
-                labelText: appLocalizations.quantity,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.confirmation_num_outlined),
+            actionsAlignment: MainAxisAlignment.spaceAround,
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(appLocalizations.cancel),
+                style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
               ),
-              keyboardType: TextInputType.number,
-              textDirection: TextDirection.rtl,
-            ),
-          ],
-        ),
-        actionsAlignment: MainAxisAlignment.spaceAround,
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(appLocalizations.cancel),
-            style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
-          ),
-          ElevatedButton.icon(
-            onPressed: () async {
-              final quantity = int.tryParse(qtyController.text) ?? 1;
-              final item = PurchaseRequestItem(
-                itemId: '',
-                itemName: descController.text,
-                quantity: quantity,
-              );
-              final request = PurchaseRequestModel(
-                id: '',
-                requesterUid: user.uid,
-                requesterName: user.name,
-                items: [item],
-                totalAmount: 0,
-                status: PurchaseRequestStatus.pendingInventory,
-                createdAt: Timestamp.now(),
-              );
-              await useCases.createPurchaseRequest(request);
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.save, color: Colors.white),
-            label: Text(appLocalizations.save),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-          ),
-        ],
+              ElevatedButton.icon(
+                onPressed: selectedItem == null
+                    ? null
+                    : () async {
+                        final quantity = int.tryParse(qtyController.text) ?? 1;
+                        final item = PurchaseRequestItem(
+                          itemId: _getId(selectedItem),
+                          itemName: _getName(selectedItem),
+                          quantity: quantity,
+                        );
+                        final request = PurchaseRequestModel(
+                          id: '',
+                          requesterUid: user.uid,
+                          requesterName: user.name,
+                          items: [item],
+                          totalAmount: 0,
+                          status: PurchaseRequestStatus.pendingInventory,
+                          createdAt: Timestamp.now(),
+                        );
+                        await useCases.createPurchaseRequest(request);
+                        Navigator.pop(context);
+                      },
+                icon: const Icon(Icons.save, color: Colors.white),
+                label: Text(appLocalizations.save),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -310,5 +372,31 @@ class ProcurementScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Stream<List<dynamic>> _itemsStream(
+      InventoryUseCases useCases, InventoryItemType type) {
+    switch (type) {
+      case InventoryItemType.rawMaterial:
+        return useCases.getRawMaterials();
+      case InventoryItemType.finishedProduct:
+        return useCases.getProducts();
+      case InventoryItemType.sparePart:
+        return useCases.getSpareParts();
+    }
+  }
+
+  String _getId(dynamic item) {
+    if (item is RawMaterialModel) return item.id;
+    if (item is ProductModel) return item.id;
+    if (item is SparePartModel) return item.id;
+    return '';
+  }
+
+  String _getName(dynamic item) {
+    if (item is RawMaterialModel) return item.name;
+    if (item is ProductModel) return item.name;
+    if (item is SparePartModel) return item.name;
+    return '';
   }
 }
