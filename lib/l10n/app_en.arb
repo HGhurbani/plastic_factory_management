@@ -454,5 +454,17 @@
   "paymentsManagement": "Payments",
   "purchasesManagement": "Purchases",
   "sparePartRequests": "Spare Part Requests",
+  "recordPayment": "Record Payment",
+  "addPurchase": "Add Purchase",
+  "selectCustomer": "Select Customer",
+  "amount": "Amount",
+  "method": "Payment Method",
+  "paymentDate": "Payment Date",
+  "category": "Category",
+  "linkedMaintenanceLog": "Linked Maintenance Log",
+  "linkedProductionOrder": "Linked Production Order",
+  "sparePartRequestDetails": "Request Details",
+  "rejectRequest": "Reject Request",
+  "reason": "Reason",
   "unknown": "Unknown"
 }

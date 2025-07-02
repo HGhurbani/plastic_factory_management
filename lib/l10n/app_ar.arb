@@ -445,4 +445,16 @@
   "paymentsManagement": "إدارة الدفعات",
   "purchasesManagement": "إدارة المشتريات",
   "sparePartRequests": "طلبات قطع الغيار",
+  "recordPayment": "تسجيل دفعة",
+  "addPurchase": "إضافة شراء",
+  "selectCustomer": "اختر العميل",
+  "amount": "المبلغ",
+  "method": "طريقة الدفع",
+  "paymentDate": "تاريخ الدفع",
+  "category": "التصنيف",
+  "linkedMaintenanceLog": "سجل الصيانة المرتبط",
+  "linkedProductionOrder": "أمر الإنتاج المرتبط",
+  "sparePartRequestDetails": "تفاصيل طلب قطع الغيار",
+  "rejectRequest": "رفض الطلب",
+  "reason": "السبب"
 }
