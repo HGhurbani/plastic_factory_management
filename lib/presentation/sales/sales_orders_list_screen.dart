@@ -15,6 +15,7 @@ import 'dart:io';
 import 'sales_order_detail_page.dart';
 import 'create_sales_order_screen.dart';
 import '../../theme/app_colors.dart'; // Ensure this defines your app's color scheme
+import '../../core/extensions/string_extensions.dart';
 
 class SalesOrdersListScreen extends StatefulWidget {
   const SalesOrdersListScreen({super.key});
@@ -302,7 +303,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                                     ),
                                   ),
                                   Text(
-                                    '#${order.id.substring(0, 6)}', // Short ID for card
+                                    '#${order.id.shortId()}', // Short ID for card
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
                                     textDirection: TextDirection.rtl,
                                   ),
