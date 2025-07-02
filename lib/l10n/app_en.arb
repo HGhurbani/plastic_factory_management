@@ -503,5 +503,14 @@
   "companyTransport": "Company Vehicle",
   "externalTransport": "External",
   "deliverySchedule": "Delivery Schedule",
-  "unknown": "Unknown"
+  "unknown": "Unknown",
+  "excelImport": "Excel Import",
+  "excelImportTitle": "Import Data from Excel",
+  "importRawMaterials": "Import Raw Materials",
+  "importCustomers": "Import Customers",
+  "importProducts": "Import Product Catalog",
+  "importTemplates": "Import Templates",
+  "importMachines": "Import Machine Files",
+  "importOperators": "Import Operator Files",
+  "fileImportedSuccessfully": "File imported successfully"
 }
