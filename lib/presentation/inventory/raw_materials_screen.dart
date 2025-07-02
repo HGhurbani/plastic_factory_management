@@ -33,13 +33,14 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            onPressed: () {
-              Navigator.of(context).pushNamed(AppRouter.inventoryAddItemRoute);
-            },
-            tooltip: appLocalizations.addInventoryItem,
-          ),
+          if (_selectedType != InventoryItemType.finishedProduct)
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              onPressed: () {
+                Navigator.of(context).pushNamed(AppRouter.inventoryAddItemRoute);
+              },
+              tooltip: appLocalizations.addInventoryItem,
+            ),
         ],
       ),
       body: Column(
@@ -115,15 +116,17 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(AppRouter.inventoryAddItemRoute);
-        },
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        tooltip: appLocalizations.addInventoryItem,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _selectedType == InventoryItemType.finishedProduct
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(AppRouter.inventoryAddItemRoute);
+              },
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              tooltip: appLocalizations.addInventoryItem,
+              child: const Icon(Icons.add),
+            ),
     );
   }
 
