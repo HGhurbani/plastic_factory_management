@@ -390,6 +390,7 @@
               "approvalDate": "تاريخ الاعتماد",
               "signatureColon": "التوقيع:",
               "attachmentsColon": "المرفقات:",
+              "statusColon": "الحالة:",
               "selectStorekeeper": "اختر أمين المخزن",
               "selectMachineForOrder": "اختر الآلة التي سيتم تشغيلها لهذا الطلب:",
               "machineRequired": "الآلة مطلوبة.",
