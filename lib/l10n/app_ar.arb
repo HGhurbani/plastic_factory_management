@@ -479,4 +479,12 @@
   "rootCauseAnalysis": "تحليل الجذور",
   "openRootCauseAnalysis": "فتح تحليلات الجذور",
   "totalOrders": "إجمالي الطلبات"
+  ,"returnRequests": "طلبات المرتجع"
+  ,"addReturnRequest": "إضافة طلب مرتجع"
+  ,"operationsReview": "اعتماد العمليات"
+  ,"salesApproval": "اعتماد المبيعات"
+  ,"schedulePickup": "تنسيق الاستلام"
+  ,"driver": "السائق"
+  ,"warehouseKeeper": "أمين المخزن"
+  ,"complete": "إكمال"
 }

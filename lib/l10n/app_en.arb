@@ -488,5 +488,13 @@
   "rootCauseAnalysis": "Root Cause Analysis",
   "openRootCauseAnalysis": "Open Root Cause Analysis",
   "totalOrders": "Total Orders",
+  "returnRequests": "Return Requests",
+  "addReturnRequest": "Add Return Request",
+  "operationsReview": "Operations Review",
+  "salesApproval": "Sales Approval",
+  "schedulePickup": "Schedule Pickup",
+  "driver": "Driver",
+  "warehouseKeeper": "Warehouse Keeper",
+  "complete": "Complete",
   "unknown": "Unknown"
 }

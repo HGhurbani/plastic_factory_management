@@ -50,6 +50,9 @@ import 'package:plastic_factory_management/domain/usecases/quality_usecases.dart
 import 'package:plastic_factory_management/data/datasources/procurement_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/procurement_repository_impl.dart';
 import 'package:plastic_factory_management/domain/usecases/procurement_usecases.dart';
+import 'package:plastic_factory_management/data/datasources/returns_datasource.dart';
+import 'package:plastic_factory_management/data/repositories/returns_repository_impl.dart';
+import 'package:plastic_factory_management/domain/usecases/returns_usecases.dart';
 // استيرادات Notifications
 import 'package:plastic_factory_management/data/datasources/notification_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/notification_repository_impl.dart';
@@ -249,6 +252,20 @@ class MyApp extends StatelessWidget {
         Provider<QualityUseCases>(
           create: (context) => QualityUseCases(
             Provider.of<QualityRepositoryImpl>(context, listen: false),
+          ),
+        ),
+        // Returns dependencies
+        Provider<ReturnsDatasource>(
+          create: (_) => ReturnsDatasource(),
+        ),
+        Provider<ReturnsRepositoryImpl>(
+          create: (context) => ReturnsRepositoryImpl(
+            Provider.of<ReturnsDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<ReturnsUseCases>(
+          create: (context) => ReturnsUseCases(
+            Provider.of<ReturnsRepositoryImpl>(context, listen: false),
           ),
         ),
       ],
