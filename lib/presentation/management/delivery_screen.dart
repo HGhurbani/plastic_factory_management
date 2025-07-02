@@ -8,6 +8,7 @@ import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
+import 'package:plastic_factory_management/theme/app_colors.dart';
 
 class DeliveryScreen extends StatelessWidget {
   const DeliveryScreen({super.key});
@@ -21,6 +22,9 @@ class DeliveryScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(appLocalizations.delivery),
         centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: StreamBuilder<List<SalesOrderModel>>(
         stream: salesUseCases.getSalesOrders(),
@@ -42,21 +46,55 @@ class DeliveryScreen extends StatelessWidget {
             itemCount: orders.length,
             itemBuilder: (context, index) {
               final order = orders[index];
-              return ListTile(
-                title: Text(order.customerName, textDirection: TextDirection.rtl),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(intl.DateFormat('yyyy-MM-dd HH:mm').format(order.deliveryTime!.toDate()), textDirection: TextDirection.rtl),
-                    if (order.driverName != null)
-                      Text('${order.driverName} - ${order.transportMode?.toArabicString() ?? ''}', textDirection: TextDirection.rtl),
-                  ],
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    _showScheduleDialog(context, salesUseCases, userUseCases, order, appLocalizations);
-                  },
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                elevation: 1,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => _showScheduleDialog(context, salesUseCases, userUseCases, order, appLocalizations),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              textDirection: TextDirection.rtl,
+                              children: [
+                                const Icon(Icons.local_shipping_outlined, color: AppColors.primary, size: 28),
+                                const SizedBox(width: 8),
+                                Text(
+                                  order.customerName,
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                  textDirection: TextDirection.rtl,
+                                ),
+                              ],
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: AppColors.secondary),
+                              onPressed: () => _showScheduleDialog(context, salesUseCases, userUseCases, order, appLocalizations),
+                              tooltip: appLocalizations.scheduleDelivery,
+                            ),
+                          ],
+                        ),
+                        const Divider(height: 16),
+                        _buildInfoRow(
+                          appLocalizations.expectedDeliveryTime,
+                          intl.DateFormat('yyyy-MM-dd HH:mm').format(order.deliveryTime!.toDate()),
+                          icon: Icons.calendar_today_outlined,
+                        ),
+                        if (order.driverName != null)
+                          _buildInfoRow(
+                            appLocalizations.driver,
+                            '${order.driverName} - ${order.transportMode?.toArabicString() ?? ''}',
+                            icon: Icons.drive_eta_outlined,
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },
@@ -171,6 +209,35 @@ class DeliveryScreen extends StatelessWidget {
           );
         });
       },
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value, {IconData? icon}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20, color: AppColors.primary.withOpacity(0.7)),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            '$label:',
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            textDirection: TextDirection.rtl,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 15, color: Colors.black87),
+              textDirection: TextDirection.rtl,
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
