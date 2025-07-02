@@ -467,5 +467,13 @@
   "sparePartRequestDetails": "Request Details",
   "rejectRequest": "Reject Request",
   "reason": "Reason",
+  "addQualityCheck": "Add Quality Check",
+  "inspectProductDelivery": "Inspect products upon delivery",
+  "rejectedQuantity": "Rejected Quantity",
+  "acceptedQuantity": "Accepted Quantity",
+  "shiftSupervisor": "Shift Supervisor",
+  "defectAnalysis": "Defect Analysis",
+  "qualityChecks": "Quality Checks",
+  "defectPhotos": "Defect Photos",
   "unknown": "Unknown"
 }

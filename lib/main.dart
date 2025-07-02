@@ -44,6 +44,9 @@ import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 import 'package:plastic_factory_management/data/datasources/financial_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/financial_repository_impl.dart';
 import 'package:plastic_factory_management/domain/usecases/financial_usecases.dart';
+import 'package:plastic_factory_management/data/datasources/quality_datasource.dart';
+import 'package:plastic_factory_management/data/repositories/quality_repository_impl.dart';
+import 'package:plastic_factory_management/domain/usecases/quality_usecases.dart';
 // استيرادات Notifications
 import 'package:plastic_factory_management/data/datasources/notification_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/notification_repository_impl.dart';
@@ -214,6 +217,20 @@ class MyApp extends StatelessWidget {
           create: (context) => FinancialUseCases(
             Provider.of<FinancialRepositoryImpl>(context, listen: false),
             Provider.of<SalesRepositoryImpl>(context, listen: false),
+          ),
+        ),
+        // Quality Control dependencies
+        Provider<QualityDatasource>(
+          create: (_) => QualityDatasource(),
+        ),
+        Provider<QualityRepositoryImpl>(
+          create: (context) => QualityRepositoryImpl(
+            Provider.of<QualityDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<QualityUseCases>(
+          create: (context) => QualityUseCases(
+            Provider.of<QualityRepositoryImpl>(context, listen: false),
           ),
         ),
       ],

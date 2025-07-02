@@ -450,6 +450,14 @@ class AppLocalizations {
   String get sparePartRequestDetails => _strings["sparePartRequestDetails"] ?? "sparePartRequestDetails";
   String get rejectRequest => _strings["rejectRequest"] ?? "rejectRequest";
   String get reason => _strings["reason"] ?? "reason";
+  String get addQualityCheck => _strings["addQualityCheck"] ?? "addQualityCheck";
+  String get inspectProductDelivery => _strings["inspectProductDelivery"] ?? "inspectProductDelivery";
+  String get rejectedQuantity => _strings["rejectedQuantity"] ?? "rejectedQuantity";
+  String get acceptedQuantity => _strings["acceptedQuantity"] ?? "acceptedQuantity";
+  String get shiftSupervisor => _strings["shiftSupervisor"] ?? "shiftSupervisor";
+  String get defectAnalysis => _strings["defectAnalysis"] ?? "defectAnalysis";
+  String get qualityChecks => _strings["qualityChecks"] ?? "qualityChecks";
+  String get defectPhotos => _strings["defectPhotos"] ?? "defectPhotos";
 
 
 }
