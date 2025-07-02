@@ -475,5 +475,13 @@
   "defectAnalysis": "Defect Analysis",
   "qualityChecks": "Quality Checks",
   "defectPhotos": "Defect Photos",
+  "productionDashboard": "Production Dashboard",
+  "maintenanceDashboard": "Maintenance Dashboard",
+  "salesDashboard": "Sales Dashboard",
+  "inventoryDashboard": "Inventory Dashboard",
+  "keyPerformanceIndicators": "Key Performance Indicators",
+  "rootCauseAnalysis": "Root Cause Analysis",
+  "openRootCauseAnalysis": "Open Root Cause Analysis",
+  "totalOrders": "Total Orders",
   "unknown": "Unknown"
 }
