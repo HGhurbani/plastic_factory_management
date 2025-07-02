@@ -512,5 +512,8 @@
   "importTemplates": "Import Templates",
   "importMachines": "Import Machine Files",
   "importOperators": "Import Operator Files",
-  "fileImportedSuccessfully": "File imported successfully"
+  "fileImportedSuccessfully": "File imported successfully",
+  "mapColumnsTitle": "Map Excel Columns",
+  "selectColumnForField": "Select column for {field}",
+  "importAction": "Import"
 }

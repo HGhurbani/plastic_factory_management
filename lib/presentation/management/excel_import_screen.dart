@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:excel/excel.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
+import 'package:plastic_factory_management/presentation/management/excel_column_mapping_dialog.dart';
 
 class ExcelImportScreen extends StatelessWidget {
   const ExcelImportScreen({super.key});
@@ -15,10 +16,47 @@ class ExcelImportScreen extends StatelessWidget {
     if (result != null && result.files.single.bytes != null) {
       final bytes = result.files.single.bytes!;
       final excel = Excel.decodeBytes(bytes);
-      // TODO: Parse [excel] according to [type] and save to Firestore
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.fileImportedSuccessfully)),
+      final sheet = excel.tables.values.isNotEmpty ? excel.tables.values.first : null;
+      if (sheet == null || sheet.rows.isEmpty) return;
+
+      final headers = sheet.rows.first
+          .map((c) => c?.value.toString() ?? '')
+          .toList();
+      final fields = _getFieldsForType(type);
+      if (fields.isEmpty) return;
+
+      final mapping = await showDialog<Map<String, String>>(
+        context: context,
+        builder: (_) => ExcelColumnMappingDialog(fields: fields, columns: headers),
       );
+      if (mapping != null) {
+        for (var i = 1; i < sheet.rows.length; i++) {
+          final row = sheet.rows[i];
+          final data = <String, dynamic>{};
+          mapping.forEach((field, column) {
+            final index = headers.indexOf(column);
+            if (index >= 0 && index < row.length) {
+              data[field] = row[index]?.value;
+            }
+          });
+          // ignore: avoid_print
+          print('Imported row: $data');
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.fileImportedSuccessfully)),
+        );
+      }
+    }
+  }
+
+  List<String> _getFieldsForType(String type) {
+    switch (type) {
+      case 'raw':
+        return ['code', 'name', 'unit'];
+      case 'customers':
+        return ['name', 'contactPerson', 'phone', 'email', 'address'];
+      default:
+        return [];
     }
   }
 
