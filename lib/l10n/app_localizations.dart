@@ -223,6 +223,10 @@ class AppLocalizations {
   String get scheduledMaintenance => _strings["scheduledMaintenance"] ?? "scheduledMaintenance";
   String get completedMaintenance => _strings["completedMaintenance"] ?? "completedMaintenance";
   String get machine => _strings["machine"] ?? "machine";
+  String get assetType => _strings["assetType"] ?? "assetType";
+  String get meterReading => _strings["meterReading"] ?? "meterReading";
+  String get sparePartsUsed => _strings["sparePartsUsed"] ?? "sparePartsUsed";
+  String get addSparePart => _strings["addSparePart"] ?? "addSparePart";
   String get checklistItem => _strings["checklistItem"] ?? "checklistItem";
   String get addChecklistItem => _strings["addChecklistItem"] ?? "addChecklistItem";
   String get schedule => _strings["schedule"] ?? "schedule";

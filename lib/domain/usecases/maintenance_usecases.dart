@@ -5,11 +5,14 @@ import 'package:plastic_factory_management/data/models/maintenance_log_model.dar
 import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart'; // لاستخدام بيانات المستخدم
 import 'package:plastic_factory_management/domain/repositories/maintenance_repository.dart';
+import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 
 class MaintenanceUseCases {
   final MaintenanceRepository repository;
+  final InventoryUseCases inventoryUseCases;
 
-  MaintenanceUseCases(this.repository);
+  MaintenanceUseCases(this.repository, this.inventoryUseCases);
 
   Stream<List<MaintenanceLogModel>> getMaintenanceLogs() {
     return repository.getMaintenanceLogs();
@@ -28,6 +31,9 @@ class MaintenanceUseCases {
     required DateTime maintenanceDateTime,
     required MaintenanceType type,
     required UserModel responsibleUser,
+    required MaintenanceAssetType assetType,
+    double? meterReading,
+    List<MaintenanceSparePart> sparePartsUsed = const [],
     String? notes,
     required List<String> checklistTasks,
   }) async {
@@ -37,9 +43,12 @@ class MaintenanceUseCases {
       machineName: selectedMachine.name,
       maintenanceDate: Timestamp.fromDate(maintenanceDateTime),
       type: type,
+      assetType: assetType,
       responsibleUid: responsibleUser.uid,
       responsibleName: responsibleUser.name,
       notes: notes,
+      meterReading: meterReading,
+      sparePartsUsed: sparePartsUsed,
       checklist: checklistTasks.map((task) => MaintenanceChecklistItem(task: task)).toList(),
       status: 'scheduled',
     );
@@ -57,9 +66,12 @@ class MaintenanceUseCases {
     required String machineName,
     required DateTime maintenanceDate,
     required MaintenanceType type,
+    required MaintenanceAssetType assetType,
     required String responsibleUid,
     required String responsibleName,
     String? notes,
+    double? meterReading,
+    List<MaintenanceSparePart> sparePartsUsed = const [],
     required List<MaintenanceChecklistItem> checklist,
     required String status,
   }) async {
@@ -69,9 +81,12 @@ class MaintenanceUseCases {
       machineName: machineName,
       maintenanceDate: Timestamp.fromDate(maintenanceDate),
       type: type,
+      assetType: assetType,
       responsibleUid: responsibleUid,
       responsibleName: responsibleName,
       notes: notes,
+      meterReading: meterReading,
+      sparePartsUsed: sparePartsUsed,
       checklist: checklist,
       status: status,
     );
@@ -98,6 +113,13 @@ class MaintenanceUseCases {
 
     // If completed, update machine status to 'ready'
     if (newStatus == 'completed') {
+      for (final part in log.sparePartsUsed) {
+        await inventoryUseCases.adjustInventory(
+          itemId: part.partId,
+          type: InventoryItemType.sparePart,
+          delta: -part.quantity,
+        );
+      }
       // This part would typically be handled by MachineryOperatorUseCases,
       // but to avoid circular dependency for this example, we'll keep it simple
       // or assume a Cloud Function would handle it.
