@@ -447,6 +447,11 @@ class AppLocalizations {
   String get driver => _strings["driver"] ?? "driver";
   String get warehouseKeeper => _strings["warehouseKeeper"] ?? "warehouseKeeper";
   String get complete => _strings["complete"] ?? "complete";
+  String get scheduleDelivery => _strings["scheduleDelivery"] ?? "scheduleDelivery";
+  String get transportMode => _strings["transportMode"] ?? "transportMode";
+  String get companyTransport => _strings["companyTransport"] ?? "companyTransport";
+  String get externalTransport => _strings["externalTransport"] ?? "externalTransport";
+  String get deliverySchedule => _strings["deliverySchedule"] ?? "deliverySchedule";
   String get addPurchaseRequest => _strings["addPurchaseRequest"] ?? "addPurchaseRequest";
   String get inventoryReview => _strings["inventoryReview"] ?? "inventoryReview";
   String get sendToSuppliers => _strings["sendToSuppliers"] ?? "sendToSuppliers";
