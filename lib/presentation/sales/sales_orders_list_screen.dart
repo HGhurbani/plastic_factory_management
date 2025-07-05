@@ -800,7 +800,15 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 },
               );
               try {
-                final user = Provider.of<UserModel?>(context, listen: false)!;
+                final user = Provider.of<UserModel?>(context, listen: false);
+                if (user == null) {
+                  Navigator.of(context).pop(); // Pop the loading indicator
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(appLocalizations.loginPrompt)),
+                  );
+                  return;
+                }
+
                 await useCases.approveSalesOrder(
                   order,
                   user,
