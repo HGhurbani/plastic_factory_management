@@ -741,7 +741,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                         child: Image.network(
                           order.customerSignatureUrl!,
                           height: 100,
-                          width: double.infinity,
+                          // Avoid using double.infinity which causes layout issues
+                          // inside the IntrinsicWidth of AlertDialog
                           fit: BoxFit.contain,
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
