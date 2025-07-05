@@ -329,6 +329,7 @@
   "orderApprovedTitle": "تم اعتماد طلب الإنتاج",
   "orderApprovedMessage": "تم تعيينك للمرحلة التالية"
   ,"warehouseNotes": "ملاحظات المخزن"
+  ,"operationsNotes": "ملاحظات العمليات"
   ,"warehouseImages": "صور المخزن"
   ,"moldInstallationNotes": "ملاحظات تركيب القوالب"
   ,"moldInstallationImages": "صور تركيب القوالب"

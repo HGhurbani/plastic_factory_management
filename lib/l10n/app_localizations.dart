@@ -299,6 +299,7 @@ class AppLocalizations {
   String get notifications => _strings["notifications"] ?? "notifications";
   String get noNotifications => _strings["noNotifications"] ?? "noNotifications";
   String get warehouseNotes => _strings["warehouseNotes"] ?? "warehouseNotes";
+  String get operationsNotes => _strings["operationsNotes"] ?? "operationsNotes";
   String get warehouseImages => _strings["warehouseImages"] ?? "warehouseImages";
   String get moldInstallationNotes => _strings["moldInstallationNotes"] ?? "moldInstallationNotes";
   String get moldInstallationImages => _strings["moldInstallationImages"] ?? "moldInstallationImages";
