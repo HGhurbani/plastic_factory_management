@@ -931,6 +931,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     }
     // Pre-select the first storekeeper if available, otherwise null
     UserModel? _selectedStorekeeper = storekeepers.isNotEmpty ? storekeepers.first : null;
+    final TextEditingController notesController =
+        TextEditingController(text: order.warehouseNotes);
 
     await showDialog(
       context: parentContext,
@@ -957,6 +959,18 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   _selectedStorekeeper = u;
                 }),
                 validator: (value) => value == null ? appLocalizations.fieldRequired : null, // Added validation
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: notesController,
+                decoration: InputDecoration(
+                  labelText: appLocalizations.enterNotes,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.notes_outlined),
+                ),
+                maxLines: 3,
+                textAlign: TextAlign.right,
+                textDirection: TextDirection.rtl,
               ),
             ],
           ),
@@ -986,7 +1000,12 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   },
                 );
                 try {
-                  await salesUseCases.initiateSupply(order, preparer, _selectedStorekeeper!);
+                  await salesUseCases.initiateSupply(
+                    order,
+                    preparer,
+                    _selectedStorekeeper!,
+                    notes: notesController.text.trim(),
+                  );
                   Navigator.of(parentContext).pop(); // Pop the loading indicator
                   ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(content: Text(appLocalizations.supplyInitiatedSuccessfully)), // New confirmation
