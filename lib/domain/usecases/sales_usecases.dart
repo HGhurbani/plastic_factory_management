@@ -215,11 +215,16 @@ class SalesUseCases {
 
   // Production order preparer initiates supply to warehouse
   Future<void> initiateSupply(
-      SalesOrderModel order, UserModel preparer, UserModel storekeeper) async {
+      SalesOrderModel order,
+      UserModel preparer,
+      UserModel storekeeper, {
+      String? notes,
+    }) async {
     final updated = order.copyWith(
       status: SalesOrderStatus.warehouseProcessing,
       warehouseManagerUid: storekeeper.uid,
       warehouseManagerName: storekeeper.name,
+      warehouseNotes: notes ?? order.warehouseNotes,
     );
     await repository.updateSalesOrder(updated);
 
