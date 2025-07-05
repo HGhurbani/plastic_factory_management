@@ -165,12 +165,15 @@ class SalesUseCases {
       );
     }
 
-    // Notify production order preparers to assign warehouse
+    // Notify operations officers and production order preparers to assign warehouse
+    final opsOfficers =
+        await userUseCases.getUsersByRole(UserRole.operationsOfficer);
     final preparers =
         await userUseCases.getUsersByRole(UserRole.productionOrderPreparer);
-    for (final p in preparers) {
+    final recipients = [...opsOfficers, ...preparers];
+    for (final user in recipients) {
       await notificationUseCases.sendNotification(
-        userId: p.uid,
+        userId: user.uid,
         title: 'طلب مبيعات بانتظار التوجيه للمخزن',
         message: 'يرجى تحديد أمين المخزن لطلب العميل ${order.customerName}',
       );
