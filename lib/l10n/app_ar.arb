@@ -335,6 +335,8 @@
   ,"orderFlowDetails": "تفاصيل الإعتمادات"
   ,"approvedBy": "اعتمد بواسطة"
   ,"approvalTime": "وقت الاعتماد"
+  ,"approvalNotes": "ملاحظات الاعتماد"
+  ,"enterApprovalNotes": "أدخل ملاحظات الاعتماد"
   ,"moldInstallationTasks": "مهام تركيب القوالب"
   ,"noMoldInstallationOrders": "لا توجد طلبات بانتظار تركيب القوالب",
   "loginRequiredToViewOrders": "تسجيل الدخول مطلوب لعرض الطلبات.",

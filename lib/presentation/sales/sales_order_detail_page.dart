@@ -87,6 +87,10 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                   '${intl.DateFormat('yyyy-MM-dd HH:mm').format(widget.order.approvedAt!.toDate())} ${appLocalizations.approvedBy} ${widget.order.approvedByName ?? appLocalizations.unknown}',
                   icon: Icons.check_circle_outline,
                 ),
+              if (widget.order.approvalNotes != null && widget.order.approvalNotes!.isNotEmpty)
+                _buildInfoRow(appLocalizations.approvalNotes, widget.order.approvalNotes!, icon: Icons.notes),
+              if (widget.order.rejectionReason != null && widget.order.rejectionReason!.isNotEmpty)
+                _buildInfoRow(appLocalizations.rejectionReason, widget.order.rejectionReason!, icon: Icons.cancel, textColor: Colors.red),
               if (widget.order.warehouseManagerName != null && widget.order.warehouseManagerName!.isNotEmpty)
                 _buildInfoRow(appLocalizations.warehouseManager, widget.order.warehouseManagerName!, icon: Icons.warehouse),
               if (widget.order.warehouseNotes != null && widget.order.warehouseNotes!.isNotEmpty)

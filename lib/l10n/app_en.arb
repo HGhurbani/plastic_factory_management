@@ -375,6 +375,8 @@
   "orderFlowDetails": "Approval Details",
   "approvedBy": "Approved By",
   "approvalTime": "Approval Time",
+  "approvalNotes": "Approval Notes",
+  "enterApprovalNotes": "Enter approval notes",
   "moldInstallationTasks": "Mold Installation Tasks",
   "noMoldInstallationOrders": "No orders awaiting mold installation",
   "loginRequiredToViewOrders": "Login required to view orders.",

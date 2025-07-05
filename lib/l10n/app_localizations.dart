@@ -305,6 +305,8 @@ class AppLocalizations {
   String get orderFlowDetails => _strings["orderFlowDetails"] ?? "orderFlowDetails";
   String get approvedBy => _strings["approvedBy"] ?? "approvedBy";
   String get approvalTime => _strings["approvalTime"] ?? "approvalTime";
+  String get approvalNotes => _strings["approvalNotes"] ?? "approvalNotes";
+  String get enterApprovalNotes => _strings["enterApprovalNotes"] ?? "enterApprovalNotes";
   String get moldInstallationTasks => _strings["moldInstallationTasks"] ?? "moldInstallationTasks";
   String get noMoldInstallationOrders => _strings["noMoldInstallationOrders"] ?? "noMoldInstallationOrders";
   String get loadingData => _strings["loadingData"] ?? "loadingData";

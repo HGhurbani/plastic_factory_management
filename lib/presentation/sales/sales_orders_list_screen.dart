@@ -683,6 +683,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
 
   void _showApproveDialog(BuildContext context, SalesUseCases useCases,
       AppLocalizations appLocalizations, SalesOrderModel order) {
+    final TextEditingController notesController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -762,6 +763,18 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   ),
                 ),
               const SizedBox(height: 16),
+              TextField(
+                controller: notesController,
+                decoration: InputDecoration(
+                  labelText: appLocalizations.enterApprovalNotes,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.notes_outlined),
+                ),
+                maxLines: 3,
+                textAlign: TextAlign.right,
+                textDirection: TextDirection.rtl,
+              ),
+              const SizedBox(height: 16),
               Text('${appLocalizations.confirmApproveOrderQuestion}: "${order.customerName}"؟', // More explicit question
                   textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
@@ -788,7 +801,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               );
               try {
                 final user = Provider.of<UserModel?>(context, listen: false)!;
-                await useCases.approveSalesOrder(order, user);
+                await useCases.approveSalesOrder(
+                  order,
+                  user,
+                  notes: notesController.text.trim().isEmpty
+                      ? null
+                      : notesController.text.trim(),
+                );
                 Navigator.of(context).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

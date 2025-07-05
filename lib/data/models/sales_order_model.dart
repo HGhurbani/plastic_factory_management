@@ -103,6 +103,7 @@ class SalesOrderModel {
   final String? approvedByUid; // UID المحاسب الذي اعتمد الطلب
   final String? approvedByName; // اسم المحاسب الذي اعتمد الطلب
   final Timestamp? approvedAt; // وقت الاعتماد
+  final String? approvalNotes; // ملاحظات الاعتماد من المحاسب
   final String? rejectionReason; // سبب الرفض إن وجد
   final bool moldTasksEnabled; // هل تم تفعيل مهام تركيب القوالب
   final String? moldSupervisorUid; // UID مشرف التركيب الذي اعتمد الطلب
@@ -136,6 +137,7 @@ class SalesOrderModel {
     this.approvedByUid,
     this.approvedByName,
     this.approvedAt,
+    this.approvalNotes,
     this.rejectionReason,
     this.moldTasksEnabled = false,
     this.moldSupervisorUid,
@@ -175,6 +177,7 @@ class SalesOrderModel {
       approvedByUid: data['approvedByUid'],
       approvedByName: data['approvedByName'],
       approvedAt: data['approvedAt'],
+      approvalNotes: data['approvalNotes'],
       rejectionReason: data['rejectionReason'],
       moldTasksEnabled: data['moldTasksEnabled'] ?? false,
       moldSupervisorUid: data['moldSupervisorUid'],
@@ -212,6 +215,7 @@ class SalesOrderModel {
       'approvedByUid': approvedByUid,
       'approvedByName': approvedByName,
       'approvedAt': approvedAt,
+      'approvalNotes': approvalNotes,
       'rejectionReason': rejectionReason,
       'moldTasksEnabled': moldTasksEnabled,
       'moldSupervisorUid': moldSupervisorUid,
@@ -247,6 +251,7 @@ class SalesOrderModel {
     String? approvedByUid,
     String? approvedByName,
     Timestamp? approvedAt,
+    String? approvalNotes,
     String? rejectionReason,
     bool? moldTasksEnabled,
     String? moldSupervisorUid,
@@ -280,6 +285,7 @@ class SalesOrderModel {
       approvedByUid: approvedByUid ?? this.approvedByUid,
       approvedByName: approvedByName ?? this.approvedByName,
       approvedAt: approvedAt ?? this.approvedAt,
+      approvalNotes: approvalNotes ?? this.approvalNotes,
       rejectionReason: rejectionReason ?? this.rejectionReason,
       moldTasksEnabled: moldTasksEnabled ?? this.moldTasksEnabled,
       moldSupervisorUid: moldSupervisorUid ?? this.moldSupervisorUid,
