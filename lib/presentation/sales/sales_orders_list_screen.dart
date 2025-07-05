@@ -804,7 +804,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 final user = Provider.of<UserModel?>(context, listen: false);
                 if (user == null) {
                   Navigator.of(parentContext).pop(); // Pop the loading indicator
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(content: Text(appLocalizations.loginPrompt)),
                   );
                   return;
@@ -818,7 +818,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       : notesController.text.trim(),
                 );
                 Navigator.of(parentContext).pop(); // Pop the loading indicator
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(parentContext).showSnackBar(
                   SnackBar(
                       content: Text(appLocalizations.orderApprovedSuccessfully)),
                 );
@@ -827,7 +827,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 final msg = e.toString().contains('CREDIT_LIMIT_EXCEEDED')
                     ? appLocalizations.creditLimitExceeded
                     : '${appLocalizations.errorApprovingOrder}: ${e.toString()}';
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(parentContext).showSnackBar(
                   SnackBar(content: Text(msg)),
                 );
               }
@@ -898,12 +898,12 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 final user = Provider.of<UserModel?>(context, listen: false)!;
                 await useCases.rejectSalesOrder(order, user, reasonController.text.trim());
                 Navigator.of(parentContext).pop(); // Pop the loading indicator
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(parentContext).showSnackBar(
                   SnackBar(content: Text(appLocalizations.orderRejectedSuccessfully)),
                 );
               } catch (e) {
                 Navigator.of(parentContext).pop(); // Pop the loading indicator
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(parentContext).showSnackBar(
                   SnackBar(content: Text('${appLocalizations.errorRejectingOrder}: ${e.toString()}')),
                 );
               }
@@ -919,12 +919,12 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showInitiateSupplyDialog(BuildContext context, SalesUseCases salesUseCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel preparer) async {
-    final userUseCases = Provider.of<UserUseCases>(context, listen: false);
+  void _showInitiateSupplyDialog(BuildContext parentContext, SalesUseCases salesUseCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel preparer) async {
+    final userUseCases = Provider.of<UserUseCases>(parentContext, listen: false);
     final storekeepers = await userUseCases.getUsersByRole(UserRole.inventoryManager);
     if (storekeepers.isEmpty) {
       // Show an error or informative message if no storekeepers are found
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(parentContext).showSnackBar(
         SnackBar(content: Text(appLocalizations.noStorekeepersFound)), // New localization
       );
       return;
@@ -933,8 +933,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     UserModel? _selectedStorekeeper = storekeepers.isNotEmpty ? storekeepers.first : null;
 
     await showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
+      context: parentContext,
+      builder: (dialogContext) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(appLocalizations.selectStorekeeper, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -963,7 +963,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           actions: [
             TextButton(
               child: Text(appLocalizations.cancel),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
             ElevatedButton.icon(
@@ -971,15 +971,15 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               label: Text(appLocalizations.initiateSupply),
               onPressed: () async {
                 if (_selectedStorekeeper == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
                     SnackBar(content: Text(appLocalizations.selectStorekeeperError)), // New snackbar
                   );
                   return;
                 }
-                Navigator.of(context).pop(); // Pop the dialog
+                Navigator.of(dialogContext).pop(); // Pop the dialog
                 // Show loading indicator
                 showDialog(
-                  context: context,
+                  context: parentContext,
                   barrierDismissible: false,
                   builder: (BuildContext loadingContext) {
                     return const Center(child: CircularProgressIndicator());
@@ -987,13 +987,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 );
                 try {
                   await salesUseCases.initiateSupply(order, preparer, _selectedStorekeeper!);
-                  Navigator.of(context).pop(); // Pop the loading indicator
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  Navigator.of(parentContext).pop(); // Pop the loading indicator
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(content: Text(appLocalizations.supplyInitiatedSuccessfully)), // New confirmation
                   );
                 } catch (e) {
-                  Navigator.of(context).pop(); // Pop the loading indicator
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  Navigator.of(parentContext).pop(); // Pop the loading indicator
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(content: Text('${appLocalizations.errorInitiatingSupply}: ${e.toString()}')),
                   );
                 }
@@ -1066,7 +1066,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showMoldDocDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
+  void _showMoldDocDialog(BuildContext parentContext, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
     final TextEditingController notesController = TextEditingController(text: order.moldInstallationNotes);
     List<XFile> pickedImages = [];
     // Initialize with existing images
@@ -1091,8 +1091,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     }
 
     showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
+      context: parentContext,
+      builder: (dialogContext) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(appLocalizations.moldInstallationDocumentation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -1195,17 +1195,17 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           actions: [
             TextButton(
               child: Text(appLocalizations.cancel),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.save),
               label: Text(appLocalizations.save),
               onPressed: () async {
-                Navigator.of(context).pop(); // Pop the dialog
+                Navigator.of(dialogContext).pop(); // Pop the dialog
                 // Show loading indicator
                 showDialog(
-                  context: context,
+                  context: parentContext,
                   barrierDismissible: false,
                   builder: (BuildContext loadingContext) {
                     return const Center(child: CircularProgressIndicator());
@@ -1217,13 +1217,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     notes: notesController.text.trim(),
                     attachments: pickedImages.map((e) => File(e.path)).toList(), // Convert XFile to File
                   );
-                  Navigator.of(context).pop(); // Pop loading
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  Navigator.of(parentContext).pop(); // Pop loading
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(content: Text(appLocalizations.documentationSavedSuccessfully)), // New confirmation
                   );
                 } catch (e) {
-                  Navigator.of(context).pop(); // Pop loading
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  Navigator.of(parentContext).pop(); // Pop loading
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(content: Text('${appLocalizations.errorSavingDocumentation}: ${e.toString()}')),
                   );
                 }
@@ -1240,7 +1240,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showWarehouseDocDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel storekeeper) {
+  void _showWarehouseDocDialog(BuildContext parentContext, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order, UserModel storekeeper) {
     final TextEditingController notesController = TextEditingController(text: order.warehouseNotes);
     List<XFile> pickedImages = [];
     // Initialize with existing images
@@ -1266,8 +1266,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     }
 
     showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
+      context: parentContext,
+      builder: (dialogContext) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Text(appLocalizations.warehouseDocumentation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -1437,17 +1437,17 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           actions: [
             TextButton(
               child: Text(appLocalizations.cancel),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.send_to_mobile,color: Colors.white,), // Specific icon for "send to production"
               label: Text(appLocalizations.sendToProduction),
               onPressed: () async {
-                Navigator.of(context).pop(); // Pop the dialog
+                Navigator.of(dialogContext).pop(); // Pop the dialog
                 // Show loading indicator
                 showDialog(
-                  context: context,
+                  context: parentContext,
                   barrierDismissible: false,
                   builder: (BuildContext loadingContext) {
                     return const Center(child: CircularProgressIndicator());
@@ -1461,13 +1461,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     attachments: pickedImages.map((e) => File(e.path)).toList(),
                     deliveryTime: selectedDeliveryTime,
                   );
-                  Navigator.of(context).pop(); // Pop loading
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  Navigator.of(parentContext).pop(); // Pop loading
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(content: Text(appLocalizations.warehouseSupplyDocumentedSuccessfully)), // New confirmation
                   );
                 } catch (e) {
-                  Navigator.of(context).pop(); // Pop loading
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  Navigator.of(parentContext).pop(); // Pop loading
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(content: Text('${appLocalizations.errorDocumentingWarehouseSupply}: ${e.toString()}')), // New error message
                   );
                 }
