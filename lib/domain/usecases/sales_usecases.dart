@@ -135,7 +135,7 @@ class SalesUseCases {
   }
 
   // Accountant approves a sales order
-  Future<void> approveSalesOrder(SalesOrderModel order, UserModel accountant) async {
+  Future<void> approveSalesOrder(SalesOrderModel order, UserModel accountant, {String? notes}) async {
     final customer = await repository.getCustomerById(order.customerId);
     if (customer != null) {
       final newDebt = customer.currentDebt + order.totalAmount;
@@ -150,6 +150,7 @@ class SalesUseCases {
       approvedByUid: accountant.uid,
       approvedByName: accountant.name,
       approvedAt: Timestamp.now(),
+      approvalNotes: notes,
       rejectionReason: null,
       moldTasksEnabled: false,
     );
