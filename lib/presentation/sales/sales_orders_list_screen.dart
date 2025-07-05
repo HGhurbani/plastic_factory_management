@@ -681,11 +681,11 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showApproveDialog(BuildContext context, SalesUseCases useCases,
+  void _showApproveDialog(BuildContext parentContext, SalesUseCases useCases,
       AppLocalizations appLocalizations, SalesOrderModel order) {
     final TextEditingController notesController = TextEditingController();
     showDialog(
-      context: context,
+      context: parentContext,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(appLocalizations.approveOrderConfirmation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -793,7 +793,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               Navigator.of(context).pop(); // Pop the confirmation dialog
               // Show loading indicator
               showDialog(
-                context: context,
+                context: parentContext,
                 barrierDismissible: false,
                 builder: (BuildContext loadingContext) {
                   return const Center(child: CircularProgressIndicator());
@@ -802,7 +802,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               try {
                 final user = Provider.of<UserModel?>(context, listen: false);
                 if (user == null) {
-                  Navigator.of(context).pop(); // Pop the loading indicator
+                  Navigator.of(parentContext).pop(); // Pop the loading indicator
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(appLocalizations.loginPrompt)),
                   );
@@ -816,13 +816,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       ? null
                       : notesController.text.trim(),
                 );
-                Navigator.of(context).pop(); // Pop the loading indicator
+                Navigator.of(parentContext).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                       content: Text(appLocalizations.orderApprovedSuccessfully)),
                 );
               } catch (e) {
-                Navigator.of(context).pop(); // Pop the loading indicator
+                Navigator.of(parentContext).pop(); // Pop the loading indicator
                 final msg = e.toString().contains('CREDIT_LIMIT_EXCEEDED')
                     ? appLocalizations.creditLimitExceeded
                     : '${appLocalizations.errorApprovingOrder}: ${e.toString()}';
@@ -842,10 +842,10 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showRejectDialog(BuildContext context, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
+  void _showRejectDialog(BuildContext parentContext, SalesUseCases useCases, AppLocalizations appLocalizations, SalesOrderModel order) {
     final TextEditingController reasonController = TextEditingController();
     showDialog(
-      context: context,
+      context: parentContext,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(appLocalizations.rejectOrderConfirmation, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
@@ -887,7 +887,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               Navigator.of(context).pop(); // Pop the confirmation dialog
               // Show loading indicator
               showDialog(
-                context: context,
+                context: parentContext,
                 barrierDismissible: false,
                 builder: (BuildContext loadingContext) {
                   return const Center(child: CircularProgressIndicator());
@@ -896,12 +896,12 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
               try {
                 final user = Provider.of<UserModel?>(context, listen: false)!;
                 await useCases.rejectSalesOrder(order, user, reasonController.text.trim());
-                Navigator.of(context).pop(); // Pop the loading indicator
+                Navigator.of(parentContext).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(appLocalizations.orderRejectedSuccessfully)),
                 );
               } catch (e) {
-                Navigator.of(context).pop(); // Pop the loading indicator
+                Navigator.of(parentContext).pop(); // Pop the loading indicator
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('${appLocalizations.errorRejectingOrder}: ${e.toString()}')),
                 );
