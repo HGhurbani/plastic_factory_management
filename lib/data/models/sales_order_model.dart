@@ -111,6 +111,7 @@ class SalesOrderModel {
   final Timestamp? moldSupervisorApprovedAt; // وقت اعتماد المشرف
   final String? moldInstallationNotes; // ملاحظات عملية التركيب
   final List<String> moldInstallationImages; // صور توثيقية للتركيب
+  final String? operationsNotes; // ملاحظات مسؤول العمليات
   final String? warehouseNotes; // ملاحظات أمين المخزن
   final List<String> warehouseImages; // صور توثيق المخزن
   final String? warehouseManagerUid; // UID أمين المخزن المسؤول
@@ -145,6 +146,7 @@ class SalesOrderModel {
     this.moldSupervisorApprovedAt,
     this.moldInstallationNotes,
     this.moldInstallationImages = const [],
+    this.operationsNotes,
     this.warehouseNotes,
     this.warehouseImages = const [],
     this.warehouseManagerUid,
@@ -185,6 +187,7 @@ class SalesOrderModel {
       moldSupervisorApprovedAt: data['moldSupervisorApprovedAt'],
       moldInstallationNotes: data['moldInstallationNotes'],
       moldInstallationImages: List<String>.from(data['moldInstallationImages'] ?? []),
+      operationsNotes: data['operationsNotes'],
       warehouseNotes: data['warehouseNotes'],
       warehouseImages: List<String>.from(data['warehouseImages'] ?? []),
       warehouseManagerUid: data['warehouseManagerUid'],
@@ -223,6 +226,7 @@ class SalesOrderModel {
       'moldSupervisorApprovedAt': moldSupervisorApprovedAt,
       'moldInstallationNotes': moldInstallationNotes,
       'moldInstallationImages': moldInstallationImages,
+      'operationsNotes': operationsNotes,
       'warehouseNotes': warehouseNotes,
       'warehouseImages': warehouseImages,
       'warehouseManagerUid': warehouseManagerUid,
@@ -259,6 +263,7 @@ class SalesOrderModel {
     Timestamp? moldSupervisorApprovedAt,
     String? moldInstallationNotes,
     List<String>? moldInstallationImages,
+    String? operationsNotes,
     String? warehouseNotes,
     List<String>? warehouseImages,
     String? warehouseManagerUid,
@@ -293,6 +298,7 @@ class SalesOrderModel {
       moldSupervisorApprovedAt: moldSupervisorApprovedAt ?? this.moldSupervisorApprovedAt,
       moldInstallationNotes: moldInstallationNotes ?? this.moldInstallationNotes,
       moldInstallationImages: moldInstallationImages ?? this.moldInstallationImages,
+      operationsNotes: operationsNotes ?? this.operationsNotes,
       warehouseNotes: warehouseNotes ?? this.warehouseNotes,
       warehouseImages: warehouseImages ?? this.warehouseImages,
       warehouseManagerUid: warehouseManagerUid ?? this.warehouseManagerUid,

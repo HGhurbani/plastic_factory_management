@@ -224,7 +224,7 @@ class SalesUseCases {
       status: SalesOrderStatus.warehouseProcessing,
       warehouseManagerUid: storekeeper.uid,
       warehouseManagerName: storekeeper.name,
-      warehouseNotes: notes ?? order.warehouseNotes,
+      operationsNotes: notes ?? order.operationsNotes,
     );
     await repository.updateSalesOrder(updated);
 
