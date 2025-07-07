@@ -106,6 +106,7 @@ class ProductionOrderUseCases {
       templateName: null,
       machineId: selectedMachine?.id,
       machineName: selectedMachine?.name,
+      orderPreparerUid: orderPreparer.uid,
       orderPreparerName: orderPreparer.name,
       orderPreparerRole: orderPreparer.userRoleEnum.toFirestoreString(),
       status: ProductionOrderStatus.pending, // الحالة الإجمالية للطلب هي 'قيد الانتظار'
