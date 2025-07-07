@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 
 class PurchaseModel {
   final String id;
@@ -10,6 +11,10 @@ class PurchaseModel {
   final String? productionOrderId;
   final String createdByUid;
   final String createdByName;
+  final String? itemId;
+  final String? itemName;
+  final InventoryItemType? itemType;
+  final double? quantity;
 
   PurchaseModel({
     required this.id,
@@ -21,6 +26,10 @@ class PurchaseModel {
     this.productionOrderId,
     required this.createdByUid,
     required this.createdByName,
+    this.itemId,
+    this.itemName,
+    this.itemType,
+    this.quantity,
   });
 
   factory PurchaseModel.fromDocumentSnapshot(DocumentSnapshot doc) {
@@ -35,6 +44,12 @@ class PurchaseModel {
       productionOrderId: data['productionOrderId'],
       createdByUid: data['createdByUid'] ?? '',
       createdByName: data['createdByName'] ?? '',
+      itemId: data['itemId'],
+      itemName: data['itemName'],
+      itemType: data['itemType'] != null
+          ? inventoryItemTypeFromString(data['itemType'])
+          : null,
+      quantity: (data['quantity'] as num?)?.toDouble(),
     );
   }
 
@@ -48,6 +63,10 @@ class PurchaseModel {
       'productionOrderId': productionOrderId,
       'createdByUid': createdByUid,
       'createdByName': createdByName,
+      if (itemId != null) 'itemId': itemId,
+      if (itemName != null) 'itemName': itemName,
+      if (itemType != null) 'itemType': inventoryItemTypeToString(itemType!),
+      if (quantity != null) 'quantity': quantity,
     };
   }
 
@@ -61,6 +80,10 @@ class PurchaseModel {
     String? productionOrderId,
     String? createdByUid,
     String? createdByName,
+    String? itemId,
+    String? itemName,
+    InventoryItemType? itemType,
+    double? quantity,
   }) {
     return PurchaseModel(
       id: id ?? this.id,
@@ -72,6 +95,10 @@ class PurchaseModel {
       productionOrderId: productionOrderId ?? this.productionOrderId,
       createdByUid: createdByUid ?? this.createdByUid,
       createdByName: createdByName ?? this.createdByName,
+      itemId: itemId ?? this.itemId,
+      itemName: itemName ?? this.itemName,
+      itemType: itemType ?? this.itemType,
+      quantity: quantity ?? this.quantity,
     );
   }
 }
