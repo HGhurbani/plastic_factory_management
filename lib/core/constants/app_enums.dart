@@ -145,3 +145,29 @@ extension TransportModeExtension on TransportMode {
     );
   }
 }
+
+enum FactoryElementType { rawMaterial, colorant, productionInput, custom }
+
+extension FactoryElementTypeExtension on FactoryElementType {
+  String toArabicString() {
+    switch (this) {
+      case FactoryElementType.rawMaterial:
+        return 'مواد خام';
+      case FactoryElementType.colorant:
+        return 'ملونات';
+      case FactoryElementType.productionInput:
+        return 'مدخلات إنتاج';
+      case FactoryElementType.custom:
+        return 'مخصص';
+    }
+  }
+
+  String toFirestoreString() => name;
+
+  static FactoryElementType fromString(String value) {
+    return FactoryElementType.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => FactoryElementType.custom,
+    );
+  }
+}
