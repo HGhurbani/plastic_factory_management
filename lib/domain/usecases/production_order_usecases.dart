@@ -4,8 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:plastic_factory_management/data/models/production_order_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
-import 'package:plastic_factory_management/data/models/template_model.dart';
-import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
@@ -74,9 +72,6 @@ class ProductionOrderUseCases {
   Future<ProductionOrderModel> createProductionOrder({
     required ProductModel selectedProduct,
     required int requiredQuantity,
-    required String batchNumber,
-    required TemplateModel selectedTemplate,
-    required MachineModel selectedMachine,
     required UserModel orderPreparer, // Pass the current user model
     String? salesOrderId,
   }) async {
@@ -98,16 +93,17 @@ class ProductionOrderUseCases {
       ),
     ];
 
+    final batchNumber = DateTime.now().millisecondsSinceEpoch.toString();
     final newOrder = ProductionOrderModel(
       id: '', // Firestore will generate this
       productId: selectedProduct.id,
       productName: selectedProduct.name,
       requiredQuantity: requiredQuantity,
       batchNumber: batchNumber,
-      templateId: selectedTemplate.id,
-      templateName: selectedTemplate.name,
-      machineId: selectedMachine.id,
-      machineName: selectedMachine.name,
+      templateId: null,
+      templateName: null,
+      machineId: null,
+      machineName: null,
       salesOrderId: salesOrderId,
       orderPreparerUid: orderPreparer.uid,
       orderPreparerName: orderPreparer.name,
