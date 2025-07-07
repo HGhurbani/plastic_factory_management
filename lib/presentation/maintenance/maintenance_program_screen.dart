@@ -5,10 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/maintenance_log_model.dart';
 import 'package:plastic_factory_management/data/models/machine_model.dart';
-import 'package:plastic_factory_management/data/models/spare_part_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/maintenance_usecases.dart';
-import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart'; // Import for custom font
@@ -400,8 +398,6 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
     MaintenanceType _selectedType = maintenanceLog?.type ?? MaintenanceType.preventive;
     MaintenanceAssetType _selectedAssetType = maintenanceLog?.assetType ?? MaintenanceAssetType.machine;
     final TextEditingController _meterController = TextEditingController(text: maintenanceLog?.meterReading?.toString() ?? '');
-    List<SparePartModel?> _selectedParts = maintenanceLog?.sparePartsUsed.map((e) => null).toList() ?? [null];
-    List<TextEditingController> _partQtyControllers = maintenanceLog?.sparePartsUsed.map((e) => TextEditingController(text: e.quantity.toString())).toList() ?? [TextEditingController()];
     DateTime _selectedDateTime = maintenanceLog?.maintenanceDate.toDate() ?? DateTime.now();
     final TextEditingController _notesController = TextEditingController(text: maintenanceLog?.notes);
     List<TextEditingController> _checklistControllers = maintenanceLog?.checklist
@@ -435,21 +431,7 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      DropdownButtonFormField<MaintenanceAssetType>(
-                        value: _selectedAssetType,
-                        decoration: InputDecoration(
-                          labelText: appLocalizations.assetType,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                          prefixIcon: Icon(Icons.category, color: AppColors.dark),
-                        ),
-                        items: MaintenanceAssetType.values.map((type) {
-                          return DropdownMenuItem(
-                            value: type,
-                            child: Text(type.toArabicString(), textDirection: TextDirection.rtl),
-                          );
-                        }).toList(),
-                        onChanged: (value) => setState(() => _selectedAssetType = value!),
-                      ),
+                      // Asset type is fixed to machine for scheduling
                       SizedBox(height: 12),
                       // Machine Selection
                       StreamBuilder<List<MachineModel>>(
@@ -617,63 +599,6 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                         textDirection: TextDirection.rtl,
                       ),
                       SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(appLocalizations.sparePartsUsed, style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.dark)),
-                      ),
-                      ..._selectedParts.asMap().entries.map((entry) {
-                        final idx = entry.key;
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: StreamBuilder<List<SparePartModel>>( 
-                                stream: Provider.of<InventoryUseCases>(context, listen: false).getSpareParts(),
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData) return SizedBox();
-                                  return DropdownButton<SparePartModel>(
-                                    value: _selectedParts[idx],
-                                    isExpanded: true,
-                                    items: snapshot.data!.map((p) => DropdownMenuItem(value: p, child: Text(p.name, textDirection: TextDirection.rtl))).toList(),
-                                    onChanged: (val) => setState(() => _selectedParts[idx] = val),
-                                  );
-                                },
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            SizedBox(
-                              width: 60,
-                              child: TextFormField(
-                                controller: _partQtyControllers[idx],
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(hintText: appLocalizations.quantity),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.remove_circle, color: Colors.redAccent),
-                              onPressed: () {
-                                setState(() {
-                                  _selectedParts.removeAt(idx);
-                                  _partQtyControllers.removeAt(idx);
-                                });
-                              },
-                            )
-                          ],
-                        );
-                      }).toList(),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton.icon(
-                          icon: Icon(Icons.add, color: AppColors.primary),
-                          label: Text(appLocalizations.addSparePart, style: TextStyle(color: AppColors.primary)),
-                          onPressed: () {
-                            setState(() {
-                              _selectedParts.add(null);
-                              _partQtyControllers.add(TextEditingController());
-                            });
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 12),
                       // Checklist Items
                       Align(
                         alignment: Alignment.centerRight,
@@ -762,13 +687,6 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                             responsibleName: maintenanceLog.responsibleName,
                             notes: _notesController.text.isEmpty ? null : _notesController.text,
                             meterReading: double.tryParse(_meterController.text),
-                            sparePartsUsed: List.generate(_selectedParts.length, (i) {
-                              final part = _selectedParts[i];
-                              final qty = double.tryParse(_partQtyControllers[i].text) ?? 0;
-                              return part == null
-                                  ? MaintenanceSparePart(partId: '', partName: '', quantity: qty)
-                                  : MaintenanceSparePart(partId: part.id, partName: part.name, quantity: qty);
-                            }),
                             checklist: tasks.map((task) => MaintenanceChecklistItem(
                                 task: task,
                                 completed: maintenanceLog.checklist.any((item) => item.task == task && item.completed)
@@ -784,13 +702,6 @@ class _MaintenanceProgramScreenState extends State<MaintenanceProgramScreen> wit
                             responsibleUser: currentUser,
                             assetType: _selectedAssetType,
                             meterReading: double.tryParse(_meterController.text),
-                            sparePartsUsed: List.generate(_selectedParts.length, (i) {
-                              final part = _selectedParts[i];
-                              final qty = double.tryParse(_partQtyControllers[i].text) ?? 0;
-                              return part == null
-                                  ? MaintenanceSparePart(partId: '', partName: '', quantity: qty)
-                                  : MaintenanceSparePart(partId: part.id, partName: part.name, quantity: qty);
-                            }),
                             notes: _notesController.text.isEmpty ? null : _notesController.text,
                             checklistTasks: tasks,
                           );
