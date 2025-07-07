@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import '../../data/models/factory_element_model.dart';
 import '../../core/constants/app_enums.dart';
 import '../../theme/app_colors.dart';
+import '../../domain/usecases/factory_element_usecases.dart';
 
 class FactoryElementsScreen extends StatefulWidget {
   const FactoryElementsScreen({super.key});
@@ -12,7 +14,6 @@ class FactoryElementsScreen extends StatefulWidget {
 }
 
 class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
-  final List<FactoryElementModel> _elements = [];
 
   FactoryElementType _typeFromArabic(String type) {
     switch (type) {
@@ -40,11 +41,13 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
     }
   }
 
-  void _deleteElement(int index) {
-    setState(() => _elements.removeAt(index));
+  Future<void> _deleteElement(String id) async {
+    final useCases =
+        Provider.of<FactoryElementUseCases>(context, listen: false);
+    await useCases.deleteElement(id);
   }
 
-  void _showEditDialog(FactoryElementModel element, int index) {
+  void _showEditDialog(FactoryElementModel element) {
     FactoryElementType type = _typeFromArabic(element.type);
     final nameController = TextEditingController(text: element.name);
     final customTypeController = TextEditingController(
@@ -118,9 +121,10 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
                     ? customTypeController.text.trim()
                     : type.toArabicString();
                 if (name.isEmpty || finalType.isEmpty) return;
-                setState(() {
-                  _elements[index] = element.copyWith(name: name, type: finalType);
-                });
+                final useCases =
+                    Provider.of<FactoryElementUseCases>(context, listen: false);
+                useCases.updateElement(
+                    id: element.id, type: finalType, name: name);
                 Navigator.pop(context);
               },
               child: Text(AppLocalizations.of(context)!.save),
@@ -203,15 +207,9 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
                     ? customTypeController.text.trim()
                     : type.toArabicString();
                 if (name.isEmpty || finalType.isEmpty) return;
-                setState(() {
-                  _elements.add(FactoryElementModel(
-                    id: DateTime.now()
-                        .millisecondsSinceEpoch
-                        .toString(),
-                    type: finalType,
-                    name: name,
-                  ));
-                });
+                final useCases =
+                    Provider.of<FactoryElementUseCases>(context, listen: false);
+                useCases.addElement(type: finalType, name: name);
                 Navigator.pop(context);
               },
               child: Text(AppLocalizations.of(context)!.add),
@@ -236,13 +234,22 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
           ),
         ],
       ),
-      body: _elements.isEmpty
-          ? Center(child: Text(loc.noData))
-          : ListView.builder(
+      body: StreamBuilder<List<FactoryElementModel>>( 
+          stream:
+              Provider.of<FactoryElementUseCases>(context).getElements(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final elements = snapshot.data!;
+            if (elements.isEmpty) {
+              return Center(child: Text(loc.noData));
+            }
+            return ListView.builder(
               padding: const EdgeInsets.all(8),
-              itemCount: _elements.length,
+              itemCount: elements.length,
               itemBuilder: (context, index) {
-                final element = _elements[index];
+                final element = elements[index];
                 return Card(
                   color: AppColors.lightGrey,
                   margin: const EdgeInsets.symmetric(vertical: 6),
@@ -261,20 +268,20 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
                         IconButton(
                           icon: const Icon(Icons.edit_outlined),
                           tooltip: loc.edit,
-                          onPressed: () =>
-                              _showEditDialog(element, index),
+                          onPressed: () => _showEditDialog(element),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete_outline),
                           tooltip: loc.delete,
-                          onPressed: () => _deleteElement(index),
+                          onPressed: () => _deleteElement(element.id),
                         ),
                       ],
                     ),
                   ),
                 );
               },
-            ),
+            );
+          }),
     );
   }
 }

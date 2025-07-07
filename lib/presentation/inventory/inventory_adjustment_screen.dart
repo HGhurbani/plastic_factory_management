@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
-import 'package:plastic_factory_management/data/models/product_model.dart';
-import 'package:plastic_factory_management/data/models/raw_material_model.dart';
-import 'package:plastic_factory_management/data/models/spare_part_model.dart';
+import 'package:plastic_factory_management/data/models/factory_element_model.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/factory_element_usecases.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 
 class InventoryAdjustmentScreen extends StatefulWidget {
@@ -15,7 +14,7 @@ class InventoryAdjustmentScreen extends StatefulWidget {
 }
 
 class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
-  InventoryItemType? _type;
+  String? _type;
   String? _itemId;
   String? _itemName;
   final TextEditingController _qtyController = TextEditingController();
@@ -40,32 +39,39 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            DropdownButtonFormField<InventoryItemType>(
-              decoration: InputDecoration(labelText: appLocalizations.selectInventoryType),
-              value: _type,
-              items: const [
-                DropdownMenuItem(
-                  value: InventoryItemType.rawMaterial,
-                  child: Text('مواد خام', textDirection: TextDirection.rtl),
-                ),
-                DropdownMenuItem(
-                  value: InventoryItemType.finishedProduct,
-                  child: Text('منتج تام', textDirection: TextDirection.rtl),
-                ),
-                DropdownMenuItem(
-                  value: InventoryItemType.sparePart,
-                  child: Text('قطع غيار', textDirection: TextDirection.rtl),
-                ),
-              ],
-              onChanged: (value) => setState(() {
-                _type = value;
-                _itemId = null;
-              }),
+            StreamBuilder<List<FactoryElementModel>>( 
+              stream: elementUseCases.getElements(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final types = snapshot.data!
+                    .map((e) => e.type)
+                    .toSet()
+                    .toList();
+                return DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                      labelText: appLocalizations.selectInventoryType),
+                  value: _type,
+                  items: types
+                      .map(
+                        (t) => DropdownMenuItem(
+                          value: t,
+                          child: Text(t, textDirection: TextDirection.rtl),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (val) => setState(() {
+                    _type = val;
+                    _itemId = null;
+                  }),
+                );
+              },
             ),
             const SizedBox(height: 16),
             if (_type != null)
-              StreamBuilder<List<dynamic>>(
-                stream: _itemsStream(useCases, _type!),
+              StreamBuilder<List<FactoryElementModel>>( 
+                stream: _itemsStream(elementUseCases, _type!),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
@@ -76,13 +82,14 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
                     value: _itemId,
                     items: items
                         .map<DropdownMenuItem<String>>(
-                          (e) => DropdownMenuItem(value: _getId(e), child: Text(_getName(e))),
+                          (e) =>
+                              DropdownMenuItem(value: e.id, child: Text(e.name)),
                         )
                         .toList(),
                     onChanged: (value) => setState(() {
                       _itemId = value;
-                      final itm = items.firstWhere((e) => _getId(e) == value);
-                      _itemName = _getName(itm);
+                      final itm = items.firstWhere((e) => e.id == value);
+                      _itemName = itm.name;
                     }),
                   );
                 },
@@ -101,7 +108,7 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
                       await useCases.adjustInventoryWithNotification(
                         itemId: _itemId!,
                         itemName: _itemName ?? '',
-                        type: _type!,
+                        type: _mapType(_type!),
                         delta: qty,
                       );
                       if (mounted) Navigator.of(context).pop();
@@ -115,28 +122,23 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
     );
   }
 
-  Stream<List<dynamic>> _itemsStream(InventoryUseCases useCases, InventoryItemType type) {
+  Stream<List<FactoryElementModel>> _itemsStream(
+      FactoryElementUseCases useCases, String type) {
+    return useCases
+        .getElements()
+        .map((list) => list.where((e) => e.type == type).toList());
+  }
+
+  InventoryItemType _mapType(String type) {
     switch (type) {
-      case InventoryItemType.rawMaterial:
-        return useCases.getRawMaterials();
-      case InventoryItemType.finishedProduct:
-        return useCases.getProducts();
-      case InventoryItemType.sparePart:
-        return useCases.getSpareParts();
+      case 'مواد خام':
+        return InventoryItemType.rawMaterial;
+      case 'منتج تام':
+        return InventoryItemType.finishedProduct;
+      case 'قطع غيار':
+        return InventoryItemType.sparePart;
+      default:
+        return InventoryItemType.rawMaterial;
     }
-  }
-
-  String _getId(dynamic item) {
-    if (item is RawMaterialModel) return item.id;
-    if (item is ProductModel) return item.id;
-    if (item is SparePartModel) return item.id;
-    return '';
-  }
-
-  String _getName(dynamic item) {
-    if (item is RawMaterialModel) return item.name;
-    if (item is ProductModel) return item.name;
-    if (item is SparePartModel) return item.name;
-    return '';
   }
 }
