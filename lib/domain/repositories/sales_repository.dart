@@ -22,6 +22,7 @@ abstract class SalesRepository {
   });
   Future<void> updateSalesOrder(SalesOrderModel order);
   Future<void> deleteSalesOrder(String orderId);
+  Future<SalesOrderModel?> getSalesOrderById(String orderId);
 
   Stream<List<ProductModel>> getAllProducts(); // For sales reps to view products
 }

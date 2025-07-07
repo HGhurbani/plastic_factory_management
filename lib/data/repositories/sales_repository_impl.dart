@@ -72,6 +72,11 @@ class SalesRepositoryImpl implements SalesRepository {
   }
 
   @override
+  Future<SalesOrderModel?> getSalesOrderById(String orderId) {
+    return datasource.getSalesOrderById(orderId);
+  }
+
+  @override
   Stream<List<ProductModel>> getAllProducts() {
     return datasource.getAllProducts();
   }
