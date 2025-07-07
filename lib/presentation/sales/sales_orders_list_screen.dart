@@ -330,6 +330,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                                   isAccountant,
                                   isProductionOrderPreparer,
                                   isInventoryManager,
+                                  isOperationsOfficer,
                                   isMoldInstallationSupervisor,
                                 ),
                               ),
@@ -397,6 +398,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       bool isAccountant,
       bool isProductionOrderPreparer,
       bool isInventoryManager,
+      bool isOperationsOfficer,
       bool isMoldInstallationSupervisor) {
     List<Widget> actions = [];
 
