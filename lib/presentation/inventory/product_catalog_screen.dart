@@ -446,20 +446,16 @@ class _ProductCatalogScreenState extends State<ProductCatalogScreen> {
             const Divider(height: 16),
             _buildDetailRow(appLocalizations.templateCode, template.code,
                 icon: Icons.qr_code_2),
-            _buildDetailRow(appLocalizations.timeRequired,
-                template.timeRequired.toString(),
-                icon: Icons.timer),
-            _buildDetailRow(appLocalizations.percentage,
-                template.percentage.toString(),
-                icon: Icons.percent),
+            _buildDetailRow(appLocalizations.templateWeight,
+                template.weight.toString(),
+                icon: Icons.scale),
+            _buildDetailRow(appLocalizations.templateHourlyCost,
+                template.costPerHour.toString(),
+                icon: Icons.attach_money),
             if (template.colors.isNotEmpty)
               _buildDetailRow(
                   appLocalizations.colors, template.colors.join('، '),
                   icon: Icons.color_lens),
-            if (template.additives.isNotEmpty)
-              _buildDetailRow(
-                  appLocalizations.additives, template.additives.join('، '),
-                  icon: Icons.add),
             if (template.materialsUsed.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(appLocalizations.materialsUsed,

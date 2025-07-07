@@ -160,8 +160,8 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
               ),
               const Divider(height: 16),
               _buildInfoRow(appLocalizations.templateCode, template.code, icon: Icons.qr_code_2),
-              _buildInfoRow(appLocalizations.timeRequired, template.timeRequired.toString(), icon: Icons.timer),
-              _buildInfoRow(appLocalizations.percentage, template.percentage.toString(), icon: Icons.percent),
+              _buildInfoRow(appLocalizations.templateWeight, template.weight.toString(), icon: Icons.scale),
+              _buildInfoRow(appLocalizations.templateHourlyCost, template.costPerHour.toString(), icon: Icons.attach_money),
             ],
           ),
         ),
@@ -225,12 +225,10 @@ class _TemplatesScreenState extends State<TemplatesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildInfoRow(appLocalizations.templateCode, template.code, icon: Icons.qr_code_2),
-                  _buildInfoRow(appLocalizations.timeRequired, template.timeRequired.toString(), icon: Icons.timer),
-                  _buildInfoRow(appLocalizations.percentage, template.percentage.toString(), icon: Icons.percent),
+                  _buildInfoRow(appLocalizations.templateWeight, template.weight.toString(), icon: Icons.scale),
+                  _buildInfoRow(appLocalizations.templateHourlyCost, template.costPerHour.toString(), icon: Icons.attach_money),
                   if (template.colors.isNotEmpty)
                     _buildInfoRow(appLocalizations.colors, template.colors.join('، '), icon: Icons.color_lens),
-                  if (template.additives.isNotEmpty)
-                    _buildInfoRow(appLocalizations.additives, template.additives.join('، '), icon: Icons.add),
                   if (template.materialsUsed.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(appLocalizations.materialsUsed, style: const TextStyle(fontWeight: FontWeight.bold)),

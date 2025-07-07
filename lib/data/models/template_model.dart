@@ -27,21 +27,19 @@ class TemplateModel {
   final String id; // Firestore document ID
   final String code; // الكود
   final String name; // الاسم
-  final double timeRequired; // الوقت المستغرق بالدقائق
+  final double weight; // الوزن
+  final double costPerHour; // تكلفة الساعة للقالب
   final List<TemplateMaterial> materialsUsed; // المواد المستخدمة
   final List<String> colors; // الألوان
-  final double percentage; // النسبة
-  final List<String> additives; // الإضافات
 
   TemplateModel({
     required this.id,
     required this.code,
     required this.name,
-    required this.timeRequired,
+    required this.weight,
+    required this.costPerHour,
     required this.materialsUsed,
     required this.colors,
-    required this.percentage,
-    required this.additives,
   });
 
   factory TemplateModel.fromDocumentSnapshot(DocumentSnapshot doc) {
@@ -50,14 +48,13 @@ class TemplateModel {
       id: doc.id,
       code: data['code'] ?? '',
       name: data['name'] ?? '',
-      timeRequired: (data['timeRequired'] as num?)?.toDouble() ?? 0.0,
+      weight: (data['weight'] as num?)?.toDouble() ?? 0.0,
+      costPerHour: (data['costPerHour'] as num?)?.toDouble() ?? 0.0,
       materialsUsed: (data['materialsUsed'] as List<dynamic>?)
               ?.map((e) => TemplateMaterial.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
       colors: List<String>.from(data['colors'] ?? []),
-      percentage: (data['percentage'] as num?)?.toDouble() ?? 0.0,
-      additives: List<String>.from(data['additives'] ?? []),
     );
   }
 
@@ -65,11 +62,10 @@ class TemplateModel {
     return {
       'code': code,
       'name': name,
-      'timeRequired': timeRequired,
+      'weight': weight,
+      'costPerHour': costPerHour,
       'materialsUsed': materialsUsed.map((e) => e.toMap()).toList(),
       'colors': colors,
-      'percentage': percentage,
-      'additives': additives,
     };
   }
 
@@ -77,21 +73,19 @@ class TemplateModel {
     String? id,
     String? code,
     String? name,
-    double? timeRequired,
+    double? weight,
+    double? costPerHour,
     List<TemplateMaterial>? materialsUsed,
     List<String>? colors,
-    double? percentage,
-    List<String>? additives,
   }) {
     return TemplateModel(
       id: id ?? this.id,
       code: code ?? this.code,
       name: name ?? this.name,
-      timeRequired: timeRequired ?? this.timeRequired,
+      weight: weight ?? this.weight,
+      costPerHour: costPerHour ?? this.costPerHour,
       materialsUsed: materialsUsed ?? this.materialsUsed,
       colors: colors ?? this.colors,
-      percentage: percentage ?? this.percentage,
-      additives: additives ?? this.additives,
     );
   }
 
