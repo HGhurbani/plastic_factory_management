@@ -29,6 +29,7 @@ class _InventoryAdjustmentScreenState extends State<InventoryAdjustmentScreen> {
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final useCases = Provider.of<InventoryUseCases>(context);
+    final elementUseCases = Provider.of<FactoryElementUseCases>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(appLocalizations.addInventoryEntry),
