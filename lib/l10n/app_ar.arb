@@ -65,6 +65,8 @@
   "editTemplate": "تعديل قالب",
   "templateCode": "كود القالب",
   "templateName": "اسم القالب",
+  "templateWeight": "الوزن",
+  "templateHourlyCost": "تكلفة الساعة للقالب",
   "templateDetails": "تفاصيل القالب",
   "timeRequired": "الوقت المستغرق",
   "percentage": "النسبة",

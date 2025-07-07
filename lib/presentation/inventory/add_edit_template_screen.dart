@@ -18,13 +18,12 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _codeController;
   late TextEditingController _nameController;
-  late TextEditingController _timeController;
-  late TextEditingController _percentageController;
+  late TextEditingController _weightController;
+  late TextEditingController _costController;
 
   Map<String, String> _rawMaterialNames = {};
   List<TemplateMaterial> _materials = [];
   List<String> _colors = [];
-  List<String> _additives = [];
 
   @override
   void initState() {
@@ -32,12 +31,10 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
     final t = widget.template;
     _codeController = TextEditingController(text: t?.code);
     _nameController = TextEditingController(text: t?.name);
-    _timeController = TextEditingController(text: t?.timeRequired.toString());
-    _percentageController =
-        TextEditingController(text: t?.percentage.toString());
+    _weightController = TextEditingController(text: t?.weight.toString());
+    _costController = TextEditingController(text: t?.costPerHour.toString());
     _materials = List<TemplateMaterial>.from(t?.materialsUsed ?? []);
     _colors = List<String>.from(t?.colors ?? []);
-    _additives = List<String>.from(t?.additives ?? []);
     _fetchRawMaterialNames();
   }
 
@@ -56,8 +53,8 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
   void dispose() {
     _codeController.dispose();
     _nameController.dispose();
-    _timeController.dispose();
-    _percentageController.dispose();
+    _weightController.dispose();
+    _costController.dispose();
     super.dispose();
   }
 
@@ -107,11 +104,11 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
-                  controller: _timeController,
+                  controller: _weightController,
                   decoration: InputDecoration(
-                    labelText: loc.timeRequired,
+                    labelText: loc.templateWeight,
                     border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.timer),
+                    prefixIcon: const Icon(Icons.scale),
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
@@ -125,11 +122,11 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
-                  controller: _percentageController,
+                  controller: _costController,
                   decoration: InputDecoration(
-                    labelText: loc.percentage,
+                    labelText: loc.templateHourlyCost,
                     border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.percent),
+                    prefixIcon: const Icon(Icons.attach_money),
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
@@ -219,40 +216,6 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(loc.additives,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8.0,
-                  runSpacing: 4.0,
-                  children: [
-                    ..._additives.map((a) => Chip(
-                          label: Text(a),
-                          onDeleted: () {
-                            setState(() {
-                              _additives.remove(a);
-                            });
-                          },
-                        )),
-                    ActionChip(
-                      avatar: const Icon(Icons.add_circle_outline,
-                          color: AppColors.primary),
-                      label: Text(loc.add),
-                      onPressed: () async {
-                        final newAdd =
-                            await _showTextInputDialog(context, loc.enterAdditiveName);
-                        if (newAdd != null && newAdd.isNotEmpty) {
-                          setState(() {
-                            _additives.add(newAdd);
-                          });
-                        }
-                      },
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   icon: Icon(isEditing ? Icons.save : Icons.add,
@@ -265,23 +228,19 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
                             id: widget.template!.id,
                             code: _codeController.text,
                             name: _nameController.text,
-                            timeRequired: double.parse(_timeController.text),
+                            weight: double.parse(_weightController.text),
+                            costPerHour: double.parse(_costController.text),
                             materialsUsed: _materials,
                             colors: _colors,
-                            percentage:
-                                double.parse(_percentageController.text),
-                            additives: _additives,
                           );
                         } else {
                           await useCases.addTemplate(
                             code: _codeController.text,
                             name: _nameController.text,
-                            timeRequired: double.parse(_timeController.text),
+                            weight: double.parse(_weightController.text),
+                            costPerHour: double.parse(_costController.text),
                             materialsUsed: _materials,
                             colors: _colors,
-                            percentage:
-                                double.parse(_percentageController.text),
-                            additives: _additives,
                           );
                         }
                         if (mounted) Navigator.of(context).pop();

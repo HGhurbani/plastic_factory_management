@@ -69,21 +69,19 @@ class InventoryUseCases {
   Future<void> addTemplate({
     required String code,
     required String name,
-    required double timeRequired,
+    required double weight,
+    required double costPerHour,
     required List<TemplateMaterial> materialsUsed,
     required List<String> colors,
-    required double percentage,
-    required List<String> additives,
   }) async {
     final newTemplate = TemplateModel(
       id: '',
       code: code,
       name: name,
-      timeRequired: timeRequired,
+      weight: weight,
+      costPerHour: costPerHour,
       materialsUsed: materialsUsed,
       colors: colors,
-      percentage: percentage,
-      additives: additives,
     );
     await repository.addTemplate(newTemplate);
   }
@@ -92,21 +90,19 @@ class InventoryUseCases {
     required String id,
     required String code,
     required String name,
-    required double timeRequired,
+    required double weight,
+    required double costPerHour,
     required List<TemplateMaterial> materialsUsed,
     required List<String> colors,
-    required double percentage,
-    required List<String> additives,
   }) async {
     final updated = TemplateModel(
       id: id,
       code: code,
       name: name,
-      timeRequired: timeRequired,
+      weight: weight,
+      costPerHour: costPerHour,
       materialsUsed: materialsUsed,
       colors: colors,
-      percentage: percentage,
-      additives: additives,
     );
     await repository.updateTemplate(updated);
   }
