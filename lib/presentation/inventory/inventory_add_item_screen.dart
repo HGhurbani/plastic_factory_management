@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/factory_element_usecases.dart';
+import 'package:plastic_factory_management/data/models/factory_element_model.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 
 class InventoryAddItemScreen extends StatefulWidget {
@@ -12,18 +14,17 @@ class InventoryAddItemScreen extends StatefulWidget {
 }
 
 class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
-  InventoryItemType? _type;
+  String? _type;
+  String? _itemId;
   final TextEditingController _codeController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _unitController = TextEditingController();
-  final TextEditingController _packagingController = TextEditingController();
 
   @override
   void dispose() {
     _codeController.dispose();
     _nameController.dispose();
     _unitController.dispose();
-    _packagingController.dispose();
     super.dispose();
   }
 
@@ -31,6 +32,7 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final useCases = Provider.of<InventoryUseCases>(context);
+    final elementUseCases = Provider.of<FactoryElementUseCases>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(appLocalizations.addInventoryItem),
@@ -42,38 +44,42 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DropdownButtonFormField<InventoryItemType>(
-                decoration: InputDecoration(labelText: appLocalizations.selectInventoryType),
-                value: _type,
-                items: const [
-                  DropdownMenuItem(
-                    value: InventoryItemType.rawMaterial,
-                    child: Text('مواد خام', textDirection: TextDirection.rtl),
-                  ),
-                  DropdownMenuItem(
-                    value: InventoryItemType.finishedProduct,
-                    child: Text('منتج تام', textDirection: TextDirection.rtl),
-                  ),
-                  DropdownMenuItem(
-                    value: InventoryItemType.sparePart,
-                    child: Text('قطع غيار', textDirection: TextDirection.rtl),
-                  ),
-                ],
-                onChanged: (value) => setState(() {
-                  _type = value;
-                  _codeController.clear();
-                  _nameController.clear();
-                  _unitController.clear();
-                  _packagingController.clear();
-                }),
+              StreamBuilder<List<FactoryElementModel>>(
+                stream: elementUseCases.getElements(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final types = snapshot.data!
+                      .map((e) => e.type)
+                      .toSet()
+                      .toList();
+                  return DropdownButtonFormField<String>(
+                    decoration: InputDecoration(labelText: appLocalizations.selectInventoryType),
+                    value: _type,
+                    items: types
+                        .map((t) => DropdownMenuItem(
+                              value: t,
+                              child: Text(t, textDirection: TextDirection.rtl),
+                            ))
+                        .toList(),
+                    onChanged: (val) => setState(() {
+                      _type = val;
+                      _itemId = null;
+                      _nameController.clear();
+                      _codeController.clear();
+                      _unitController.clear();
+                    }),
+                  );
+                },
               ),
               const SizedBox(height: 16),
-              if (_type != null) ..._buildFields(appLocalizations),
+              if (_type != null) ..._buildFields(appLocalizations, elementUseCases),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _canSubmit()
                     ? () async {
-                        switch (_type) {
+                        switch (_mapType(_type!)) {
                           case InventoryItemType.rawMaterial:
                             await useCases.addRawMaterial(
                               code: _codeController.text,
@@ -89,7 +95,7 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
                               billOfMaterials: const [],
                               colors: const [],
                               additives: const [],
-                              packagingType: _packagingController.text,
+                              packagingType: '',
                               requiresPackaging: false,
                               requiresSticker: false,
                               productType: 'single',
@@ -119,78 +125,79 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
   }
 
   bool _canSubmit() {
-    if (_type == null) return false;
+    if (_type == null || _itemId == null) return false;
     if (_codeController.text.isEmpty || _nameController.text.isEmpty) return false;
-    if (_type == InventoryItemType.finishedProduct) {
+    if (_mapType(_type!) == InventoryItemType.finishedProduct) {
       return true;
     }
     return _unitController.text.isNotEmpty;
   }
 
-  List<Widget> _buildFields(AppLocalizations loc) {
-    switch (_type) {
-      case InventoryItemType.rawMaterial:
-        return [
-          TextFormField(
-            controller: _nameController,
-            decoration: InputDecoration(labelText: loc.materialName),
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _codeController,
-            decoration: InputDecoration(labelText: loc.materialCode),
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _unitController,
-            decoration: InputDecoration(labelText: loc.unitOfMeasurement),
-            onChanged: (_) => setState(() {}),
-          ),
-        ];
-      case InventoryItemType.finishedProduct:
-        return [
-          TextFormField(
-            controller: _nameController,
-            decoration: InputDecoration(labelText: loc.productName),
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _codeController,
-            decoration: InputDecoration(labelText: loc.productCode),
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _packagingController,
-            decoration: InputDecoration(labelText: loc.packagingType),
-            onChanged: (_) => setState(() {}),
-          ),
-        ];
-      case InventoryItemType.sparePart:
-        return [
-          TextFormField(
-            controller: _nameController,
-            decoration: InputDecoration(labelText: loc.materialName),
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _codeController,
-            decoration: InputDecoration(labelText: loc.materialCode),
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _unitController,
-            decoration: InputDecoration(labelText: loc.unitOfMeasurement),
-            onChanged: (_) => setState(() {}),
-          ),
-        ];
+  List<Widget> _buildFields(AppLocalizations loc, FactoryElementUseCases elementUseCases) {
+    final typeEnum = _mapType(_type!);
+    return [
+      StreamBuilder<List<FactoryElementModel>>(
+        stream: _itemsStream(elementUseCases, _type!),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final items = snapshot.data!;
+          return DropdownButtonFormField<String>(
+            decoration: InputDecoration(labelText: loc.selectItem),
+            value: _itemId,
+            items: items
+                .map((e) => DropdownMenuItem(
+                      value: e.id,
+                      child: Text(e.name, textDirection: TextDirection.rtl),
+                    ))
+                .toList(),
+            onChanged: (val) => setState(() {
+              _itemId = val;
+              final itm = items.firstWhere((e) => e.id == val);
+              _nameController.text = itm.name;
+            }),
+          );
+        },
+      ),
+      const SizedBox(height: 12),
+      TextFormField(
+        controller: _codeController,
+        decoration: InputDecoration(
+          labelText: typeEnum == InventoryItemType.finishedProduct
+              ? loc.productCode
+              : loc.materialCode,
+        ),
+        onChanged: (_) => setState(() {}),
+      ),
+      if (typeEnum != InventoryItemType.finishedProduct) ...[
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _unitController,
+          decoration: InputDecoration(labelText: loc.unitOfMeasurement),
+          onChanged: (_) => setState(() {}),
+        ),
+      ],
+    ];
+  }
+
+  Stream<List<FactoryElementModel>> _itemsStream(
+      FactoryElementUseCases useCases, String type) {
+    return useCases
+        .getElements()
+        .map((list) => list.where((e) => e.type == type).toList());
+  }
+
+  InventoryItemType _mapType(String type) {
+    switch (type) {
+      case 'مواد خام':
+        return InventoryItemType.rawMaterial;
+      case 'منتج تام':
+        return InventoryItemType.finishedProduct;
+      case 'قطع غيار':
+        return InventoryItemType.sparePart;
       default:
-        return [];
+        return InventoryItemType.rawMaterial;
     }
   }
 }
