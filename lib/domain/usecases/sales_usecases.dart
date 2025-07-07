@@ -399,6 +399,10 @@ class SalesUseCases {
     await repository.deleteSalesOrder(orderId);
   }
 
+  Future<SalesOrderModel?> getSalesOrderById(String orderId) {
+    return repository.getSalesOrderById(orderId);
+  }
+
   // --- Product Catalog for Sales Reps ---
   Stream<List<ProductModel>> getProductCatalogForSales() {
     return repository.getAllProducts(); // Reusing the product model from inventory

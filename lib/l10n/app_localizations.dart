@@ -419,6 +419,9 @@ class AppLocalizations {
   String get tryAgain => _strings["tryAgain"] ?? "tryAgain";
   String get clearFilter => _strings["clearFilter"] ?? "clearFilter";
   String get orderId => _strings["orderId"] ?? "orderId";
+  String get orderType => _strings["orderType"] ?? "orderType";
+  String get fetchOrder => _strings["fetchOrder"] ?? "fetchOrder";
+  String get orderDetails => _strings["orderDetails"] ?? "orderDetails";
   String get unknown => _strings["unknown"] ?? "unknown";
   String get addTemplate => _strings["addTemplate"] ?? "addTemplate";
   String get editTemplate => _strings["editTemplate"] ?? "editTemplate";

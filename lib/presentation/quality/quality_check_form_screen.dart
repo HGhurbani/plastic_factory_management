@@ -8,10 +8,16 @@ import 'package:provider/provider.dart';
 
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
+import 'package:plastic_factory_management/data/models/sales_order_model.dart';
+import 'package:plastic_factory_management/data/models/production_order_model.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
 import 'package:plastic_factory_management/domain/usecases/quality_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/core/services/file_upload_service.dart';
+
+enum OrderType { sales, production }
 
 class QualityCheckFormScreen extends StatefulWidget {
   const QualityCheckFormScreen({Key? key}) : super(key: key);
@@ -23,6 +29,10 @@ class QualityCheckFormScreen extends StatefulWidget {
 class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
   final _formKey = GlobalKey<FormState>();
   ProductModel? _selectedProduct;
+  final TextEditingController _orderIdController = TextEditingController();
+  OrderType? _orderType;
+  SalesOrderModel? _salesOrder;
+  ProductionOrderModel? _productionOrder;
   final TextEditingController _inspectedController = TextEditingController();
   final TextEditingController _rejectedController = TextEditingController();
   final TextEditingController _supervisorController = TextEditingController();
@@ -34,6 +44,7 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
 
   @override
   void dispose() {
+    _orderIdController.dispose();
     _inspectedController.dispose();
     _rejectedController.dispose();
     _supervisorController.dispose();
@@ -46,6 +57,29 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
     if (picked != null) {
       setState(() {
         _images.add(File(picked.path));
+      });
+    }
+  }
+
+  Future<void> _fetchOrder() async {
+    final id = _orderIdController.text.trim();
+    if (id.isEmpty || _orderType == null) return;
+    if (_orderType == OrderType.sales) {
+      final salesUseCases = Provider.of<SalesUseCases>(context, listen: false);
+      final order = await salesUseCases.getSalesOrderById(id);
+      setState(() {
+        _salesOrder = order;
+        _productionOrder = null;
+        _selectedProduct = null;
+      });
+    } else {
+      final prodUseCases =
+          Provider.of<ProductionOrderUseCases>(context, listen: false);
+      final order = await prodUseCases.getProductionOrderById(id);
+      setState(() {
+        _productionOrder = order;
+        _salesOrder = null;
+        _selectedProduct = null;
       });
     }
   }
@@ -98,6 +132,36 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                DropdownButtonFormField<OrderType>(
+                  value: _orderType,
+                  decoration: InputDecoration(labelText: loc.orderType),
+                  items: [
+                    DropdownMenuItem(
+                      value: OrderType.sales,
+                      child: Text(loc.salesOrder),
+                    ),
+                    DropdownMenuItem(
+                      value: OrderType.production,
+                      child: Text(loc.productionOrder),
+                    ),
+                  ],
+                  onChanged: (val) => setState(() => _orderType = val),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _orderIdController,
+                  decoration: InputDecoration(labelText: loc.orderId),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: _fetchOrder,
+                  child: Text(loc.fetchOrder),
+                ),
+                if (_salesOrder != null || _productionOrder != null) ...[
+                  const SizedBox(height: 12),
+                  _buildOrderDetails(loc),
+                  const SizedBox(height: 12),
+                ],
                 StreamBuilder<List<ProductModel>>(
                   stream: inventoryUseCases.getProducts(),
                   builder: (context, snapshot) {
@@ -175,5 +239,45 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildOrderDetails(AppLocalizations loc) {
+    if (_salesOrder != null) {
+      final o = _salesOrder!;
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${loc.salesOrder} #${o.id}',
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text('${loc.customerName}: ${o.customerName}'),
+              Text('${loc.statusColon} ${o.status.toArabicString()}'),
+            ],
+          ),
+        ),
+      );
+    }
+    if (_productionOrder != null) {
+      final o = _productionOrder!;
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${loc.productionOrder} #${o.id}',
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              if (o.machineName != null)
+                Text('${loc.machineName}: ${o.machineName}'),
+              Text('${loc.productName}: ${o.productName}'),
+              Text('${loc.statusColon} ${o.status.toArabicString()}'),
+            ],
+          ),
+        ),
+      );
+    }
+    return const SizedBox.shrink();
   }
 }

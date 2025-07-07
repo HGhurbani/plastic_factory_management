@@ -81,6 +81,14 @@ class SalesDatasource {
     await _firestore.collection('sales_orders').doc(orderId).delete();
   }
 
+  Future<SalesOrderModel?> getSalesOrderById(String orderId) async {
+    final doc = await _firestore.collection('sales_orders').doc(orderId).get();
+    if (doc.exists) {
+      return SalesOrderModel.fromDocumentSnapshot(doc);
+    }
+    return null;
+  }
+
   // --- Product Data Access (for product catalog viewing and order creation) ---
   Stream<List<ProductModel>> getAllProducts() {
     return _firestore.collection('products').snapshots().map((snapshot) {
