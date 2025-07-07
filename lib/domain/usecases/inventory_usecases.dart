@@ -73,6 +73,7 @@ class InventoryUseCases {
     required double costPerHour,
     required List<TemplateMaterial> materialsUsed,
     required List<String> colors,
+    required List<String> productionInputs,
   }) async {
     final newTemplate = TemplateModel(
       id: '',
@@ -82,6 +83,7 @@ class InventoryUseCases {
       costPerHour: costPerHour,
       materialsUsed: materialsUsed,
       colors: colors,
+      productionInputs: productionInputs,
     );
     await repository.addTemplate(newTemplate);
   }
@@ -94,6 +96,7 @@ class InventoryUseCases {
     required double costPerHour,
     required List<TemplateMaterial> materialsUsed,
     required List<String> colors,
+    required List<String> productionInputs,
   }) async {
     final updated = TemplateModel(
       id: id,
@@ -103,6 +106,7 @@ class InventoryUseCases {
       costPerHour: costPerHour,
       materialsUsed: materialsUsed,
       colors: colors,
+      productionInputs: productionInputs,
     );
     await repository.updateTemplate(updated);
   }

@@ -59,6 +59,7 @@
   "productCode": "رقم الكود",
   "materialsUsed": "المواد المستخدمة لإنتاجه",
   "colors": "الألوان",
+  "productionInputs": "مدخلات إنتاج",
   "additives": "إضافات",
   "templates": "القوالب",
   "addTemplate": "إضافة قالب",

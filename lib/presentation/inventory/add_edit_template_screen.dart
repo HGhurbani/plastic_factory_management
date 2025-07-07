@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/factory_element_usecases.dart';
+import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/data/models/template_model.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
@@ -24,6 +26,10 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
   Map<String, String> _rawMaterialNames = {};
   List<TemplateMaterial> _materials = [];
   List<String> _colors = [];
+  List<String> _productionInputs = [];
+
+  List<String> _availableColors = [];
+  List<String> _availableInputs = [];
 
   @override
   void initState() {
@@ -35,7 +41,9 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
     _costController = TextEditingController(text: t?.costPerHour.toString());
     _materials = List<TemplateMaterial>.from(t?.materialsUsed ?? []);
     _colors = List<String>.from(t?.colors ?? []);
+    _productionInputs = List<String>.from(t?.productionInputs ?? []);
     _fetchRawMaterialNames();
+    _fetchFactoryElements();
   }
 
   Future<void> _fetchRawMaterialNames() async {
@@ -45,6 +53,25 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
     if (mounted) {
       setState(() {
         _rawMaterialNames = {for (var m in materials) m.id: m.name};
+      });
+    }
+  }
+
+  Future<void> _fetchFactoryElements() async {
+    final useCases = Provider.of<FactoryElementUseCases>(context, listen: false);
+    final elements = await useCases.getElements().first;
+    if (mounted) {
+      setState(() {
+        _availableColors = elements
+            .where((e) => e.type ==
+                FactoryElementType.colorant.toArabicString())
+            .map((e) => e.name)
+            .toList();
+        _availableInputs = elements
+            .where((e) => e.type ==
+                FactoryElementType.productionInput.toArabicString())
+            .map((e) => e.name)
+            .toList();
       });
     }
   }
@@ -204,11 +231,48 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
                           color: AppColors.primary),
                       label: Text(loc.add),
                       onPressed: () async {
-                        final newColor =
-                            await _showTextInputDialog(context, loc.enterColorName);
-                        if (newColor != null && newColor.isNotEmpty) {
+                        final newColor = await _showOptionsDialog(
+                            context, loc.colors, _availableColors);
+                        if (newColor != null && newColor.isNotEmpty &&
+                            !_colors.contains(newColor)) {
                           setState(() {
                             _colors.add(newColor);
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(loc.productionInputs,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: [
+                    ..._productionInputs.map((p) => Chip(
+                          label: Text(p),
+                          onDeleted: () {
+                            setState(() {
+                              _productionInputs.remove(p);
+                            });
+                          },
+                        )),
+                    ActionChip(
+                      avatar: const Icon(Icons.add_circle_outline,
+                          color: AppColors.primary),
+                      label: Text(loc.add),
+                      onPressed: () async {
+                        final newInput = await _showOptionsDialog(
+                            context, loc.productionInputs, _availableInputs);
+                        if (newInput != null &&
+                            !_productionInputs.contains(newInput)) {
+                          setState(() {
+                            _productionInputs.add(newInput);
                           });
                         }
                       },
@@ -232,6 +296,7 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
                             costPerHour: double.parse(_costController.text),
                             materialsUsed: _materials,
                             colors: _colors,
+                            productionInputs: _productionInputs,
                           );
                         } else {
                           await useCases.addTemplate(
@@ -241,6 +306,7 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
                             costPerHour: double.parse(_costController.text),
                             materialsUsed: _materials,
                             colors: _colors,
+                            productionInputs: _productionInputs,
                           );
                         }
                         if (mounted) Navigator.of(context).pop();
@@ -430,6 +496,44 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<String?> _showOptionsDialog(
+      BuildContext context, String title, List<String> options) {
+    final loc = AppLocalizations.of(context)!;
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(title, textAlign: TextAlign.center),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView(
+                shrinkWrap: true,
+                children: options
+                    .map(
+                      (o) => ListTile(
+                        title: Text(o, textDirection: TextDirection.rtl),
+                        onTap: () => Navigator.pop(dialogContext, o),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(loc.cancel),
               ),
             ],
           ),
