@@ -6,6 +6,11 @@ import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/purchase_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/usecases/financial_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/data/models/raw_material_model.dart';
+import 'package:plastic_factory_management/data/models/product_model.dart';
+import 'package:plastic_factory_management/data/models/spare_part_model.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
 import 'package:plastic_factory_management/core/extensions/string_extensions.dart';
 
@@ -16,6 +21,7 @@ class PurchasesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final financialUseCases = Provider.of<FinancialUseCases>(context);
+    final inventoryUseCases = Provider.of<InventoryUseCases>(context, listen: false);
     final currentUser = Provider.of<UserModel?>(context);
 
     return Scaffold(
@@ -30,7 +36,11 @@ class PurchasesScreen extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: () => _showAddPurchaseDialog(
-                  context, financialUseCases, currentUser, appLocalizations),
+                  context,
+                  financialUseCases,
+                  inventoryUseCases,
+                  currentUser,
+                  appLocalizations),
               tooltip: appLocalizations.addPurchase,
             ),
         ],
@@ -38,7 +48,11 @@ class PurchasesScreen extends StatelessWidget {
       floatingActionButton: currentUser != null
           ? FloatingActionButton(
               onPressed: () => _showAddPurchaseDialog(
-                  context, financialUseCases, currentUser, appLocalizations),
+                  context,
+                  financialUseCases,
+                  inventoryUseCases,
+                  currentUser,
+                  appLocalizations),
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               tooltip: appLocalizations.addPurchase,
@@ -172,14 +186,21 @@ class PurchasesScreen extends StatelessWidget {
     );
   }
 
-  void _showAddPurchaseDialog(BuildContext context, FinancialUseCases useCases,
-      UserModel currentUser, AppLocalizations appLocalizations) {
+  void _showAddPurchaseDialog(
+      BuildContext context,
+      FinancialUseCases useCases,
+      InventoryUseCases inventoryUseCases,
+      UserModel currentUser,
+      AppLocalizations appLocalizations) {
     final formKey = GlobalKey<FormState>();
     final descController = TextEditingController();
     final categoryController = TextEditingController();
     final amountController = TextEditingController();
     final maintenanceController = TextEditingController();
     final productionController = TextEditingController();
+    final qtyController = TextEditingController(text: '1');
+    InventoryItemType? selectedType;
+    dynamic selectedItem;
     DateTime selectedDate = DateTime.now();
 
     showDialog(
@@ -271,6 +292,82 @@ class PurchasesScreen extends StatelessWidget {
                       ),
                       textAlign: TextAlign.right,
                     ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<InventoryItemType>(
+                      value: selectedType,
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.selectInventoryType,
+                        border: const OutlineInputBorder(),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: InventoryItemType.rawMaterial,
+                          child: Text('المادة الأولية',
+                              textDirection: TextDirection.rtl),
+                        ),
+                        DropdownMenuItem(
+                          value: InventoryItemType.finishedProduct,
+                          child: Text('الإنتاج التام',
+                              textDirection: TextDirection.rtl),
+                        ),
+                        DropdownMenuItem(
+                          value: InventoryItemType.sparePart,
+                          child: Text('قطع الغيار',
+                              textDirection: TextDirection.rtl),
+                        ),
+                      ],
+                      onChanged: (val) {
+                        selectedType = val;
+                        selectedItem = null;
+                        (context as Element).markNeedsBuild();
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    if (selectedType != null)
+                      StreamBuilder<List<dynamic>>(
+                        stream:
+                            _itemsStream(inventoryUseCases, selectedType!),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          final items = snapshot.data!;
+                          return DropdownButtonFormField<dynamic>(
+                            value: selectedItem,
+                            decoration: InputDecoration(
+                              labelText: appLocalizations.selectItem,
+                              border: const OutlineInputBorder(),
+                            ),
+                            items: items
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e,
+                                    child: Text(_getName(e),
+                                        textDirection: TextDirection.rtl),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (val) {
+                              selectedItem = val;
+                              (context as Element).markNeedsBuild();
+                            },
+                          );
+                        },
+                      ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: qtyController,
+                      decoration: InputDecoration(
+                        labelText: appLocalizations.quantity,
+                        border: const OutlineInputBorder(),
+                        prefixIcon:
+                            const Icon(Icons.confirmation_num_outlined),
+                      ),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      textAlign: TextAlign.right,
+                    ),
                   ],
                 ),
               ),
@@ -291,12 +388,27 @@ class PurchasesScreen extends StatelessWidget {
                       category: categoryController.text,
                       amount: double.tryParse(amountController.text) ?? 0.0,
                       purchaseDate: Timestamp.fromDate(selectedDate),
-                      maintenanceLogId: maintenanceController.text.isEmpty ? null : maintenanceController.text,
-                      productionOrderId: productionController.text.isEmpty ? null : productionController.text,
+                      maintenanceLogId:
+                          maintenanceController.text.isEmpty ? null : maintenanceController.text,
+                      productionOrderId:
+                          productionController.text.isEmpty ? null : productionController.text,
                       createdByUid: currentUser.uid,
                       createdByName: currentUser.name,
+                      itemId: selectedItem != null ? _getId(selectedItem) : null,
+                      itemName:
+                          selectedItem != null ? _getName(selectedItem) : null,
+                      itemType: selectedType,
+                      quantity: double.tryParse(qtyController.text),
                     );
                     await useCases.recordPurchase(purchase);
+                    if (selectedType != null && selectedItem != null) {
+                      await inventoryUseCases.adjustInventoryWithNotification(
+                        itemId: _getId(selectedItem),
+                        itemName: _getName(selectedItem),
+                        type: selectedType!,
+                        delta: double.tryParse(qtyController.text) ?? 0.0,
+                      );
+                    }
                     Navigator.pop(context);
                   }
                 },
@@ -349,5 +461,31 @@ class PurchasesScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Stream<List<dynamic>> _itemsStream(
+      InventoryUseCases useCases, InventoryItemType type) {
+    switch (type) {
+      case InventoryItemType.rawMaterial:
+        return useCases.getRawMaterials();
+      case InventoryItemType.finishedProduct:
+        return useCases.getProducts();
+      case InventoryItemType.sparePart:
+        return useCases.getSpareParts();
+    }
+  }
+
+  String _getName(dynamic item) {
+    if (item is RawMaterialModel) return item.name;
+    if (item is ProductModel) return item.name;
+    if (item is SparePartModel) return item.name;
+    return '';
+  }
+
+  String _getId(dynamic item) {
+    if (item is RawMaterialModel) return item.id;
+    if (item is ProductModel) return item.id;
+    if (item is SparePartModel) return item.id;
+    return '';
   }
 }
