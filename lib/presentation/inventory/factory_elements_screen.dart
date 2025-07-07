@@ -15,6 +15,7 @@ class FactoryElementsScreen extends StatefulWidget {
 
 class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
   String _selectedType = 'all';
+  final List<String> _units = ['kg', 'liter', 'piece'];
 
   FactoryElementType _typeFromArabic(String type) {
     switch (type) {
@@ -54,6 +55,7 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
     final customTypeController = TextEditingController(
       text: type == FactoryElementType.custom ? element.type : '',
     );
+    String? unit = element.unit;
     showDialog(
       context: context,
       builder: (context) {
@@ -107,6 +109,21 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
                       labelText: AppLocalizations.of(context)!.elementName),
                   textDirection: TextDirection.rtl,
                 ),
+                if (type == FactoryElementType.rawMaterial) ...[
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: unit,
+                    decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.selectUnit),
+                    items: _units
+                        .map((u) => DropdownMenuItem(
+                              value: u,
+                              child: Text(u, textDirection: TextDirection.rtl),
+                            ))
+                        .toList(),
+                    onChanged: (val) => setState(() => unit = val),
+                  ),
+                ],
               ],
             ),
           ),
@@ -125,7 +142,10 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
                 final useCases =
                     Provider.of<FactoryElementUseCases>(context, listen: false);
                 useCases.updateElement(
-                    id: element.id, type: finalType, name: name);
+                    id: element.id,
+                    type: finalType,
+                    name: name,
+                    unit: unit);
                 Navigator.pop(context);
               },
               child: Text(AppLocalizations.of(context)!.save),
@@ -140,6 +160,7 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
     FactoryElementType type = FactoryElementType.rawMaterial;
     final nameController = TextEditingController();
     final customTypeController = TextEditingController();
+    String? unit = _units.first;
     showDialog(
       context: context,
       builder: (context) {
@@ -193,6 +214,21 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
                       labelText: AppLocalizations.of(context)!.elementName),
                   textDirection: TextDirection.rtl,
                 ),
+                if (type == FactoryElementType.rawMaterial) ...[
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: unit,
+                    decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.selectUnit),
+                    items: _units
+                        .map((u) => DropdownMenuItem(
+                              value: u,
+                              child: Text(u, textDirection: TextDirection.rtl),
+                            ))
+                        .toList(),
+                    onChanged: (val) => setState(() => unit = val),
+                  ),
+                ],
               ],
             ),
           ),
@@ -210,7 +246,7 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
                 if (name.isEmpty || finalType.isEmpty) return;
                 final useCases =
                     Provider.of<FactoryElementUseCases>(context, listen: false);
-                useCases.addElement(type: finalType, name: name);
+                useCases.addElement(type: finalType, name: name, unit: unit);
                 Navigator.pop(context);
               },
               child: Text(AppLocalizations.of(context)!.add),
@@ -288,7 +324,10 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
                           title: Text(element.name,
                               textDirection: TextDirection.rtl,
                               textAlign: TextAlign.right),
-                          subtitle: Text(element.type,
+                          subtitle: Text(
+                              element.unit != null && element.unit!.isNotEmpty
+                                  ? '${element.type} - ${element.unit}'
+                                  : element.type,
                               textDirection: TextDirection.rtl,
                               textAlign: TextAlign.right),
                           trailing: Row(
