@@ -26,6 +26,9 @@ import 'package:plastic_factory_management/domain/usecases/production_order_usec
 import 'package:plastic_factory_management/data/datasources/inventory_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/inventory_repository_impl.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/data/datasources/factory_element_datasource.dart';
+import 'package:plastic_factory_management/data/repositories/factory_element_repository_impl.dart';
+import 'package:plastic_factory_management/domain/usecases/factory_element_usecases.dart';
 
 // استيرادات Machinery & Operator
 import 'package:plastic_factory_management/data/datasources/machinery_operator_datasource.dart';
@@ -146,6 +149,20 @@ class MyApp extends StatelessWidget {
             Provider.of<InventoryRepositoryImpl>(context, listen: false),
             Provider.of<NotificationUseCases>(context, listen: false),
             Provider.of<UserUseCases>(context, listen: false),
+          ),
+        ),
+        // توفير Factory Elements Dependencies
+        Provider<FactoryElementDatasource>(
+          create: (_) => FactoryElementDatasource(),
+        ),
+        Provider<FactoryElementRepositoryImpl>(
+          create: (context) => FactoryElementRepositoryImpl(
+            Provider.of<FactoryElementDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<FactoryElementUseCases>(
+          create: (context) => FactoryElementUseCases(
+            Provider.of<FactoryElementRepositoryImpl>(context, listen: false),
           ),
         ),
         // توفير Production Order Dependencies
