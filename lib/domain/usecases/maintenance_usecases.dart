@@ -6,13 +6,19 @@ import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart'; // لاستخدام بيانات المستخدم
 import 'package:plastic_factory_management/domain/repositories/maintenance_repository.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
 import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 
 class MaintenanceUseCases {
   final MaintenanceRepository repository;
   final InventoryUseCases inventoryUseCases;
+  final MachineryOperatorUseCases machineryUseCases;
 
-  MaintenanceUseCases(this.repository, this.inventoryUseCases);
+  MaintenanceUseCases(
+    this.repository,
+    this.inventoryUseCases,
+    this.machineryUseCases,
+  );
 
   Stream<List<MaintenanceLogModel>> getMaintenanceLogs() {
     return repository.getMaintenanceLogs();
@@ -53,11 +59,11 @@ class MaintenanceUseCases {
       status: 'scheduled',
     );
     await repository.addMaintenanceLog(newLog);
-
-    // Update machine status to 'underMaintenance' or 'scheduled_maintenance' (if we had such status)
-    // For simplicity, we might update it to 'underMaintenance' when the scheduled date arrives
-    // or when the maintenance starts. This would typically involve Cloud Functions.
-    // For now, only the log is created.
+    // Update machine status to under maintenance immediately
+    await machineryUseCases.updateMachineStatus(
+      selectedMachine.id,
+      MachineStatus.underMaintenance,
+    );
   }
 
   Future<void> updateMaintenanceLog({
@@ -120,12 +126,10 @@ class MaintenanceUseCases {
           delta: -part.quantity,
         );
       }
-      // This part would typically be handled by MachineryOperatorUseCases,
-      // but to avoid circular dependency for this example, we'll keep it simple
-      // or assume a Cloud Function would handle it.
-      // For now, let's just make a direct call if this is the only place it's needed.
-      // You'd need to fetch the machine and update its status.
-      // E.g., await MachineryOperatorUseCases(...).updateMachineStatus(log.machineId, MachineStatus.ready);
+      await machineryUseCases.updateMachineStatus(
+        log.machineId,
+        MachineStatus.ready,
+      );
     }
   }
 

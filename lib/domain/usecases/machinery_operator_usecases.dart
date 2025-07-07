@@ -64,6 +64,15 @@ class MachineryOperatorUseCases {
     return repository.getMachineById(machineId);
   }
 
+  // Update only the status of a machine
+  Future<void> updateMachineStatus(String machineId, MachineStatus status) async {
+    final machine = await repository.getMachineById(machineId);
+    if (machine != null) {
+      final updatedMachine = machine.copyWith(status: status);
+      await repository.updateMachine(updatedMachine);
+    }
+  }
+
   // --- Operator Use Cases ---
 
   Stream<List<OperatorModel>> getOperators() {
