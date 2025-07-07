@@ -76,6 +76,7 @@ class AppLocalizations {
   String get productCode => _strings["productCode"] ?? "productCode";
   String get materialsUsed => _strings["materialsUsed"] ?? "materialsUsed";
   String get colors => _strings["colors"] ?? "colors";
+  String get productionInputs => _strings["productionInputs"] ?? "productionInputs";
   String get additives => _strings["additives"] ?? "additives";
   String get templates => _strings["templates"] ?? "templates";
   String get selectTemplate => _strings["selectTemplate"] ?? "selectTemplate";

@@ -31,6 +31,7 @@ class TemplateModel {
   final double costPerHour; // تكلفة الساعة للقالب
   final List<TemplateMaterial> materialsUsed; // المواد المستخدمة
   final List<String> colors; // الألوان
+  final List<String> productionInputs; // مدخلات الإنتاج
 
   TemplateModel({
     required this.id,
@@ -40,6 +41,7 @@ class TemplateModel {
     required this.costPerHour,
     required this.materialsUsed,
     required this.colors,
+    required this.productionInputs,
   });
 
   factory TemplateModel.fromDocumentSnapshot(DocumentSnapshot doc) {
@@ -55,6 +57,7 @@ class TemplateModel {
               .toList() ??
           [],
       colors: List<String>.from(data['colors'] ?? []),
+      productionInputs: List<String>.from(data['productionInputs'] ?? []),
     );
   }
 
@@ -66,6 +69,7 @@ class TemplateModel {
       'costPerHour': costPerHour,
       'materialsUsed': materialsUsed.map((e) => e.toMap()).toList(),
       'colors': colors,
+      'productionInputs': productionInputs,
     };
   }
 
@@ -77,6 +81,7 @@ class TemplateModel {
     double? costPerHour,
     List<TemplateMaterial>? materialsUsed,
     List<String>? colors,
+    List<String>? productionInputs,
   }) {
     return TemplateModel(
       id: id ?? this.id,
@@ -86,6 +91,7 @@ class TemplateModel {
       costPerHour: costPerHour ?? this.costPerHour,
       materialsUsed: materialsUsed ?? this.materialsUsed,
       colors: colors ?? this.colors,
+      productionInputs: productionInputs ?? this.productionInputs,
     );
   }
 
