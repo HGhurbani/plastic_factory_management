@@ -258,10 +258,33 @@ class SalesUseCases {
       warehouseImages: uploaded,
       warehouseManagerUid: storekeeper.uid,
       warehouseManagerName: storekeeper.name,
-      deliveryTime: deliveryTime != null ? Timestamp.fromDate(deliveryTime) : order.deliveryTime,
-      status: SalesOrderStatus.inProduction,
+      deliveryTime: deliveryTime != null
+          ? Timestamp.fromDate(deliveryTime)
+          : order.deliveryTime,
+      status: SalesOrderStatus.warehouseProcessing,
     );
     await repository.updateSalesOrder(updated);
+  }
+
+  /// Operations officer forwards order to mold supervisor after review
+  Future<void> forwardToMoldSupervisor(
+      SalesOrderModel order, UserModel operationsOfficer,
+      {String? notes}) async {
+    final updated = order.copyWith(
+      status: SalesOrderStatus.awaitingMoldApproval,
+      operationsNotes: notes ?? order.operationsNotes,
+    );
+    await repository.updateSalesOrder(updated);
+
+    final supervisors =
+        await userUseCases.getUsersByRole(UserRole.moldInstallationSupervisor);
+    for (final sup in supervisors) {
+      await notificationUseCases.sendNotification(
+        userId: sup.uid,
+        title: 'طلب بانتظار اعتماد القوالب',
+        message: 'يرجى مراجعة طلب العميل ${order.customerName}',
+      );
+    }
   }
 
   Future<void> scheduleDelivery({

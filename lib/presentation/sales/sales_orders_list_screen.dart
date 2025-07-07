@@ -72,6 +72,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     final bool isAccountant = currentUser.userRoleEnum == UserRole.accountant;
     final bool isProductionOrderPreparer = currentUser.userRoleEnum == UserRole.operationsOfficer ||
         currentUser.userRoleEnum == UserRole.productionOrderPreparer;
+    final bool isOperationsOfficer =
+        currentUser.userRoleEnum == UserRole.operationsOfficer;
     final bool isInventoryManager = currentUser.userRoleEnum == UserRole.inventoryManager;
     final bool isMoldInstallationSupervisor = currentUser.userRoleEnum == UserRole.moldInstallationSupervisor;
 
@@ -462,7 +464,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           ),
         ),
       );
-    } else if (isInventoryManager && order.status == SalesOrderStatus.warehouseProcessing) {
+    } else if (isInventoryManager &&
+        order.status == SalesOrderStatus.warehouseProcessing) {
       actions.add(
         ElevatedButton.icon(
           icon: const Icon(Icons.receipt_long_outlined, color: Colors.white),
@@ -470,6 +473,24 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           onPressed: () => _showWarehouseDocDialog(context, useCases, appLocalizations, order, currentUser),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.secondary,
+            foregroundColor: Colors.white,
+            textStyle: const TextStyle(fontSize: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+      );
+
+    } else if (isOperationsOfficer &&
+        order.status == SalesOrderStatus.warehouseProcessing) {
+      actions.add(
+        ElevatedButton.icon(
+          icon: const Icon(Icons.send, color: Colors.white),
+          label: Text(appLocalizations.forwardToMoldSupervisor),
+          onPressed: () => _showForwardToMoldDialog(
+              context, useCases, appLocalizations, order, currentUser),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             textStyle: const TextStyle(fontSize: 12),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1499,6 +1520,82 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showForwardToMoldDialog(BuildContext parentContext, SalesUseCases useCases,
+      AppLocalizations appLocalizations, SalesOrderModel order, UserModel officer) {
+    final TextEditingController notesController =
+        TextEditingController(text: order.operationsNotes);
+
+    showDialog(
+      context: parentContext,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(appLocalizations.forwardToMoldSupervisor,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(appLocalizations.confirmForwardToMoldSupervisor,
+                textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            TextField(
+              controller: notesController,
+              decoration: InputDecoration(
+                labelText: appLocalizations.enterNotes,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.notes_outlined),
+              ),
+              maxLines: 3,
+              textAlign: TextAlign.right,
+              textDirection: TextDirection.rtl,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text(appLocalizations.cancel),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.send, color: Colors.white),
+            label: Text(appLocalizations.forwardToMoldSupervisor),
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              showDialog(
+                context: parentContext,
+                barrierDismissible: false,
+                builder: (context) => const Center(child: CircularProgressIndicator()),
+              );
+              try {
+                await useCases.forwardToMoldSupervisor(
+                  order,
+                  officer,
+                  notes: notesController.text.trim(),
+                );
+                Navigator.of(parentContext).pop();
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  SnackBar(content: Text(appLocalizations.forwardToMoldSuccess)),
+                );
+              } catch (e) {
+                Navigator.of(parentContext).pop();
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  SnackBar(content: Text(
+                      '${appLocalizations.forwardToMoldError}: ${e.toString()}')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+        ],
       ),
     );
   }
