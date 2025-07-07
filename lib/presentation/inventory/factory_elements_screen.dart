@@ -14,6 +14,7 @@ class FactoryElementsScreen extends StatefulWidget {
 }
 
 class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
+  String _selectedType = 'all';
 
   FactoryElementType _typeFromArabic(String type) {
     switch (type) {
@@ -234,7 +235,7 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<List<FactoryElementModel>>( 
+      body: StreamBuilder<List<FactoryElementModel>>(
           stream:
               Provider.of<FactoryElementUseCases>(context).getElements(),
           builder: (context, snapshot) {
@@ -245,41 +246,72 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
             if (elements.isEmpty) {
               return Center(child: Text(loc.noData));
             }
-            return ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: elements.length,
-              itemBuilder: (context, index) {
-                final element = elements[index];
-                return Card(
-                  color: AppColors.lightGrey,
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  child: ListTile(
-                    leading: Icon(_iconForType(element.type),
-                        color: AppColors.primary),
-                    title: Text(element.name,
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right),
-                    subtitle: Text(element.type,
-                        textDirection: TextDirection.rtl,
-                        textAlign: TextAlign.right),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit_outlined),
-                          tooltip: loc.edit,
-                          onPressed: () => _showEditDialog(element),
+
+            final types = elements.map((e) => e.type).toSet().toList();
+            final filtered = _selectedType == 'all'
+                ? elements
+                : elements.where((e) => e.type == _selectedType).toList();
+
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButton<String>(
+                    value: _selectedType,
+                    onChanged: (val) => setState(() => _selectedType = val!),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'all',
+                        child: Text(loc.all, textDirection: TextDirection.rtl),
+                      ),
+                      ...types.map(
+                        (t) => DropdownMenuItem(
+                          value: t,
+                          child: Text(t, textDirection: TextDirection.rtl),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          tooltip: loc.delete,
-                          onPressed: () => _deleteElement(element.id),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                );
-              },
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(8),
+                    itemCount: filtered.length,
+                    itemBuilder: (context, index) {
+                      final element = filtered[index];
+                      return Card(
+                        color: AppColors.lightGrey,
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        child: ListTile(
+                          leading: Icon(_iconForType(element.type),
+                              color: AppColors.primary),
+                          title: Text(element.name,
+                              textDirection: TextDirection.rtl,
+                              textAlign: TextAlign.right),
+                          subtitle: Text(element.type,
+                              textDirection: TextDirection.rtl,
+                              textAlign: TextAlign.right),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit_outlined),
+                                tooltip: loc.edit,
+                                onPressed: () => _showEditDialog(element),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline),
+                                tooltip: loc.delete,
+                                onPressed: () => _deleteElement(element.id),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             );
           }),
     );
