@@ -6,6 +6,7 @@ import 'package:plastic_factory_management/data/models/production_order_model.da
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
+import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 import 'package:plastic_factory_management/data/repositories/production_order_repository.dart';
@@ -72,6 +73,7 @@ class ProductionOrderUseCases {
   Future<ProductionOrderModel> createProductionOrder({
     required ProductModel selectedProduct,
     required int requiredQuantity,
+    MachineModel? selectedMachine,
     required UserModel orderPreparer, // Pass the current user model
     String? salesOrderId,
   }) async {
@@ -102,10 +104,8 @@ class ProductionOrderUseCases {
       batchNumber: batchNumber,
       templateId: null,
       templateName: null,
-      machineId: null,
-      machineName: null,
-      salesOrderId: salesOrderId,
-      orderPreparerUid: orderPreparer.uid,
+      machineId: selectedMachine?.id,
+      machineName: selectedMachine?.name,
       orderPreparerName: orderPreparer.name,
       orderPreparerRole: orderPreparer.userRoleEnum.toFirestoreString(),
       status: ProductionOrderStatus.pending, // الحالة الإجمالية للطلب هي 'قيد الانتظار'
