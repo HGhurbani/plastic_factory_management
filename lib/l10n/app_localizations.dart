@@ -64,6 +64,11 @@ class AppLocalizations {
   String get actualTime => _strings["actualTime"] ?? "actualTime";
   String get delayReason => _strings["delayReason"] ?? "delayReason";
   String get rawMaterials => _strings["rawMaterials"] ?? "rawMaterials";
+  String get factoryElements => _strings["factoryElements"] ?? "factoryElements";
+  String get addFactoryElement => _strings["addFactoryElement"] ?? "addFactoryElement";
+  String get elementType => _strings["elementType"] ?? "elementType";
+  String get enterElementType => _strings["enterElementType"] ?? "enterElementType";
+  String get elementName => _strings["elementName"] ?? "elementName";
   String get currentQuantity => _strings["currentQuantity"] ?? "currentQuantity";
   String get unitOfMeasurement => _strings["unitOfMeasurement"] ?? "unitOfMeasurement";
   String get minStockLevel => _strings["minStockLevel"] ?? "minStockLevel";
