@@ -444,7 +444,7 @@
   "addInventoryEntry": "إضافة حركة مخزون",
   "addInventoryItem": "إضافة صنف مخزون",
   "selectInventoryType": "اختر نوع المخزون",
-  "selectItem": "اختر الصنف",
+  "selectItem": "اختر المنتج/العنصر",
   "finishedProducts": "الإنتاج التام",
   "spareParts": "قطع الغيار",
   "noData": "لا توجد بيانات",

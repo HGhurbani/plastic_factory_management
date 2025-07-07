@@ -18,13 +18,11 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
   String? _itemId;
   final TextEditingController _codeController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _unitController = TextEditingController();
 
   @override
   void dispose() {
     _codeController.dispose();
     _nameController.dispose();
-    _unitController.dispose();
     super.dispose();
   }
 
@@ -68,7 +66,6 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
                       _itemId = null;
                       _nameController.clear();
                       _codeController.clear();
-                      _unitController.clear();
                     }),
                   );
                 },
@@ -84,7 +81,7 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
                             await useCases.addRawMaterial(
                               code: _codeController.text,
                               name: _nameController.text,
-                              unit: _unitController.text,
+                              unit: '',
                             );
                             break;
                           case InventoryItemType.finishedProduct:
@@ -106,7 +103,7 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
                             await useCases.addSparePart(
                               code: _codeController.text,
                               name: _nameController.text,
-                              unit: _unitController.text,
+                              unit: '',
                             );
                             break;
                           default:
@@ -127,10 +124,7 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
   bool _canSubmit() {
     if (_type == null || _itemId == null) return false;
     if (_codeController.text.isEmpty || _nameController.text.isEmpty) return false;
-    if (_mapType(_type!) == InventoryItemType.finishedProduct) {
-      return true;
-    }
-    return _unitController.text.isNotEmpty;
+    return true;
   }
 
   List<Widget> _buildFields(AppLocalizations loc, FactoryElementUseCases elementUseCases) {
@@ -170,14 +164,7 @@ class _InventoryAddItemScreenState extends State<InventoryAddItemScreen> {
         ),
         onChanged: (_) => setState(() {}),
       ),
-      if (typeEnum != InventoryItemType.finishedProduct) ...[
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: _unitController,
-          decoration: InputDecoration(labelText: loc.unitOfMeasurement),
-          onChanged: (_) => setState(() {}),
-        ),
-      ],
+      // Unit field removed as per new requirements
     ];
   }
 
