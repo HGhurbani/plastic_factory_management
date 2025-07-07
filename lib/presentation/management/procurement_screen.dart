@@ -395,9 +395,9 @@ class ProcurementScreen extends StatelessWidget {
   }
 
   String _getName(dynamic item) {
-    if (item is RawMaterialModel) return item.name;
-    if (item is ProductModel) return item.name;
-    if (item is SparePartModel) return item.name;
+    if (item is RawMaterialModel) return '${item.code} - ${item.name}';
+    if (item is ProductModel) return '${item.productCode} - ${item.name}';
+    if (item is SparePartModel) return '${item.code} - ${item.name}';
     return '';
   }
 }
