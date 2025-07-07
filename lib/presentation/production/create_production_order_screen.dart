@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
+import 'package:plastic_factory_management/data/models/machine_model.dart';
+import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
 import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
 
 class CreateProductionOrderScreen extends StatefulWidget {
@@ -15,6 +17,7 @@ class CreateProductionOrderScreen extends StatefulWidget {
 class _CreateProductionOrderScreenState extends State<CreateProductionOrderScreen> {
   final _formKey = GlobalKey<FormState>();
   ProductModel? _selectedProduct;
+  MachineModel? _selectedMachine;
   final TextEditingController _quantityController = TextEditingController();
 
   @override
@@ -31,6 +34,12 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
         );
         return;
       }
+      if (_selectedMachine == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.machineRequired)),
+        );
+        return;
+      }
 
       setState(() {
         // يمكن إضافة مؤشر تحميل هنا
@@ -41,6 +50,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
           selectedProduct: _selectedProduct!,
           requiredQuantity: int.parse(_quantityController.text),
           orderPreparer: currentUser,
+          selectedMachine: _selectedMachine!,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.orderCreatedSuccessfully)), // إضافة هذا النص في ARB
@@ -65,6 +75,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
     final productionUseCases = Provider.of<ProductionOrderUseCases>(context);
     final currentUser = Provider.of<UserModel?>(context); // Current logged-in user
 
+    final machineryUseCases = Provider.of<MachineryOperatorUseCases>(context);
     if (currentUser == null) {
       return Scaffold(
         appBar: AppBar(title: Text(appLocalizations.createOrder)),
@@ -121,6 +132,42 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
               ),
               SizedBox(height: 16),
               // Required Quantity
+              StreamBuilder<List<MachineModel>>( 
+                stream: machineryUseCases.getMachines(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Text('خطأ في تحميل الآلات: ${snapshot.error}');
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Text('لا توجد آلات متاحة. يرجى إضافة آلات أولاً.');
+                  }
+
+                  return DropdownButtonFormField<MachineModel>(
+                    value: _selectedMachine,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.machine,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: snapshot.data!.map((machine) {
+                      return DropdownMenuItem(
+                        value: machine,
+                        child: Text(machine.name, textDirection: TextDirection.rtl),
+                      );
+                    }).toList(),
+                    onChanged: (MachineModel? newValue) {
+                      setState(() {
+                        _selectedMachine = newValue;
+                      });
+                    },
+                    validator: (value) =>
+                        value == null ? appLocalizations.machineRequired : null,
+                  );
+                },
+              ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _quantityController,
                 decoration: InputDecoration(
