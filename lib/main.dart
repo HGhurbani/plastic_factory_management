@@ -209,6 +209,7 @@ class MyApp extends StatelessWidget {
           create: (context) => MaintenanceUseCases(
             Provider.of<MaintenanceRepositoryImpl>(context, listen: false),
             Provider.of<InventoryUseCases>(context, listen: false),
+            Provider.of<MachineryOperatorUseCases>(context, listen: false),
           ),
         ),
         // توفير Sales Dependencies (جديد)
