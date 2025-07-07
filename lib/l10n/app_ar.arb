@@ -465,6 +465,8 @@
   "inventoryReview": "مراجعة المخزون",
   "sendToSuppliers": "إرسال للموردين",
   "financialApproval": "الموافقة المالية",
+  "awaitingApproval": "بانتظار اعتماد المحاسب",
+  "awaitingWarehouse": "بانتظار أمين المخزن",
   "recordPayment": "تسجيل دفعة",
   "addPurchase": "إضافة شراء",
   "selectCustomer": "اختر العميل",

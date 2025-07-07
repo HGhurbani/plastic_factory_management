@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum PurchaseRequestStatus {
-  pendingInventory,
-  awaitingSupplier,
-  awaitingFinance,
-  completed,
+  awaitingApproval, // بانتظار اعتماد المحاسب
+  awaitingWarehouse, // بانتظار أمين المخزن
+  completed, // تم استلام المشتريات
+  rejected, // مرفوض من المحاسب
 }
 
 extension PurchaseRequestStatusExtension on PurchaseRequestStatus {
@@ -12,7 +12,7 @@ extension PurchaseRequestStatusExtension on PurchaseRequestStatus {
   static PurchaseRequestStatus fromString(String status) {
     return PurchaseRequestStatus.values.firstWhere(
       (e) => e.name == status,
-      orElse: () => PurchaseRequestStatus.pendingInventory,
+      orElse: () => PurchaseRequestStatus.awaitingApproval,
     );
   }
 }
@@ -54,9 +54,12 @@ class PurchaseRequestModel {
   final Timestamp createdAt;
   final String? supplierId;
   final String? supplierName;
-  final String? financeUid;
-  final String? financeName;
-  final Timestamp? financeApprovedAt;
+  final String? accountantUid;
+  final String? accountantName;
+  final Timestamp? accountantApprovedAt;
+  final String? warehouseUid;
+  final String? warehouseName;
+  final Timestamp? warehouseReceivedAt;
 
   PurchaseRequestModel({
     required this.id,
@@ -68,9 +71,12 @@ class PurchaseRequestModel {
     required this.createdAt,
     this.supplierId,
     this.supplierName,
-    this.financeUid,
-    this.financeName,
-    this.financeApprovedAt,
+    this.accountantUid,
+    this.accountantName,
+    this.accountantApprovedAt,
+    this.warehouseUid,
+    this.warehouseName,
+    this.warehouseReceivedAt,
   });
 
   factory PurchaseRequestModel.fromDocumentSnapshot(DocumentSnapshot doc) {
@@ -84,13 +90,16 @@ class PurchaseRequestModel {
               .toList() ??
           [],
       totalAmount: (data['totalAmount'] as num?)?.toDouble() ?? 0.0,
-      status: PurchaseRequestStatusExtension.fromString(data['status'] ?? 'pendingInventory'),
+      status: PurchaseRequestStatusExtension.fromString(data['status'] ?? 'awaitingApproval'),
       createdAt: data['createdAt'] ?? Timestamp.now(),
       supplierId: data['supplierId'],
       supplierName: data['supplierName'],
-      financeUid: data['financeUid'],
-      financeName: data['financeName'],
-      financeApprovedAt: data['financeApprovedAt'],
+      accountantUid: data['accountantUid'],
+      accountantName: data['accountantName'],
+      accountantApprovedAt: data['accountantApprovedAt'],
+      warehouseUid: data['warehouseUid'],
+      warehouseName: data['warehouseName'],
+      warehouseReceivedAt: data['warehouseReceivedAt'],
     );
   }
 
@@ -104,9 +113,12 @@ class PurchaseRequestModel {
       'createdAt': createdAt,
       'supplierId': supplierId,
       'supplierName': supplierName,
-      'financeUid': financeUid,
-      'financeName': financeName,
-      'financeApprovedAt': financeApprovedAt,
+      'accountantUid': accountantUid,
+      'accountantName': accountantName,
+      'accountantApprovedAt': accountantApprovedAt,
+      'warehouseUid': warehouseUid,
+      'warehouseName': warehouseName,
+      'warehouseReceivedAt': warehouseReceivedAt,
     };
   }
 
@@ -120,9 +132,12 @@ class PurchaseRequestModel {
     Timestamp? createdAt,
     String? supplierId,
     String? supplierName,
-    String? financeUid,
-    String? financeName,
-    Timestamp? financeApprovedAt,
+    String? accountantUid,
+    String? accountantName,
+    Timestamp? accountantApprovedAt,
+    String? warehouseUid,
+    String? warehouseName,
+    Timestamp? warehouseReceivedAt,
   }) {
     return PurchaseRequestModel(
       id: id ?? this.id,
@@ -134,9 +149,12 @@ class PurchaseRequestModel {
       createdAt: createdAt ?? this.createdAt,
       supplierId: supplierId ?? this.supplierId,
       supplierName: supplierName ?? this.supplierName,
-      financeUid: financeUid ?? this.financeUid,
-      financeName: financeName ?? this.financeName,
-      financeApprovedAt: financeApprovedAt ?? this.financeApprovedAt,
+      accountantUid: accountantUid ?? this.accountantUid,
+      accountantName: accountantName ?? this.accountantName,
+      accountantApprovedAt: accountantApprovedAt ?? this.accountantApprovedAt,
+      warehouseUid: warehouseUid ?? this.warehouseUid,
+      warehouseName: warehouseName ?? this.warehouseName,
+      warehouseReceivedAt: warehouseReceivedAt ?? this.warehouseReceivedAt,
     );
   }
 }

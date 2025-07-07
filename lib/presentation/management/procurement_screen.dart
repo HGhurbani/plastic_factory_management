@@ -241,7 +241,7 @@ class ProcurementScreen extends StatelessWidget {
                           requesterName: user.name,
                           items: [item],
                           totalAmount: 0,
-                          status: PurchaseRequestStatus.pendingInventory,
+                          status: PurchaseRequestStatus.awaitingApproval,
                           createdAt: Timestamp.now(),
                         );
                         await useCases.createPurchaseRequest(request);
@@ -289,29 +289,54 @@ class ProcurementScreen extends StatelessWidget {
             child: Text(appLocalizations.cancel),
             style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
           ),
-          if (user != null && request.status == PurchaseRequestStatus.pendingInventory)
+          if (user != null &&
+              user.userRoleEnum == UserRole.accountant &&
+              request.status == PurchaseRequestStatus.awaitingApproval)
             ElevatedButton.icon(
               onPressed: () async {
-                await useCases.sendToSupplier(request, supplierId: 'default', supplierName: 'default');
+                await useCases.approveByAccountant(
+                    request, user.uid, user.name);
                 Navigator.pop(context);
               },
-              icon: const Icon(Icons.local_shipping_outlined, color: Colors.white, size: 20),
-              label: Text(appLocalizations.sendToSuppliers),
+              icon: const Icon(Icons.check_circle_outline,
+                  color: Colors.white, size: 20),
+              label: Text(appLocalizations.approve),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.secondary,
+                backgroundColor: Colors.green.shade700,
                 foregroundColor: Colors.white,
               ),
             ),
-          if (user != null && request.status == PurchaseRequestStatus.awaitingFinance)
+          if (user != null &&
+              user.userRoleEnum == UserRole.accountant &&
+              request.status == PurchaseRequestStatus.awaitingApproval)
             ElevatedButton.icon(
               onPressed: () async {
-                await useCases.approveFinance(request, user.uid, user.name);
+                await useCases.rejectByAccountant(
+                    request, user.uid, user.name);
                 Navigator.pop(context);
               },
-              icon: const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
-              label: Text(appLocalizations.financialApproval),
+              icon: const Icon(Icons.cancel_outlined,
+                  color: Colors.white, size: 20),
+              label: Text(appLocalizations.reject),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade700,
+                backgroundColor: Colors.red.shade700,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          if (user != null &&
+              user.userRoleEnum == UserRole.inventoryManager &&
+              request.status == PurchaseRequestStatus.awaitingWarehouse)
+            ElevatedButton.icon(
+              onPressed: () async {
+                await useCases.receiveByWarehouse(
+                    request, user.uid, user.name);
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.inventory_2_outlined,
+                  color: Colors.white, size: 20),
+              label: Text(appLocalizations.complete),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
               ),
             ),
@@ -322,12 +347,12 @@ class ProcurementScreen extends StatelessWidget {
 
   String _statusToArabic(PurchaseRequestStatus status, BuildContext context) {
     switch (status) {
-      case PurchaseRequestStatus.pendingInventory:
-        return AppLocalizations.of(context)!.inventoryReview;
-      case PurchaseRequestStatus.awaitingSupplier:
-        return 'بانتظار المورد';
-      case PurchaseRequestStatus.awaitingFinance:
-        return 'مراجعة المالية';
+      case PurchaseRequestStatus.awaitingApproval:
+        return AppLocalizations.of(context)!.pendingApproval;
+      case PurchaseRequestStatus.awaitingWarehouse:
+        return AppLocalizations.of(context)!.warehouseKeeper;
+      case PurchaseRequestStatus.rejected:
+        return AppLocalizations.of(context)!.rejected;
       case PurchaseRequestStatus.completed:
         return 'مكتمل';
     }
@@ -335,12 +360,12 @@ class ProcurementScreen extends StatelessWidget {
 
   Color _getStatusColor(PurchaseRequestStatus status) {
     switch (status) {
-      case PurchaseRequestStatus.pendingInventory:
+      case PurchaseRequestStatus.awaitingApproval:
         return AppColors.accentOrange;
-      case PurchaseRequestStatus.awaitingSupplier:
+      case PurchaseRequestStatus.awaitingWarehouse:
         return Colors.blue.shade700;
-      case PurchaseRequestStatus.awaitingFinance:
-        return AppColors.secondary;
+      case PurchaseRequestStatus.rejected:
+        return Colors.red.shade700;
       case PurchaseRequestStatus.completed:
         return Colors.green.shade700;
     }

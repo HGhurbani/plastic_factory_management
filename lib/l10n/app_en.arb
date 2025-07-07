@@ -474,6 +474,8 @@
   "inventoryReview": "Inventory Review",
   "sendToSuppliers": "Send to Suppliers",
   "financialApproval": "Financial Approval",
+  "awaitingApproval": "Awaiting Accountant Approval",
+  "awaitingWarehouse": "Awaiting Warehouse",
   "recordPayment": "Record Payment",
   "addPurchase": "Add Purchase",
   "selectCustomer": "Select Customer",

@@ -17,23 +17,35 @@ class ProcurementUseCases {
     await repository.addPurchaseRequest(request);
   }
 
-  Future<void> sendToSupplier(PurchaseRequestModel request,
-      {required String supplierId, required String supplierName}) async {
+  Future<void> approveByAccountant(
+      PurchaseRequestModel request, String approverUid, String approverName) async {
     final updated = request.copyWith(
-      status: PurchaseRequestStatus.awaitingFinance,
-      supplierId: supplierId,
-      supplierName: supplierName,
+      status: PurchaseRequestStatus.awaitingWarehouse,
+      accountantUid: approverUid,
+      accountantName: approverName,
+      accountantApprovedAt: Timestamp.now(),
     );
     await repository.updatePurchaseRequest(updated);
   }
 
-  Future<void> approveFinance(
+  Future<void> rejectByAccountant(
       PurchaseRequestModel request, String approverUid, String approverName) async {
     final updated = request.copyWith(
+      status: PurchaseRequestStatus.rejected,
+      accountantUid: approverUid,
+      accountantName: approverName,
+      accountantApprovedAt: Timestamp.now(),
+    );
+    await repository.updatePurchaseRequest(updated);
+  }
+
+  Future<void> receiveByWarehouse(
+      PurchaseRequestModel request, String uid, String name) async {
+    final updated = request.copyWith(
       status: PurchaseRequestStatus.completed,
-      financeUid: approverUid,
-      financeName: approverName,
-      financeApprovedAt: Timestamp.now(),
+      warehouseUid: uid,
+      warehouseName: name,
+      warehouseReceivedAt: Timestamp.now(),
     );
     await repository.updatePurchaseRequest(updated);
   }
