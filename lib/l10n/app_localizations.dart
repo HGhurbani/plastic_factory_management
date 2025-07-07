@@ -380,6 +380,10 @@ class AppLocalizations {
   String get selectStorekeeperError => _strings["selectStorekeeperError"] ?? "selectStorekeeperError";
   String get supplyInitiatedSuccessfully => _strings["supplyInitiatedSuccessfully"] ?? "supplyInitiatedSuccessfully";
   String get errorInitiatingSupply => _strings["errorInitiatingSupply"] ?? "errorInitiatingSupply";
+  String get forwardToMoldSupervisor => _strings["forwardToMoldSupervisor"] ?? "forwardToMoldSupervisor";
+  String get confirmForwardToMoldSupervisor => _strings["confirmForwardToMoldSupervisor"] ?? "confirmForwardToMoldSupervisor";
+  String get forwardToMoldSuccess => _strings["forwardToMoldSuccess"] ?? "forwardToMoldSuccess";
+  String get forwardToMoldError => _strings["forwardToMoldError"] ?? "forwardToMoldError";
   String get units => _strings["units"] ?? "units";
   String get imageLoadError => _strings["imageLoadError"] ?? "imageLoadError";
   String get reviewOrderDetails => _strings["reviewOrderDetails"] ?? "reviewOrderDetails";
