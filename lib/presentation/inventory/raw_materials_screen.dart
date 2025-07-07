@@ -7,13 +7,9 @@ import 'package:plastic_factory_management/data/models/raw_material_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/spare_part_model.dart';
 import 'package:plastic_factory_management/domain/usecases/inventory_usecases.dart';
-import 'package:plastic_factory_management/domain/usecases/factory_element_usecases.dart';
-import 'package:plastic_factory_management/data/models/factory_element_model.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/presentation/routes/app_router.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
-
-import '../../data/models/inventory_balance_model.dart';
 
 
 class RawMaterialsScreen extends StatefulWidget {
@@ -24,12 +20,11 @@ class RawMaterialsScreen extends StatefulWidget {
 }
 
 class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
-  String? _selectedType;
+  InventoryItemType _selectedType = InventoryItemType.rawMaterial;
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final inventoryUseCases = Provider.of<InventoryUseCases>(context);
-    final elementUseCases = Provider.of<FactoryElementUseCases>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -39,8 +34,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          if (_selectedType != null &&
-              _mapType(_selectedType!) != InventoryItemType.finishedProduct)
+          if (_selectedType != InventoryItemType.finishedProduct)
             IconButton(
               icon: const Icon(Icons.add_circle_outline),
               onPressed: () {
@@ -54,31 +48,26 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: StreamBuilder<List<FactoryElementModel>>(
-              stream: elementUseCases.getElements(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final types =
-                    snapshot.data!.map((e) => e.type).toSet().toList();
-                if (_selectedType == null && types.isNotEmpty) {
-                  _selectedType = types.first;
-                }
-                return DropdownButton<String>(
-                  value: _selectedType,
-                  onChanged: (val) => setState(() => _selectedType = val),
-                  items: types
-                      .map(
-                        (t) => DropdownMenuItem(
-                          value: t,
-                          child:
-                              Text(t, textDirection: TextDirection.rtl),
-                        ),
-                      )
-                      .toList(),
-                );
-              },
+            child: DropdownButton<InventoryItemType>(
+              value: _selectedType,
+              onChanged: (val) => setState(() => _selectedType = val!),
+              items: [
+                DropdownMenuItem(
+                  value: InventoryItemType.rawMaterial,
+                  child: Text(appLocalizations.rawMaterials,
+                      textDirection: TextDirection.rtl),
+                ),
+                DropdownMenuItem(
+                  value: InventoryItemType.finishedProduct,
+                  child: Text(appLocalizations.finishedProducts,
+                      textDirection: TextDirection.rtl),
+                ),
+                DropdownMenuItem(
+                  value: InventoryItemType.sparePart,
+                  child: Text(appLocalizations.spareParts,
+                      textDirection: TextDirection.rtl),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -129,8 +118,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
           ),
         ],
       ),
-      floatingActionButton: _selectedType == null ||
-              _mapType(_selectedType!) == InventoryItemType.finishedProduct
+      floatingActionButton: _selectedType == InventoryItemType.finishedProduct
           ? null
           : FloatingActionButton(
               onPressed: () {
@@ -145,10 +133,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
   }
 
   Stream<List<dynamic>> _itemsStream(InventoryUseCases useCases) {
-    if (_selectedType == null) {
-      return const Stream.empty();
-    }
-    switch (_mapType(_selectedType!)) {
+    switch (_selectedType) {
       case InventoryItemType.rawMaterial:
         return useCases.getRawMaterials();
       case InventoryItemType.finishedProduct:
@@ -160,7 +145,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
 
   Widget _buildListItem(
       dynamic item, InventoryUseCases useCases, AppLocalizations loc) {
-    if (_mapType(_selectedType!) == InventoryItemType.finishedProduct) {
+    if (_selectedType == InventoryItemType.finishedProduct) {
       final product = item as ProductModel;
       return ListTile(
         leading: const Icon(Icons.inventory_2),
@@ -171,13 +156,13 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
       );
     }
 
-    final code = _mapType(_selectedType!) == InventoryItemType.rawMaterial
+    final code = _selectedType == InventoryItemType.rawMaterial
         ? (item as RawMaterialModel).code
         : (item as SparePartModel).code;
-    final name = _mapType(_selectedType!) == InventoryItemType.rawMaterial
+    final name = _selectedType == InventoryItemType.rawMaterial
         ? (item as RawMaterialModel).name
         : (item as SparePartModel).name;
-    final id = _mapType(_selectedType!) == InventoryItemType.rawMaterial
+    final id = _selectedType == InventoryItemType.rawMaterial
         ? (item as RawMaterialModel).id
         : (item as SparePartModel).id;
 
@@ -203,7 +188,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
               IconButton(
                 icon: const Icon(Icons.edit, color: AppColors.primary),
                 onPressed: () {
-                  if (_mapType(_selectedType!) == InventoryItemType.rawMaterial) {
+                  if (_selectedType == InventoryItemType.rawMaterial) {
                     _showAddEditMaterialDialog(context, useCases, loc,
                         material: item as RawMaterialModel);
                   } else {
@@ -216,7 +201,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
               IconButton(
                 icon: const Icon(Icons.delete, color: Colors.redAccent),
                 onPressed: () {
-                  if (_mapType(_selectedType!) == InventoryItemType.rawMaterial) {
+                  if (_selectedType == InventoryItemType.rawMaterial) {
                     _showDeleteConfirmationDialog(context, useCases, loc, id, name);
                   } else {
                     _showDeletePartConfirmationDialog(context, useCases, loc, id, name);
@@ -546,16 +531,4 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
     );
   }
 
-  InventoryItemType _mapType(String type) {
-    switch (type) {
-      case 'مواد خام':
-        return InventoryItemType.rawMaterial;
-      case 'منتج تام':
-        return InventoryItemType.finishedProduct;
-      case 'قطع غيار':
-        return InventoryItemType.sparePart;
-      default:
-        return InventoryItemType.rawMaterial;
-    }
-  }
 }
