@@ -437,6 +437,7 @@ class AppLocalizations {
   String get addInventoryItem => _strings["addInventoryItem"] ?? "addInventoryItem";
   String get selectInventoryType => _strings["selectInventoryType"] ?? "selectInventoryType";
   String get selectItem => _strings["selectItem"] ?? "selectItem";
+  String get selectUnit => _strings["selectUnit"] ?? "selectUnit";
   String get finishedProducts => _strings["finishedProducts"] ?? "finishedProducts";
   String get spareParts => _strings["spareParts"] ?? "spareParts";
   String get noData => _strings["noData"] ?? "noData";

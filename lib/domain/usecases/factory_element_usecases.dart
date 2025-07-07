@@ -10,17 +10,28 @@ class FactoryElementUseCases {
     return repository.getElements();
   }
 
-  Future<void> addElement({required String type, required String name}) {
+  Future<void> addElement({required String type, required String name, String? unit}) {
     final element = FactoryElementModel(
       id: '',
       type: type,
       name: name,
+      unit: unit,
     );
     return repository.addElement(element);
   }
 
-  Future<void> updateElement({required String id, required String type, required String name}) {
-    final element = FactoryElementModel(id: id, type: type, name: name);
+  Future<void> updateElement({
+    required String id,
+    required String type,
+    required String name,
+    String? unit,
+  }) {
+    final element = FactoryElementModel(
+      id: id,
+      type: type,
+      name: name,
+      unit: unit,
+    );
     return repository.updateElement(element);
   }
 
