@@ -757,6 +757,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         color: moduleColors['inventory']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.productCatalogRoute),
       ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.purchaseRequests,
+        subtitle: "طلبات المشتريات",
+        icon: Icons.shopping_bag,
+        color: moduleColors['procurement']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.procurementRoute),
+      ));
     }
 
     // Modules for Quality Inspector (مراقب الجودة)
@@ -789,6 +798,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         icon: Icons.shopping_cart,
         color: moduleColors['sales']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.purchaseRequests,
+        subtitle: "طلبات المشتريات",
+        icon: Icons.shopping_bag,
+        color: moduleColors['procurement']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.procurementRoute),
       ));
     }
 
