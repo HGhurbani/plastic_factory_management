@@ -117,7 +117,11 @@ class ProductionOrderUseCases {
     final createdOrder = await repository.createProductionOrder(newOrder);
 
     if (orderPreparer.userRoleEnum == UserRole.operationsOfficer) {
-      await approveProductionOrder(createdOrder, orderPreparer);
+      await approveProductionOrder(
+        createdOrder,
+        orderPreparer,
+        selectedMachine: selectedMachine,
+      );
 
       final storekeepers =
           await userUseCases.getUsersByRole(UserRole.inventoryManager);
@@ -181,6 +185,7 @@ class ProductionOrderUseCases {
     UserModel approver, {
     String? notes,
     List<File>? attachments,
+    MachineModel? selectedMachine,
   }) async {
     final updatedWorkflow = List<ProductionWorkflowStage>.from(order.workflowStages);
 
@@ -232,6 +237,8 @@ class ProductionOrderUseCases {
       approvedByUid: approver.uid,
       approvedAt: Timestamp.now(),
       currentStage: 'استلام مشرف تركيب القوالب', // تعيين المرحلة الحالية للطلب
+      machineId: selectedMachine?.id ?? order.machineId,
+      machineName: selectedMachine?.name ?? order.machineName,
       workflowStages: updatedWorkflow,
     );
     await repository.updateProductionOrder(updatedOrder);

@@ -7,6 +7,8 @@ import 'package:plastic_factory_management/data/models/production_order_model.da
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
+import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -452,6 +454,8 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
     final TextEditingController notesController = TextEditingController();
     List<XFile> pickedImages = [];
     final ImagePicker picker = ImagePicker();
+    MachineModel? selectedMachine;
+    final machineryUseCases = Provider.of<MachineryOperatorUseCases>(context, listen: false);
 
     Future<void> pickImages() async {
       final images = await picker.pickMultiImage();
@@ -472,6 +476,41 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('${appLocalizations.confirmApproveOrder} "${order.productName}"؟', textAlign: TextAlign.center, style: TextStyle(color: AppColors.dark)),
+                  const SizedBox(height: 16),
+                  StreamBuilder<List<MachineModel>>(
+                    stream: machineryUseCases.getAvailableMachines(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final machines = snapshot.data!;
+                      if (selectedMachine == null && order.machineId != null) {
+                        for (final m in machines) {
+                          if (m.id == order.machineId) {
+                            selectedMachine = m;
+                            break;
+                          }
+                        }
+                      }
+                      return DropdownButtonFormField<MachineModel>(
+                        value: selectedMachine,
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.machine,
+                          border: const OutlineInputBorder(),
+                        ),
+                        items: machines.map((m) => DropdownMenuItem(
+                              value: m,
+                              child: Text(m.name, textDirection: TextDirection.rtl),
+                            ))
+                            .toList(),
+                        onChanged: (MachineModel? newValue) {
+                          setState(() {
+                            selectedMachine = newValue;
+                          });
+                        },
+                      );
+                    },
+                  ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: notesController,
@@ -555,6 +594,12 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                 icon: const Icon(Icons.check, color: Colors.white),
                 label: Text(appLocalizations.approve, style: TextStyle(color: Colors.white)),
                 onPressed: () async {
+                  if (selectedMachine == null) {
+                    ScaffoldMessenger.of(dialogContext).showSnackBar(
+                      SnackBar(content: Text(appLocalizations.machineRequired)),
+                    );
+                    return;
+                  }
                   Navigator.of(dialogContext).pop();
                   // Show loading indicator
                   showDialog(
@@ -570,6 +615,7 @@ class _ProductionOrdersListScreenState extends State<ProductionOrdersListScreen>
                       approver,
                       notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
                       attachments: pickedImages.map((e) => File(e.path)).toList(),
+                      selectedMachine: selectedMachine,
                     );
                     Navigator.of(context).pop(); // Pop the loading indicator
                     ScaffoldMessenger.of(context).showSnackBar(
