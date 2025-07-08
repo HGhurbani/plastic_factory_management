@@ -17,6 +17,7 @@ import 'package:plastic_factory_management/domain/usecases/production_order_usec
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/core/services/file_upload_service.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
+import 'package:plastic_factory_management/theme/app_colors.dart';
 
 class QualityCheckFormScreen extends StatefulWidget {
   const QualityCheckFormScreen({Key? key}) : super(key: key);
@@ -138,6 +139,9 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
       appBar: AppBar(
         title: Text(loc.addQualityCheck),
         centerTitle: true,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -170,6 +174,10 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
                 const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: _fetchOrder,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                  ),
                   child: Text(loc.fetchOrder),
                 ),
                 if (_salesOrder != null || _productionOrder != null) ...[
@@ -246,6 +254,10 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                  ),
                   child: Text(loc.save),
                 )
               ],
