@@ -524,6 +524,33 @@ class ProductionOrderUseCases {
     return repository.getProducts();
   }
 
+  // Mark production order as delivered after quality inspection
+  Future<void> markOrderDelivered(
+      ProductionOrderModel order, UserModel inspector) async {
+    final updatedWorkflow = List<ProductionWorkflowStage>.from(order.workflowStages)
+      ..add(ProductionWorkflowStage(
+        stageName: 'تم فحص الجودة والتسليم',
+        status: 'completed',
+        assignedToUid: inspector.uid,
+        assignedToName: inspector.name,
+        completedAt: Timestamp.now(),
+      ));
+
+    final updatedOrder = order.copyWith(
+      status: ProductionOrderStatus.completed,
+      currentStage: 'مكتمل',
+      workflowStages: updatedWorkflow,
+    );
+    await repository.updateProductionOrder(updatedOrder);
+
+    await inventoryUseCases.adjustInventoryWithNotification(
+      itemId: order.productId,
+      itemName: order.productName,
+      type: InventoryItemType.finishedProduct,
+      delta: order.requiredQuantity.toDouble(),
+    );
+  }
+
   Future<ProductModel?> getProductById(String productId) {
     return repository.getProductById(productId);
   }
