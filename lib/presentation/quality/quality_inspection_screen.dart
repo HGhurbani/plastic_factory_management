@@ -19,7 +19,7 @@ class QualityInspectionScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(loc.qualityChecks),
         centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -29,6 +29,8 @@ class QualityInspectionScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const QualityCheckFormScreen()),
           );
         },
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),
       body: StreamBuilder<List<QualityCheckModel>>(

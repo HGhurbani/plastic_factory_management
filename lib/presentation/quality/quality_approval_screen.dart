@@ -9,6 +9,7 @@ import '../../domain/usecases/production_order_usecases.dart';
 import '../../domain/usecases/quality_usecases.dart';
 import '../../domain/usecases/sales_usecases.dart';
 import '../../l10n/app_localizations.dart';
+import '../../theme/app_colors.dart';
 
 class QualityApprovalScreen extends StatefulWidget {
   const QualityApprovalScreen({super.key});
@@ -93,6 +94,9 @@ class _QualityApprovalScreenState extends State<QualityApprovalScreen> {
       appBar: AppBar(
         title: Text(loc.approveRejectOrder),
         centerTitle: true,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -123,6 +127,10 @@ class _QualityApprovalScreenState extends State<QualityApprovalScreen> {
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: _fetchOrder,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
                 child: Text(loc.fetchOrder),
               ),
               if (_salesOrder != null || _productionOrder != null) ...[
@@ -141,6 +149,10 @@ class _QualityApprovalScreenState extends State<QualityApprovalScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => _submit(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                      ),
                       child: Text(loc.approve),
                     ),
                   ),
