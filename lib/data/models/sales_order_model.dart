@@ -112,6 +112,8 @@ class SalesOrderModel {
   final String? moldInstallationNotes; // ملاحظات عملية التركيب
   final List<String> moldInstallationImages; // صور توثيقية للتركيب
   final String? operationsNotes; // ملاحظات مسؤول العمليات
+  final String? machineId; // الآلة المحددة للطلب
+  final String? machineName; // اسم الآلة المحددة
   final String? warehouseNotes; // ملاحظات أمين المخزن
   final List<String> warehouseImages; // صور توثيق المخزن
   final String? warehouseManagerUid; // UID أمين المخزن المسؤول
@@ -147,6 +149,8 @@ class SalesOrderModel {
     this.moldInstallationNotes,
     this.moldInstallationImages = const [],
     this.operationsNotes,
+    this.machineId,
+    this.machineName,
     this.warehouseNotes,
     this.warehouseImages = const [],
     this.warehouseManagerUid,
@@ -188,6 +192,8 @@ class SalesOrderModel {
       moldInstallationNotes: data['moldInstallationNotes'],
       moldInstallationImages: List<String>.from(data['moldInstallationImages'] ?? []),
       operationsNotes: data['operationsNotes'],
+      machineId: data['machineId'],
+      machineName: data['machineName'],
       warehouseNotes: data['warehouseNotes'],
       warehouseImages: List<String>.from(data['warehouseImages'] ?? []),
       warehouseManagerUid: data['warehouseManagerUid'],
@@ -227,6 +233,8 @@ class SalesOrderModel {
       'moldInstallationNotes': moldInstallationNotes,
       'moldInstallationImages': moldInstallationImages,
       'operationsNotes': operationsNotes,
+      'machineId': machineId,
+      'machineName': machineName,
       'warehouseNotes': warehouseNotes,
       'warehouseImages': warehouseImages,
       'warehouseManagerUid': warehouseManagerUid,
@@ -264,6 +272,8 @@ class SalesOrderModel {
     String? moldInstallationNotes,
     List<String>? moldInstallationImages,
     String? operationsNotes,
+    String? machineId,
+    String? machineName,
     String? warehouseNotes,
     List<String>? warehouseImages,
     String? warehouseManagerUid,
@@ -299,6 +309,8 @@ class SalesOrderModel {
       moldInstallationNotes: moldInstallationNotes ?? this.moldInstallationNotes,
       moldInstallationImages: moldInstallationImages ?? this.moldInstallationImages,
       operationsNotes: operationsNotes ?? this.operationsNotes,
+      machineId: machineId ?? this.machineId,
+      machineName: machineName ?? this.machineName,
       warehouseNotes: warehouseNotes ?? this.warehouseNotes,
       warehouseImages: warehouseImages ?? this.warehouseImages,
       warehouseManagerUid: warehouseManagerUid ?? this.warehouseManagerUid,

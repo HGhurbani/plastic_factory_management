@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:plastic_factory_management/data/models/customer_model.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/data/models/product_model.dart';
+import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/domain/repositories/sales_repository.dart';
 import 'dart:io';
@@ -274,11 +275,16 @@ class SalesUseCases {
 
   /// Operations officer forwards order to mold supervisor after review
   Future<void> forwardToMoldSupervisor(
-      SalesOrderModel order, UserModel operationsOfficer,
-      {String? notes}) async {
+      SalesOrderModel order,
+      UserModel operationsOfficer, {
+      String? notes,
+      MachineModel? machine,
+    }) async {
     final updated = order.copyWith(
       status: SalesOrderStatus.awaitingMoldApproval,
       operationsNotes: notes ?? order.operationsNotes,
+      machineId: machine?.id ?? order.machineId,
+      machineName: machine?.name ?? order.machineName,
     );
     await repository.updateSalesOrder(updated);
 
