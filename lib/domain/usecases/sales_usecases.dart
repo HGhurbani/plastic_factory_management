@@ -97,7 +97,15 @@ class SalesUseCases {
     required double totalAmount,
     File? customerSignatureFile,
     Uint8List? customerSignatureBytes,
+    required InventoryUseCases inventoryUseCases,
   }) async {
+    for (final item in orderItems) {
+      final available = await inventoryUseCases.getAvailableQuantity(
+          item.productId, InventoryItemType.finishedProduct);
+      if (available < item.quantity) {
+        throw Exception('INSUFFICIENT_STOCK');
+      }
+    }
     final newOrder = SalesOrderModel(
       id: '', // Firestore will generate
       customerId: customer.id,

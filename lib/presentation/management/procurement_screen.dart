@@ -327,7 +327,10 @@ class ProcurementScreen extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () async {
                 await useCases.receiveByWarehouse(
-                    request, user.uid, user.name);
+                    request,
+                    user.uid,
+                    user.name,
+                    Provider.of<InventoryUseCases>(context, listen: false));
                 Navigator.pop(context);
               },
               icon: const Icon(Icons.inventory_2_outlined,

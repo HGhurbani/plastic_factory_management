@@ -118,6 +118,12 @@ class InventoryRepositoryImpl implements InventoryRepository {
   }
 
   @override
+  Future<InventoryBalanceModel?> getInventoryBalance(
+      String itemId, InventoryItemType type) {
+    return datasource.getInventoryBalance(itemId, type);
+  }
+
+  @override
   Future<void> updateInventoryQuantity({
     required String itemId,
     required InventoryItemType type,

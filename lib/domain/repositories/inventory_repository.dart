@@ -37,6 +37,8 @@ abstract class InventoryRepository {
 
   // --- Inventory Balances ---
   Stream<List<InventoryBalanceModel>> getInventoryBalances(InventoryItemType type);
+  Future<InventoryBalanceModel?> getInventoryBalance(
+      String itemId, InventoryItemType type);
   Future<void> updateInventoryQuantity({
     required String itemId,
     required InventoryItemType type,
