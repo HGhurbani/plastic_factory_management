@@ -155,6 +155,20 @@ class InventoryDatasource {
             .toList());
   }
 
+  Future<InventoryBalanceModel?> getInventoryBalance(
+      String itemId, InventoryItemType type) async {
+    final query = await _firestore
+        .collection('inventory_balances')
+        .where('itemId', isEqualTo: itemId)
+        .where('type', isEqualTo: inventoryItemTypeToString(type))
+        .limit(1)
+        .get();
+    if (query.docs.isNotEmpty) {
+      return InventoryBalanceModel.fromDocumentSnapshot(query.docs.first);
+    }
+    return null;
+  }
+
   Future<void> updateInventoryQuantity({
     required String itemId,
     required InventoryItemType type,

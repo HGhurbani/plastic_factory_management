@@ -40,7 +40,8 @@ class ProcurementUseCases {
   }
 
   Future<void> receiveByWarehouse(
-      PurchaseRequestModel request, String uid, String name) async {
+      PurchaseRequestModel request, String uid, String name,
+      InventoryUseCases inventoryUseCases) async {
     final updated = request.copyWith(
       status: PurchaseRequestStatus.completed,
       warehouseUid: uid,
@@ -48,5 +49,14 @@ class ProcurementUseCases {
       warehouseReceivedAt: Timestamp.now(),
     );
     await repository.updatePurchaseRequest(updated);
+
+    for (final item in request.items) {
+      await inventoryUseCases.adjustInventoryWithNotification(
+        itemId: item.itemId,
+        itemName: item.itemName,
+        type: InventoryItemType.rawMaterial,
+        delta: item.quantity.toDouble(),
+      );
+    }
   }
 }

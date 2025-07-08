@@ -212,7 +212,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
     });
   }
 
-  Future<void> _submitOrder(SalesUseCases useCases, UserModel currentUser) async {
+  Future<void> _submitOrder(SalesUseCases useCases, InventoryUseCases inventoryUseCases, UserModel currentUser) async {
     if (_formKey.currentState!.validate() && _orderItems.isNotEmpty) {
       if (_selectedCustomer == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -260,6 +260,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
           totalAmount: _totalAmount,
           customerSignatureFile: signatureFile,
           customerSignatureBytes: signatureBytes,
+          inventoryUseCases: inventoryUseCases,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.salesOrderCreatedSuccessfully)),
@@ -433,7 +434,10 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
               ElevatedButton.icon(
                 icon: Icon(Icons.send, color: Colors.white),
                 label: Text(appLocalizations.submitOrder, style: TextStyle(color: Colors.white)),
-                onPressed: () => _submitOrder(salesUseCases, currentUser),
+                onPressed: () => _submitOrder(
+                    salesUseCases,
+                    Provider.of<InventoryUseCases>(context, listen: false),
+                    currentUser),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   minimumSize: Size(double.infinity, 55),

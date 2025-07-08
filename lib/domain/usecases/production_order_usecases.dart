@@ -77,6 +77,14 @@ class ProductionOrderUseCases {
     required UserModel orderPreparer, // Pass the current user model
     String? salesOrderId,
   }) async {
+    for (final material in selectedProduct.billOfMaterials) {
+      final needed = material.quantityPerUnit * requiredQuantity;
+      final available = await inventoryUseCases.getAvailableQuantity(
+          material.materialId, InventoryItemType.rawMaterial);
+      if (available < needed) {
+        throw Exception('INSUFFICIENT_STOCK');
+      }
+    }
     // Define the initial workflow stages
     final List<ProductionWorkflowStage> initialWorkflow = [
       ProductionWorkflowStage(

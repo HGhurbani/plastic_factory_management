@@ -258,6 +258,17 @@ class InventoryUseCases {
     return repository.getInventoryBalances(type);
   }
 
+  Future<InventoryBalanceModel?> getInventoryBalance(
+      String itemId, InventoryItemType type) {
+    return repository.getInventoryBalance(itemId, type);
+  }
+
+  Future<double> getAvailableQuantity(
+      String itemId, InventoryItemType type) async {
+    final balance = await repository.getInventoryBalance(itemId, type);
+    return balance?.quantity ?? 0;
+  }
+
   Future<void> adjustInventory({
     required String itemId,
     required InventoryItemType type,

@@ -1,10 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../data/models/return_request_model.dart';
 import '../repositories/returns_repository.dart';
+import 'sales_usecases.dart';
+import 'inventory_usecases.dart';
+import 'package:plastic_factory_management/data/models/inventory_balance_model.dart';
 
 class ReturnsUseCases {
   final ReturnsRepository repository;
-  ReturnsUseCases(this.repository);
+  final SalesUseCases salesUseCases;
+  final InventoryUseCases inventoryUseCases;
+  ReturnsUseCases(
+      this.repository, this.salesUseCases, this.inventoryUseCases);
 
   Stream<List<ReturnRequestModel>> getReturnRequests() {
     return repository.getReturnRequests();
@@ -49,6 +55,17 @@ class ReturnsUseCases {
   }
 
   Future<void> markCompleted(ReturnRequestModel request) async {
+    final order = await salesUseCases.getSalesOrderById(request.salesOrderId);
+    if (order != null) {
+      for (final item in order.orderItems) {
+        await inventoryUseCases.adjustInventoryWithNotification(
+          itemId: item.productId,
+          itemName: item.productName,
+          type: InventoryItemType.finishedProduct,
+          delta: item.quantity.toDouble(),
+        );
+      }
+    }
     final updated = request.copyWith(status: ReturnRequestStatus.completed);
     await repository.updateReturnRequest(updated);
   }

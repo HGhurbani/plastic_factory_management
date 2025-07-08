@@ -318,6 +318,8 @@ class MyApp extends StatelessWidget {
         Provider<ReturnsUseCases>(
           create: (context) => ReturnsUseCases(
             Provider.of<ReturnsRepositoryImpl>(context, listen: false),
+            Provider.of<SalesUseCases>(context, listen: false),
+            Provider.of<InventoryUseCases>(context, listen: false),
           ),
         ),
       ],
