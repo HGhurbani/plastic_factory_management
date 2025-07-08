@@ -18,6 +18,7 @@ import 'package:plastic_factory_management/presentation/sales/customer_managemen
 import 'package:plastic_factory_management/presentation/sales/create_sales_order_screen.dart'; // استيراد جديد
 import 'package:plastic_factory_management/presentation/sales/sales_orders_list_screen.dart'; // استيراد جديد
 import 'package:plastic_factory_management/presentation/quality/quality_inspection_screen.dart';
+import 'package:plastic_factory_management/presentation/quality/quality_approval_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/inventory_management_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/inventory_adjustment_screen.dart';
 import 'package:plastic_factory_management/presentation/inventory/inventory_add_item_screen.dart';
@@ -56,6 +57,7 @@ class AppRouter {
   static const String createSalesOrderRoute = '/sales/orders/create'; // مسار جديد
   static const String salesOrdersListRoute = '/sales/orders/list'; // مسار جديد
   static const String qualityInspectionRoute = '/quality/inspections';
+  static const String qualityApprovalRoute = '/quality/approval';
   static const String inventoryManagementRoute = '/inventory/management';
   static const String inventoryAdjustmentRoute = '/inventory/adjustment';
   static const String inventoryAddItemRoute = '/inventory/add_item';
@@ -109,6 +111,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => SalesOrdersListScreen());
       case qualityInspectionRoute:
         return MaterialPageRoute(builder: (_) => QualityInspectionScreen());
+      case qualityApprovalRoute:
+        return MaterialPageRoute(builder: (_) => const QualityApprovalScreen());
       case inventoryManagementRoute:
         return MaterialPageRoute(builder: (_) => InventoryManagementScreen());
       case inventoryAdjustmentRoute:
