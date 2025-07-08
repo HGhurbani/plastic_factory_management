@@ -103,12 +103,31 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(child: Text(appLocalizations.noData));
                 }
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  itemBuilder: (context, index) {
-                    final item = snapshot.data![index];
-                    return _buildListItem(item, inventoryUseCases, appLocalizations);
+                return StreamBuilder<List<InventoryBalanceModel>>(
+                  stream: inventoryUseCases.getInventoryBalances(_selectedType),
+                  builder: (context, balSnap) {
+                    final qtyMap = {
+                      for (var b in balSnap.data ?? []) b.itemId: b.quantity
+                    };
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      itemBuilder: (context, index) {
+                        final item = snapshot.data![index];
+                        final id = _selectedType == InventoryItemType.finishedProduct
+                            ? (item as ProductModel).id
+                            : _selectedType == InventoryItemType.rawMaterial
+                                ? (item as RawMaterialModel).id
+                                : (item as SparePartModel).id;
+                        final qty = qtyMap[id] ?? 0.0;
+                        return _buildListItem(
+                            context,
+                            item,
+                            qty,
+                            inventoryUseCases,
+                            appLocalizations);
+                      },
+                    );
                   },
                 );
               },
@@ -142,7 +161,11 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
   }
 
   Widget _buildListItem(
-      dynamic item, InventoryUseCases useCases, AppLocalizations loc) {
+      BuildContext context,
+      dynamic item,
+      double quantity,
+      InventoryUseCases useCases,
+      AppLocalizations loc) {
     if (_selectedType == InventoryItemType.finishedProduct) {
       final product = item as ProductModel;
       return ListTile(
@@ -151,6 +174,22 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
             textDirection: TextDirection.rtl,
             textAlign: TextAlign.right,
             style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(
+          '${loc.currentQuantity}: $quantity',
+          textDirection: TextDirection.rtl,
+        ),
+        trailing: IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () {
+            _showAdjustQuantityDialog(
+              context,
+              useCases,
+              loc,
+              product.id,
+              product.name,
+            );
+          },
+        ),
       );
     }
 
@@ -180,6 +219,10 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
             textAlign: TextAlign.right,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
+          subtitle: Text(
+            '${loc.currentQuantity}: $quantity',
+            textDirection: TextDirection.rtl,
+          ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -195,6 +238,19 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                   }
                 },
                 tooltip: loc.edit,
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  _showAdjustQuantityDialog(
+                    context,
+                    useCases,
+                    loc,
+                    id,
+                    name,
+                  );
+                },
+                tooltip: loc.addInventoryEntry,
               ),
               IconButton(
                 icon: const Icon(Icons.delete, color: Colors.redAccent),
@@ -523,6 +579,50 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                 foregroundColor: Colors.white,
               ),
             ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAdjustQuantityDialog(
+      BuildContext context,
+      InventoryUseCases useCases,
+      AppLocalizations loc,
+      String itemId,
+      String itemName) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(loc.addInventoryEntry, textAlign: TextAlign.center),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(labelText: loc.quantity),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textDirection: TextDirection.rtl,
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(loc.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final delta = double.tryParse(controller.text) ?? 0;
+                if (delta == 0) return;
+                await useCases.adjustInventoryWithNotification(
+                  itemId: itemId,
+                  itemName: itemName,
+                  type: _selectedType,
+                  delta: delta,
+                );
+                if (context.mounted) Navigator.of(dialogContext).pop();
+              },
+              child: Text(loc.save),
+            )
           ],
         );
       },
