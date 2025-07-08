@@ -21,6 +21,7 @@ import 'package:plastic_factory_management/presentation/inventory/inventory_mana
 import 'package:plastic_factory_management/presentation/quality/quality_inspection_screen.dart';
 import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
 import 'package:plastic_factory_management/domain/usecases/user_activity_log_usecases.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -405,14 +406,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.qualityApprovalRoute),
       ));
 
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.operatorProfiles,
-        subtitle: "ملفات المشغلين",
-        icon: Icons.people,
-        color: moduleColors['machinery']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.operatorProfilesRoute),
-      ));
+      // modules.add(_buildModuleButton(
+      //   context: context,
+      //   title: appLocalizations.operatorProfiles,
+      //   subtitle: "ملفات المشغلين",
+      //   icon: Icons.people,
+      //   color: moduleColors['machinery']!,
+      //   onPressed: () => Navigator.of(context).pushNamed(AppRouter.operatorProfilesRoute),
+      // ));
 
       modules.add(_buildModuleButton(
         context: context,
@@ -941,6 +942,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Determine crossAxisCount based on screen width
+    int crossAxisCount;
+    if (screenWidth < 600) { // Phone
+      crossAxisCount = 2;
+    } else if (screenWidth < 900) { // Tablet
+      crossAxisCount = 3;
+    } else if (screenWidth < 1200) { // Small Laptop
+      crossAxisCount = 4;
+    } else { // Large Laptop / Desktop
+      crossAxisCount = 5; // Or even 6 for very large screens
+    }
 
     return Scaffold(
       key: _scaffoldKey,
@@ -972,7 +986,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
         ],
       ),
-      // drawer: _currentUser == null ? null : _buildDrawer(appLocalizations),
+      // drawer: _currentUser == null ? null : _buildDrawer(appLocalizations), // Keep the drawer for mobile
       body: _isLoading
           ? const Center(
         child: Column(
@@ -1027,34 +1041,56 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           : Directionality(
         textDirection: TextDirection.rtl,
         child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: _buildWelcomeCard(),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.85,
-                ),
-                delegate: SliverChildListDelegate(
-                  _getModulesForRole(appLocalizations),
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 20),
-            ),
-          ],
+          child: LayoutBuilder( // Use LayoutBuilder for more granular control based on available width
+            builder: (context, constraints) {
+              // Adjust crossAxisCount based on current constraints.maxWidth
+              int adaptiveCrossAxisCount;
+              if (constraints.maxWidth < 600) { // Small screens (phones)
+                adaptiveCrossAxisCount = 2;
+              } else if (constraints.maxWidth < 900) { // Medium screens (tablets)
+                adaptiveCrossAxisCount = 3;
+              } else if (constraints.maxWidth < 1200) { // Large screens (small laptops)
+                adaptiveCrossAxisCount = 4;
+              } else { // Extra large screens (desktops, large monitors)
+                adaptiveCrossAxisCount = 5;
+              }
+
+              // Consider a min-max approach for childAspectRatio for better filling
+              // You might need to experiment with this value
+              final double childAspectRatio = (constraints.maxWidth / adaptiveCrossAxisCount) / 220; // 220 is a heuristic for item height
+
+              return CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: _buildWelcomeCard(),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: adaptiveCrossAxisCount,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        // Adjust childAspectRatio dynamically or set a reasonable fixed value
+                        // A value around 0.9 to 1.1 usually works well for square-ish cards
+                        childAspectRatio: 0.85, // You might need to tweak this
+                      ),
+                      delegate: SliverChildListDelegate(
+                        _getModulesForRole(appLocalizations),
+                      ),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 20),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
-      ),
       ),
     );
   }

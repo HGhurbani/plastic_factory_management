@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:plastic_factory_management/data/models/purchase_request_model.dart';
 import 'package:plastic_factory_management/domain/repositories/procurement_repository.dart';
+import '../../data/models/inventory_balance_model.dart';
 import 'inventory_usecases.dart';
 
 class ProcurementUseCases {

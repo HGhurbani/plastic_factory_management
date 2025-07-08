@@ -15,6 +15,8 @@ import 'dart:typed_data'; // لاستخدام Uint8List
 import 'package:path_provider/path_provider.dart'; // لحفظ التوقيع مؤقتاً
 import 'package:flutter/foundation.dart';
 
+import '../../domain/usecases/inventory_usecases.dart';
+
 class CreateSalesOrderScreen extends StatefulWidget {
   @override
   _CreateSalesOrderScreenState createState() => _CreateSalesOrderScreenState();

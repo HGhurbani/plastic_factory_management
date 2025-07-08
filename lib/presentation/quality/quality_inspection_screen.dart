@@ -68,7 +68,7 @@ class QualityInspectionScreen extends StatelessWidget {
                               const Icon(Icons.fact_check, color: AppColors.primary, size: 28),
                               const SizedBox(width: 8),
                               Text(
-                                check.productName,
+                                check.productName ?? "",
                                 textDirection: TextDirection.rtl,
                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                               ),
@@ -83,7 +83,7 @@ class QualityInspectionScreen extends StatelessWidget {
                       const Divider(height: 16),
                       _buildInfoRow(loc.inspectProductDelivery, check.inspectedQuantity.toString(), icon: Icons.inventory_2),
                       _buildInfoRow(loc.rejectedQuantity, check.rejectedQuantity.toString(), icon: Icons.highlight_remove_outlined),
-                      _buildInfoRow(loc.shiftSupervisor, check.shiftSupervisorName, icon: Icons.supervisor_account_outlined),
+                      _buildInfoRow(loc.shiftSupervisor, check.shiftSupervisorName?? "", icon: Icons.supervisor_account_outlined),
                       _buildInfoRow(loc.qualityInspector, check.qualityInspectorName, icon: Icons.verified_user_outlined),
                       if (check.defectAnalysis != null && check.defectAnalysis!.trim().isNotEmpty)
                         _buildInfoRow(loc.defectAnalysis, check.defectAnalysis!, icon: Icons.report_problem_outlined),
