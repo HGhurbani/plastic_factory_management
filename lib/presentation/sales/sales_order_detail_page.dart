@@ -91,6 +91,8 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                 _buildInfoRow(appLocalizations.approvalNotes, widget.order.approvalNotes!, icon: Icons.notes),
               if (widget.order.operationsNotes != null && widget.order.operationsNotes!.isNotEmpty)
                 _buildInfoRow(appLocalizations.operationsNotes, widget.order.operationsNotes!, icon: Icons.notes),
+              if (widget.order.machineName != null && widget.order.machineName!.isNotEmpty)
+                _buildInfoRow(appLocalizations.machine, widget.order.machineName!, icon: Icons.precision_manufacturing_outlined),
               if (widget.order.rejectionReason != null && widget.order.rejectionReason!.isNotEmpty)
                 _buildInfoRow(appLocalizations.rejectionReason, widget.order.rejectionReason!, icon: Icons.cancel, textColor: Colors.red),
               if (widget.order.warehouseManagerName != null && widget.order.warehouseManagerName!.isNotEmpty)

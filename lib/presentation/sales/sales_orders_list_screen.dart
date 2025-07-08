@@ -9,6 +9,8 @@ import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
 import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
+import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -1526,10 +1528,17 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showForwardToMoldDialog(BuildContext parentContext, SalesUseCases useCases,
-      AppLocalizations appLocalizations, SalesOrderModel order, UserModel officer) {
+  void _showForwardToMoldDialog(
+      BuildContext parentContext,
+      SalesUseCases useCases,
+      AppLocalizations appLocalizations,
+      SalesOrderModel order,
+      UserModel officer) {
+    final machineryUseCases =
+        Provider.of<MachineryOperatorUseCases>(parentContext, listen: false);
     final TextEditingController notesController =
         TextEditingController(text: order.operationsNotes);
+    MachineModel? selectedMachine;
 
     showDialog(
       context: parentContext,
@@ -1543,6 +1552,41 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           children: [
             Text(appLocalizations.confirmForwardToMoldSupervisor,
                 textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            StreamBuilder<List<MachineModel>>( 
+              stream: machineryUseCases.getMachines(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final machines = snapshot.data!;
+                if (machines.isEmpty) {
+                  return Text(appLocalizations.noData);
+                }
+                if (selectedMachine == null && order.machineId != null) {
+                  selectedMachine = machines.firstWhere(
+                      (m) => m.id == order.machineId,
+                      orElse: () => machines.first);
+                }
+                return DropdownButtonFormField<MachineModel>(
+                  value: selectedMachine,
+                  decoration: InputDecoration(
+                    labelText: appLocalizations.machine,
+                    border: const OutlineInputBorder(),
+                  ),
+                  items: machines
+                      .map((machine) => DropdownMenuItem(
+                            value: machine,
+                            child: Text(machine.name,
+                                textDirection: TextDirection.rtl),
+                          ))
+                      .toList(),
+                  onChanged: (val) => selectedMachine = val,
+                  validator: (value) =>
+                      value == null ? appLocalizations.machineRequired : null,
+                );
+              },
+            ),
             const SizedBox(height: 12),
             TextField(
               controller: notesController,
@@ -1567,6 +1611,12 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             icon: const Icon(Icons.send, color: Colors.white),
             label: Text(appLocalizations.forwardToMoldSupervisor),
             onPressed: () async {
+              if (selectedMachine == null) {
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  SnackBar(content: Text(appLocalizations.machineRequired)),
+                );
+                return;
+              }
               Navigator.of(dialogContext).pop();
               showDialog(
                 context: parentContext,
@@ -1578,6 +1628,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   order,
                   officer,
                   notes: notesController.text.trim(),
+                  machine: selectedMachine,
                 );
                 Navigator.of(parentContext).pop();
                 ScaffoldMessenger.of(parentContext).showSnackBar(
