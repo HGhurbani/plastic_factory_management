@@ -49,6 +49,43 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
     await useCases.deleteElement(id);
   }
 
+  void _showDeleteConfirmationDialog(FactoryElementModel element) {
+    final loc = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: Text(
+            loc.confirmDeletion,
+            style: const TextStyle(color: Colors.red),
+            textAlign: TextAlign.center,
+          ),
+          content: Text(
+            '${loc.delete} "${element.name}"?\n${loc.thisActionCannotBeUndone}',
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(loc.cancel),
+            ),
+            ElevatedButton.icon(
+              onPressed: () async {
+                await _deleteElement(element.id);
+                if (mounted) Navigator.pop(context);
+              },
+              icon: const Icon(Icons.delete_outline, color: Colors.white),
+              label: Text(loc.delete),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showEditDialog(FactoryElementModel element) {
     FactoryElementType type = _typeFromArabic(element.type);
     final nameController = TextEditingController(text: element.name);
@@ -263,6 +300,7 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.factoryElements),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: _showAddDialog,
@@ -311,48 +349,84 @@ class _FactoryElementsScreenState extends State<FactoryElementsScreen> {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
                     itemCount: filtered.length,
                     itemBuilder: (context, index) {
                       final element = filtered[index];
-                      return Card(
-                        color: AppColors.lightGrey,
-                        margin: const EdgeInsets.symmetric(vertical: 6),
-                        child: ListTile(
-                          leading: Icon(_iconForType(element.type),
-                              color: AppColors.primary),
-                          title: Text(element.name,
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right),
-                          subtitle: Text(
-                              element.unit != null && element.unit!.isNotEmpty
-                                  ? '${element.type} - ${element.unit}'
-                                  : element.type,
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined),
-                                tooltip: loc.edit,
-                                onPressed: () => _showEditDialog(element),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline),
-                                tooltip: loc.delete,
-                                onPressed: () => _deleteElement(element.id),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+                      return _buildElementItem(element, loc);
                     },
                   ),
                 ),
               ],
             );
           }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddDialog,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        tooltip: loc.addFactoryElement,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildElementItem(FactoryElementModel element, AppLocalizations loc) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(12),
+        leading: CircleAvatar(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          child: Icon(_iconForType(element.type)),
+        ),
+        title: Text(
+          element.name,
+          textDirection: TextDirection.rtl,
+          textAlign: TextAlign.right,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        subtitle: Text(
+          element.unit != null && element.unit!.isNotEmpty
+              ? '${element.type} - ${element.unit}'
+              : element.type,
+          textDirection: TextDirection.rtl,
+          textAlign: TextAlign.right,
+        ),
+        trailing: PopupMenuButton<String>(
+          onSelected: (val) {
+            if (val == 'edit') {
+              _showEditDialog(element);
+            } else if (val == 'delete') {
+              _showDeleteConfirmationDialog(element);
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'edit',
+              child: Row(
+                children: [
+                  const Icon(Icons.edit, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Text(loc.edit),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'delete',
+              child: Row(
+                children: [
+                  const Icon(Icons.delete_outline, color: Colors.redAccent),
+                  const SizedBox(width: 8),
+                  Text(loc.delete),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
