@@ -112,6 +112,18 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
       defectAnalysis: _defectController.text,
       imageUrls: urls,
     );
+
+    // Mark related orders as delivered
+    if (_salesOrder != null) {
+      final salesUseCases = Provider.of<SalesUseCases>(context, listen: false);
+      await salesUseCases.markOrderDelivered(_salesOrder!);
+    }
+    if (_productionOrder != null) {
+      final prodUseCases =
+          Provider.of<ProductionOrderUseCases>(context, listen: false);
+      await prodUseCases.markOrderDelivered(_productionOrder!, currentUser);
+    }
+
     if (mounted) Navigator.of(context).pop();
   }
 

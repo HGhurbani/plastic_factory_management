@@ -134,6 +134,12 @@ class SalesUseCases {
     }
   }
 
+  // Mark a sales order as delivered (fulfilled)
+  Future<void> markOrderDelivered(SalesOrderModel order) async {
+    final updatedOrder = order.copyWith(status: SalesOrderStatus.fulfilled);
+    await repository.updateSalesOrder(updatedOrder);
+  }
+
   // Accountant approves a sales order
   Future<void> approveSalesOrder(SalesOrderModel order, UserModel accountant, {String? notes}) async {
     final customer = await repository.getCustomerById(order.customerId);
