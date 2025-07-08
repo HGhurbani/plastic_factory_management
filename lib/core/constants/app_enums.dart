@@ -171,3 +171,29 @@ extension FactoryElementTypeExtension on FactoryElementType {
     );
   }
 }
+
+enum OrderType { sales, production }
+
+extension OrderTypeExtension on OrderType {
+  String toFirestoreString() => name;
+
+  static OrderType fromString(String value) {
+    return OrderType.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => OrderType.sales,
+    );
+  }
+}
+
+enum QualityApprovalStatus { approved, rejected }
+
+extension QualityApprovalStatusExtension on QualityApprovalStatus {
+  String toFirestoreString() => name;
+
+  static QualityApprovalStatus fromString(String value) {
+    return QualityApprovalStatus.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => QualityApprovalStatus.approved,
+    );
+  }
+}

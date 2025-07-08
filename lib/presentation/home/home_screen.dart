@@ -397,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         subtitle: "فحص الجودة",
         icon: Icons.verified,
         color: moduleColors['quality']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.qualityInspectionRoute),
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.qualityApprovalRoute),
       ));
 
       modules.add(_buildModuleButton(
@@ -774,7 +774,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         subtitle: "فحص الجودة",
         icon: Icons.verified,
         color: moduleColors['quality']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.qualityInspectionRoute),
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.qualityApprovalRoute),
       ));
     }
 

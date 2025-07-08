@@ -16,8 +16,7 @@ import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/core/services/file_upload_service.dart';
-
-enum OrderType { sales, production }
+import 'package:plastic_factory_management/core/constants/app_enums.dart';
 
 class QualityCheckFormScreen extends StatefulWidget {
   const QualityCheckFormScreen({Key? key}) : super(key: key);
@@ -101,6 +100,9 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
 
     final useCases = Provider.of<QualityUseCases>(context, listen: false);
     await useCases.recordQualityCheck(
+      orderId: _orderIdController.text.trim(),
+      orderType: _orderType!,
+      status: QualityApprovalStatus.approved,
       productId: _selectedProduct!.id,
       productName: _selectedProduct!.name,
       inspectedQuantity: inspected,
@@ -109,6 +111,7 @@ class _QualityCheckFormScreenState extends State<QualityCheckFormScreen> {
       shiftSupervisorName: _supervisorController.text,
       qualityInspectorUid: currentUser.uid,
       qualityInspectorName: currentUser.name,
+      notes: null,
       defectAnalysis: _defectController.text,
       imageUrls: urls,
     );
