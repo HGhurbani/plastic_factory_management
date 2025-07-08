@@ -13,6 +13,8 @@ import 'package:plastic_factory_management/domain/usecases/inventory_usecases.da
 import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
 import 'package:plastic_factory_management/data/models/template_model.dart';
 import 'package:plastic_factory_management/data/models/machine_model.dart';
+import 'package:plastic_factory_management/domain/usecases/production_daily_log_usecases.dart';
+import 'package:plastic_factory_management/data/models/production_daily_log_model.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:image_picker/image_picker.dart'; // لإرفاق الصور
 import 'package:signature/signature.dart'; // للتوقيع الرقمي
@@ -195,6 +197,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     final appLocalizations = AppLocalizations.of(context)!;
     final currentUser = Provider.of<UserModel?>(context);
     final productionUseCases = Provider.of<ProductionOrderUseCases>(context);
+    final logUseCases = Provider.of<ProductionDailyLogUseCases>(context);
 
     if (currentUser == null) {
       return Scaffold(
@@ -354,6 +357,69 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                 ),
               );
             }).toList(),
+            SizedBox(height: 24),
+            Text(
+              'متابعة مشرف الوردية:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.right,
+            ),
+            const SizedBox(height: 8),
+            StreamBuilder<List<ProductionDailyLogModel>>(
+              stream: logUseCases.getLogsForOrder(widget.order.id),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final logs = snapshot.data!;
+                if (logs.isEmpty) {
+                  return const Text('لا توجد متابعات بعد');
+                }
+                return Column(
+                  children: logs.map((log) {
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              intl.DateFormat('yyyy-MM-dd').format(log.createdAt.toDate()),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.right,
+                            ),
+                            if (log.notes != null && log.notes!.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Text(log.notes!, textAlign: TextAlign.right),
+                              ),
+                            if (log.imageUrls.isNotEmpty)
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: log.imageUrls
+                                    .map((u) => Image.network(u, width: 60, height: 60))
+                                    .toList(),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            if (currentUser.userRoleEnum == UserRole.productionShiftSupervisor &&
+                widget.order.status == ProductionOrderStatus.inProduction)
+              Align(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: () => _showAddDailyLogDialog(
+                      context, logUseCases, widget.order, currentUser),
+                  child: const Text('إضافة متابعة'),
+                ),
+              ),
             SizedBox(height: 24),
             // Action button for the current user based on their role and stage
             Align(
@@ -1014,6 +1080,103 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                       print('Error completing stage: $e');
                     }
                   },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _showAddDailyLogDialog(BuildContext context,
+      ProductionDailyLogUseCases logUseCases, ProductionOrderModel order,
+      UserModel currentUser) async {
+    List<File> logImages = [];
+    String? notes;
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('إضافة متابعة يومية'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (v) => notes = v,
+                      decoration: const InputDecoration(
+                        labelText: 'ملاحظات',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final picked =
+                                await _picker.pickImage(source: ImageSource.camera);
+                            if (picked != null) {
+                              setState(() => logImages.add(File(picked.path)));
+                            }
+                          },
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text('كاميرا'),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final picked =
+                                await _picker.pickImage(source: ImageSource.gallery);
+                            if (picked != null) {
+                              setState(() => logImages.add(File(picked.path)));
+                            }
+                          },
+                          icon: const Icon(Icons.photo_library),
+                          label: const Text('معرض'),
+                        ),
+                      ],
+                    ),
+                    if (logImages.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: logImages
+                              .map((f) => Image.file(f, width: 60, height: 60))
+                              .toList(),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('إلغاء'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.of(dialogContext).pop();
+                    await logUseCases.addDailyLog(
+                      orderId: order.id,
+                      supervisorUid: currentUser.uid,
+                      supervisorName: currentUser.name,
+                      notes: notes,
+                      images: logImages,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('تم حفظ المتابعة')),);
+                  },
+                  child: const Text('حفظ'),
                 ),
               ],
             );

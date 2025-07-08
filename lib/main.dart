@@ -21,6 +21,9 @@ import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/data/datasources/production_order_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/production_order_repository_impl.dart';
 import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
+import 'package:plastic_factory_management/data/datasources/production_daily_log_datasource.dart';
+import 'package:plastic_factory_management/data/repositories/production_daily_log_repository_impl.dart';
+import 'package:plastic_factory_management/domain/usecases/production_daily_log_usecases.dart';
 
 // استيرادات Inventory
 import 'package:plastic_factory_management/data/datasources/inventory_datasource.dart';
@@ -180,6 +183,20 @@ class MyApp extends StatelessWidget {
             Provider.of<NotificationUseCases>(context, listen: false),
             Provider.of<UserUseCases>(context, listen: false),
             Provider.of<InventoryUseCases>(context, listen: false),
+          ),
+        ),
+        // توفير Production Daily Log Dependencies
+        Provider<ProductionDailyLogDatasource>(
+          create: (_) => ProductionDailyLogDatasource(),
+        ),
+        Provider<ProductionDailyLogRepositoryImpl>(
+          create: (context) => ProductionDailyLogRepositoryImpl(
+            Provider.of<ProductionDailyLogDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<ProductionDailyLogUseCases>(
+          create: (context) => ProductionDailyLogUseCases(
+            Provider.of<ProductionDailyLogRepositoryImpl>(context, listen: false),
           ),
         ),
         // توفير Machinery & Operator Dependencies
