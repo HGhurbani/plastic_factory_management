@@ -407,6 +407,9 @@ class AppLocalizations {
   String get confirmDeleteUser => _strings["confirmDeleteUser"] ?? "confirmDeleteUser";
   String get userDeletedSuccessfully => _strings["userDeletedSuccessfully"] ?? "userDeletedSuccessfully";
   String get errorDeletingUser => _strings["errorDeletingUser"] ?? "errorDeletingUser";
+  String get userActivityLogs => _strings["userActivityLogs"] ?? "userActivityLogs";
+  String get selectUser => _strings["selectUser"] ?? "selectUser";
+  String get noActivityLogs => _strings["noActivityLogs"] ?? "noActivityLogs";
   String get termsOfUseTitle => _strings["termsOfUseTitle"] ?? "termsOfUseTitle";
   String get termsOfUseText => _strings["termsOfUseText"] ?? "termsOfUseText";
   String get acceptTerms => _strings["acceptTerms"] ?? "acceptTerms";

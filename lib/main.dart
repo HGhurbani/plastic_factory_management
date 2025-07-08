@@ -67,6 +67,9 @@ import 'package:plastic_factory_management/domain/usecases/notification_usecases
 import 'package:plastic_factory_management/data/datasources/user_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/user_repository_impl.dart';
 import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
+import 'package:plastic_factory_management/data/datasources/user_activity_log_datasource.dart';
+import 'package:plastic_factory_management/data/repositories/user_activity_log_repository_impl.dart';
+import 'package:plastic_factory_management/domain/usecases/user_activity_log_usecases.dart';
 
 
 import 'package:plastic_factory_management/presentation/auth/login_screen.dart';
@@ -136,6 +139,20 @@ class MyApp extends StatelessWidget {
         Provider<UserUseCases>(
           create: (context) => UserUseCases(
             Provider.of<UserRepositoryImpl>(context, listen: false),
+          ),
+        ),
+        // توفير User Activity Log Dependencies
+        Provider<UserActivityLogDatasource>(
+          create: (_) => UserActivityLogDatasource(),
+        ),
+        Provider<UserActivityLogRepositoryImpl>(
+          create: (context) => UserActivityLogRepositoryImpl(
+            Provider.of<UserActivityLogDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<UserActivityLogUseCases>(
+          create: (context) => UserActivityLogUseCases(
+            Provider.of<UserActivityLogRepositoryImpl>(context, listen: false),
           ),
         ),
         // توفير Inventory Dependencies

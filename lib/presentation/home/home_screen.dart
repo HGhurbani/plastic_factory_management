@@ -20,6 +20,7 @@ import 'package:plastic_factory_management/presentation/sales/sales_orders_list_
 import 'package:plastic_factory_management/presentation/inventory/inventory_management_screen.dart';
 import 'package:plastic_factory_management/presentation/quality/quality_inspection_screen.dart';
 import 'package:plastic_factory_management/presentation/accounting/accounting_screen.dart';
+import 'package:plastic_factory_management/domain/usecases/user_activity_log_usecases.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -111,6 +112,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<void> _signOut() async {
     final shouldSignOut = await _showSignOutDialog();
     if (shouldSignOut == true) {
+      if (_currentUser != null) {
+        await Provider.of<UserActivityLogUseCases>(context, listen: false)
+            .logActivity(userId: _currentUser!.uid, action: 'logout');
+      }
       await _authService.signOut();
       if (mounted) {
         Navigator.of(context).pushReplacementNamed(AppRouter.loginRoute);
@@ -436,6 +441,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         icon: Icons.manage_accounts,
         color: moduleColors['management']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.userManagementRoute),
+      ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.userActivityLogs,
+        subtitle: "سجل الاستخدام",
+        icon: Icons.history,
+        color: moduleColors['management']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.userActivityLogsRoute),
       ));
 
       modules.add(_buildModuleButton(

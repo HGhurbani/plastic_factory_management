@@ -30,6 +30,7 @@ import 'package:plastic_factory_management/presentation/accounting/purchases_scr
 import 'package:plastic_factory_management/presentation/accounting/spare_part_requests_screen.dart';
 import 'package:plastic_factory_management/presentation/notifications/notifications_screen.dart';
 import 'package:plastic_factory_management/presentation/management/user_management_screen.dart';
+import 'package:plastic_factory_management/presentation/management/user_activity_logs_screen.dart';
 import 'package:plastic_factory_management/presentation/management/returns_screen.dart';
 import 'package:plastic_factory_management/presentation/management/delivery_screen.dart';
 import 'package:plastic_factory_management/presentation/management/reports_screen.dart';
@@ -68,6 +69,7 @@ class AppRouter {
   static const String purchasesRoute = '/accounting/purchases';
   static const String sparePartRequestsRoute = '/accounting/spare_requests';
   static const String userManagementRoute = '/management/users';
+  static const String userActivityLogsRoute = '/management/user_activity_logs';
   static const String returnsRoute = '/management/returns';
   static const String deliveryRoute = '/management/delivery';
   static const String reportsRoute = '/management/reports';
@@ -133,6 +135,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SparePartRequestsScreen());
       case userManagementRoute:
         return MaterialPageRoute(builder: (_) => UserManagementScreen());
+      case userActivityLogsRoute:
+        return MaterialPageRoute(builder: (_) => const UserActivityLogsScreen());
       case returnsRoute:
         return MaterialPageRoute(builder: (_) => ReturnsScreen());
       case deliveryRoute:

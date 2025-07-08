@@ -9,6 +9,7 @@ import 'package:plastic_factory_management/presentation/routes/app_router.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/user_activity_log_usecases.dart';
 
 import 'terms_of_use_screen.dart';
 
@@ -66,10 +67,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     });
 
     try {
-      await _authService.signInWithEmailPassword(
+      final user = await _authService.signInWithEmailPassword(
         _emailController.text.trim(),
         _passwordController.text,
       );
+      await Provider.of<UserActivityLogUseCases>(context, listen: false)
+          .logActivity(userId: user.uid, action: 'login');
       await _navigateAfterLogin();
     } on FirebaseAuthException catch (e) {
       setState(() {
