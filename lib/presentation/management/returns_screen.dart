@@ -4,10 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/return_request_model.dart';
 import 'package:plastic_factory_management/data/models/user_model.dart';
+import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/domain/usecases/returns_usecases.dart';
 import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 
 class ReturnsScreen extends StatelessWidget {
   const ReturnsScreen({super.key});
@@ -16,6 +18,7 @@ class ReturnsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final useCases = Provider.of<ReturnsUseCases>(context);
+    final salesUseCases = Provider.of<SalesUseCases>(context);
     final currentUser = Provider.of<UserModel?>(context);
 
     return Scaffold(
@@ -30,7 +33,7 @@ class ReturnsScreen extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.add_box_outlined),
               onPressed: () =>
-                  _showAddDialog(context, useCases, currentUser, appLocalizations),
+                  _showAddDialog(context, useCases, salesUseCases, currentUser, appLocalizations),
               tooltip: appLocalizations.addReturnRequest,
             ),
         ],
@@ -94,6 +97,7 @@ class ReturnsScreen extends StatelessWidget {
                           ],
                         ),
                         const Divider(height: 16),
+                        _buildInfoRow(appLocalizations.orderId, r.salesOrderId, icon: Icons.confirmation_number_outlined),
                         _buildInfoRow(appLocalizations.reason, r.reason, icon: Icons.help_outline),
                         _buildInfoRow(appLocalizations.orderDate,
                             '${intl.DateFormat('yyyy-MM-dd').format(r.createdAt.toDate())}',
@@ -111,51 +115,95 @@ class ReturnsScreen extends StatelessWidget {
   }
 }
 
-void _showAddDialog(BuildContext context, ReturnsUseCases useCases, UserModel user,
-    AppLocalizations appLocalizations) {
+void _showAddDialog(BuildContext context, ReturnsUseCases useCases,
+    SalesUseCases salesUseCases, UserModel user, AppLocalizations appLocalizations) {
   final reasonController = TextEditingController();
+  final orderIdController = TextEditingController();
+  SalesOrderModel? fetchedOrder;
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text(appLocalizations.addReturnRequest, textAlign: TextAlign.center),
-      content: TextField(
-        controller: reasonController,
-        decoration: InputDecoration(
-          labelText: appLocalizations.reason,
-          border: const OutlineInputBorder(),
-          prefixIcon: const Icon(Icons.help_outline),
-        ),
-        textDirection: TextDirection.rtl,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(appLocalizations.cancel),
-          style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
-        ),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.save, color: Colors.white),
-          onPressed: () async {
-            final request = ReturnRequestModel(
-              id: '',
-              requesterUid: user.uid,
-              requesterName: user.name,
-              reason: reasonController.text,
-              status: ReturnRequestStatus.pendingOperations,
-              createdAt: Timestamp.now(),
-            );
-            await useCases.createReturnRequest(request);
-            Navigator.pop(context);
-          },
-          label: Text(appLocalizations.save),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    builder: (context) => StatefulBuilder(
+      builder: (context, setState) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title:
+            Text(appLocalizations.addReturnRequest, textAlign: TextAlign.center),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: orderIdController,
+                decoration: InputDecoration(
+                  labelText: appLocalizations.orderId,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.confirmation_number_outlined),
+                ),
+                textDirection: TextDirection.rtl,
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final id = orderIdController.text.trim();
+                  if (id.isEmpty) return;
+                  final order = await salesUseCases.getSalesOrderById(id);
+                  setState(() => fetchedOrder = order);
+                },
+                icon: const Icon(Icons.search),
+                label: Text(appLocalizations.fetchOrder),
+              ),
+              if (fetchedOrder != null) ...[
+                const SizedBox(height: 8),
+                _buildInfoRow(appLocalizations.customerName,
+                    fetchedOrder!.customerName, icon: Icons.person),
+                _buildInfoRow(appLocalizations.totalAmount,
+                    '﷼${fetchedOrder!.totalAmount.toStringAsFixed(2)}',
+                    icon: Icons.currency_exchange),
+              ],
+              const SizedBox(height: 8),
+              TextField(
+                controller: reasonController,
+                decoration: InputDecoration(
+                  labelText: appLocalizations.reason,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.help_outline),
+                ),
+                textDirection: TextDirection.rtl,
+              ),
+            ],
           ),
         ),
-      ],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(appLocalizations.cancel),
+            style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.save, color: Colors.white),
+            onPressed: () async {
+              if (fetchedOrder == null) return;
+              final request = ReturnRequestModel(
+                id: '',
+                requesterUid: user.uid,
+                requesterName: user.name,
+                salesOrderId: fetchedOrder!.id,
+                reason: reasonController.text,
+                status: ReturnRequestStatus.pendingOperations,
+                createdAt: Timestamp.now(),
+              );
+              await useCases.createReturnRequest(request);
+              Navigator.pop(context);
+            },
+            label: Text(appLocalizations.save),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape:
+                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }
@@ -177,6 +225,8 @@ void _showRequestDialog(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildInfoRow(appLocalizations.orderId, request.salesOrderId,
+              icon: Icons.confirmation_number_outlined),
           _buildInfoRow(appLocalizations.reason, request.reason, icon: Icons.help_outline),
           _buildInfoRow(appLocalizations.status, request.status.toArabicString(), icon: Icons.info_outline),
           if (request.status == ReturnRequestStatus.awaitingPickup) ...[

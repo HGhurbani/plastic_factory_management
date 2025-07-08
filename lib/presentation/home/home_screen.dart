@@ -714,6 +714,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         color: moduleColors['sales']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
       ));
+
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.returnRequests,
+        subtitle: "طلبات المرتجع",
+        icon: Icons.assignment_return,
+        color: moduleColors['returns']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.returnsRoute),
+      ));
     }
 
     // Modules for Inventory Manager (أمين المخزن)

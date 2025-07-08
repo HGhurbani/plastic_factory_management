@@ -34,6 +34,7 @@ class ReturnRequestModel {
   final String id;
   final String requesterUid;
   final String requesterName;
+  final String salesOrderId;
   final String reason;
   final ReturnRequestStatus status;
   final Timestamp createdAt;
@@ -51,6 +52,7 @@ class ReturnRequestModel {
     required this.id,
     required this.requesterUid,
     required this.requesterName,
+    required this.salesOrderId,
     required this.reason,
     required this.status,
     required this.createdAt,
@@ -71,6 +73,7 @@ class ReturnRequestModel {
       id: doc.id,
       requesterUid: data['requesterUid'] ?? '',
       requesterName: data['requesterName'] ?? '',
+      salesOrderId: data['salesOrderId'] ?? '',
       reason: data['reason'] ?? '',
       status: ReturnRequestStatusExtension.fromString(data['status'] ?? 'pendingOperations'),
       createdAt: data['createdAt'] ?? Timestamp.now(),
@@ -90,6 +93,7 @@ class ReturnRequestModel {
     return {
       'requesterUid': requesterUid,
       'requesterName': requesterName,
+      'salesOrderId': salesOrderId,
       'reason': reason,
       'status': status.toFirestoreString(),
       'createdAt': createdAt,
@@ -109,6 +113,7 @@ class ReturnRequestModel {
     String? id,
     String? requesterUid,
     String? requesterName,
+    String? salesOrderId,
     String? reason,
     ReturnRequestStatus? status,
     Timestamp? createdAt,
@@ -126,6 +131,7 @@ class ReturnRequestModel {
       id: id ?? this.id,
       requesterUid: requesterUid ?? this.requesterUid,
       requesterName: requesterName ?? this.requesterName,
+      salesOrderId: salesOrderId ?? this.salesOrderId,
       reason: reason ?? this.reason,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
