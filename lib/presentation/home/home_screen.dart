@@ -588,22 +588,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (role == UserRole.productionShiftSupervisor) {
       modules.add(_buildModuleButton(
         context: context,
-        title: appLocalizations.productionWorkflowTracking,
-        subtitle: "تتبع سير العمل",
-        icon: Icons.timeline,
-        color: moduleColors['production']!,
-        onPressed: () {},
-        isComingSoon: true,
+        title: appLocalizations.salesOrders,
+        subtitle: "إدارة المبيعات",
+        icon: Icons.shopping_cart,
+        color: moduleColors['sales']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
       ));
 
       modules.add(_buildModuleButton(
         context: context,
-        title: "مهام الإنتاج",
-        subtitle: "إدارة المهام اليومية",
-        icon: Icons.work,
+        title: appLocalizations.productionOrderManagement,
+        subtitle: "طلبات الإنتاج",
+        icon: Icons.production_quantity_limits,
         color: moduleColors['production']!,
-        onPressed: () {},
-        isComingSoon: true,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
       ));
 
       modules.add(_buildModuleButton(

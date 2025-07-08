@@ -13,6 +13,8 @@ import 'package:plastic_factory_management/data/models/product_model.dart';
 import 'package:plastic_factory_management/data/models/spare_part_model.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
 
+import '../../core/constants/app_enums.dart';
+
 class ProcurementScreen extends StatelessWidget {
   const ProcurementScreen({super.key});
 
@@ -158,15 +160,11 @@ class ProcurementScreen extends StatelessWidget {
                     items: const [
                       DropdownMenuItem(
                         value: InventoryItemType.rawMaterial,
-                        child: Text('المادة الأولية', textDirection: TextDirection.rtl),
+                        child: Text('عناصر المخزون', textDirection: TextDirection.rtl),
                       ),
                       DropdownMenuItem(
                         value: InventoryItemType.finishedProduct,
                         child: Text('الإنتاج التام', textDirection: TextDirection.rtl),
-                      ),
-                      DropdownMenuItem(
-                        value: InventoryItemType.sparePart,
-                        child: Text('قطع الغيار', textDirection: TextDirection.rtl),
                       ),
                     ],
                     onChanged: (val) => setState(() {

@@ -11,6 +11,8 @@ import 'package:plastic_factory_management/core/constants/app_enums.dart';
 import 'package:plastic_factory_management/presentation/routes/app_router.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
 
+import '../../data/models/inventory_balance_model.dart';
+
 
 class RawMaterialsScreen extends StatefulWidget {
   const RawMaterialsScreen({super.key});
@@ -62,11 +64,7 @@ class _RawMaterialsScreenState extends State<RawMaterialsScreen> {
                   child: Text(appLocalizations.finishedProducts,
                       textDirection: TextDirection.rtl),
                 ),
-                DropdownMenuItem(
-                  value: InventoryItemType.sparePart,
-                  child: Text(appLocalizations.spareParts,
-                      textDirection: TextDirection.rtl),
-                ),
+
               ],
             ),
           ),
