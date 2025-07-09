@@ -160,6 +160,8 @@ class ProductionOrderModel {
   final String? machineId; // الآلة المستخدمة
   final String? machineName;
   final String? salesOrderId; // If this order was generated from a sales order
+  final String? shiftSupervisorUid; // UID مشرف الوردية المسؤول عن الإنتاج
+  final String? shiftSupervisorName; // اسم مشرف الوردية
   final String orderPreparerUid; // UID of the user who prepared the order
   final String orderPreparerName;
   final String orderPreparerRole; // Role of the user who prepared the order
@@ -182,6 +184,8 @@ class ProductionOrderModel {
     this.machineId,
     this.machineName,
     this.salesOrderId,
+    this.shiftSupervisorUid,
+    this.shiftSupervisorName,
     required this.orderPreparerUid,
     required this.orderPreparerName,
     required this.orderPreparerRole,
@@ -207,6 +211,8 @@ class ProductionOrderModel {
       machineId: data['machineId'],
       machineName: data['machineName'],
       salesOrderId: data['salesOrderId'],
+      shiftSupervisorUid: data['shiftSupervisorUid'],
+      shiftSupervisorName: data['shiftSupervisorName'],
       orderPreparerUid: data['orderPreparerUid'] ?? '',
       orderPreparerName: data['orderPreparerName'] ?? '',
       orderPreparerRole: data['orderPreparerRole'] ?? 'unknown',
@@ -234,6 +240,8 @@ class ProductionOrderModel {
       'machineId': machineId,
       'machineName': machineName,
       'salesOrderId': salesOrderId,
+      'shiftSupervisorUid': shiftSupervisorUid,
+      'shiftSupervisorName': shiftSupervisorName,
       'orderPreparerUid': orderPreparerUid,
       'orderPreparerName': orderPreparerName,
       'orderPreparerRole': orderPreparerRole,
@@ -259,6 +267,8 @@ class ProductionOrderModel {
     String? machineId,
     String? machineName,
     String? salesOrderId,
+    String? shiftSupervisorUid,
+    String? shiftSupervisorName,
     String? orderPreparerUid,
     String? orderPreparerName,
     String? orderPreparerRole,
@@ -281,6 +291,8 @@ class ProductionOrderModel {
       machineId: machineId ?? this.machineId,
       machineName: machineName ?? this.machineName,
       salesOrderId: salesOrderId ?? this.salesOrderId,
+      shiftSupervisorUid: shiftSupervisorUid ?? this.shiftSupervisorUid,
+      shiftSupervisorName: shiftSupervisorName ?? this.shiftSupervisorName,
       orderPreparerUid: orderPreparerUid ?? this.orderPreparerUid,
       orderPreparerName: orderPreparerName ?? this.orderPreparerName,
       orderPreparerRole: orderPreparerRole ?? this.orderPreparerRole,
@@ -292,5 +304,4 @@ class ProductionOrderModel {
       currentStage: currentStage ?? this.currentStage,
       workflowStages: workflowStages ?? this.workflowStages,
     );
-  }
-}
+  }}

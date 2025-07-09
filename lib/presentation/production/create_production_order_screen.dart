@@ -8,6 +8,8 @@ import 'package:plastic_factory_management/data/models/user_model.dart';
 import 'package:plastic_factory_management/data/models/machine_model.dart';
 import 'package:plastic_factory_management/domain/usecases/machinery_operator_usecases.dart';
 import 'package:plastic_factory_management/domain/usecases/production_order_usecases.dart';
+import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
+import 'package:plastic_factory_management/core/constants/app_enums.dart';
 
 class CreateProductionOrderScreen extends StatefulWidget {
   @override
@@ -18,6 +20,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
   final _formKey = GlobalKey<FormState>();
   ProductModel? _selectedProduct;
   MachineModel? _selectedMachine;
+  UserModel? _selectedSupervisor;
   final TextEditingController _quantityController = TextEditingController();
 
   @override
@@ -40,6 +43,12 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
         );
         return;
       }
+      if (_selectedSupervisor == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.fieldRequired)),
+        );
+        return;
+      }
 
       setState(() {
         // يمكن إضافة مؤشر تحميل هنا
@@ -51,6 +60,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
           requiredQuantity: int.parse(_quantityController.text),
           orderPreparer: currentUser,
           selectedMachine: _selectedMachine!,
+          shiftSupervisor: _selectedSupervisor!,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.orderCreatedSuccessfully)), // إضافة هذا النص في ARB
@@ -173,6 +183,31 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
                     },
                     validator: (value) =>
                         value == null ? appLocalizations.machineRequired : null,
+                  );
+                },
+              ),
+              SizedBox(height: 16),
+              FutureBuilder<List<UserModel>>( 
+                future: Provider.of<UserUseCases>(context, listen: false)
+                    .getUsersByRole(UserRole.productionShiftSupervisor),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Text(appLocalizations.noUsersAvailable);
+                  }
+                  return DropdownButtonFormField<UserModel>(
+                    value: _selectedSupervisor,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.shiftSupervisor,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: snapshot.data!
+                        .map((u) => DropdownMenuItem(value: u, child: Text(u.name, textDirection: TextDirection.rtl)))
+                        .toList(),
+                    onChanged: (val) => setState(() => _selectedSupervisor = val),
+                    validator: (value) => value == null ? appLocalizations.fieldRequired : null,
                   );
                 },
               ),

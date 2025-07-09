@@ -241,6 +241,9 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                 icon: Icons.confirmation_number),
             _buildDetailRow(appLocalizations.orderPreparer, widget.order.orderPreparerName,
                 icon: Icons.person),
+            _buildDetailRow(appLocalizations.shiftSupervisor,
+                widget.order.shiftSupervisorName ?? '-',
+                icon: Icons.supervisor_account_outlined),
             if (_template != null) ...[
               const SizedBox(height: 8),
               Text(appLocalizations.templateDetails,
