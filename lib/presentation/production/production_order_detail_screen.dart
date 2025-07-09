@@ -22,6 +22,9 @@ import 'dart:io'; // لاستخدام File
 import 'dart:typed_data'; // لاستخدام Uint8List
 import 'package:flutter/foundation.dart';
 import 'package:plastic_factory_management/theme/app_colors.dart';
+import 'package:plastic_factory_management/domain/usecases/shift_handover_usecases.dart';
+import 'package:plastic_factory_management/data/models/shift_handover_model.dart';
+import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
 
 // شاشة تفاصيل طلب الإنتاج
 class ProductionOrderDetailScreen extends StatefulWidget {
@@ -418,6 +421,63 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                   onPressed: () => _showAddDailyLogDialog(
                       context, logUseCases, widget.order, currentUser),
                   child: const Text('إضافة متابعة'),
+                ),
+              ),
+            const SizedBox(height: 24),
+            Text(
+              'سجل تسليم الورديات:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.right,
+            ),
+            const SizedBox(height: 8),
+            StreamBuilder<List<ShiftHandoverModel>>(
+              stream: Provider.of<ShiftHandoverUseCases>(context)
+                  .getHandoversForOrder(widget.order.id),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final handovers = snapshot.data!;
+                if (handovers.isEmpty) {
+                  return const Text('لا توجد عمليات تسليم');
+                }
+                return Column(
+                  children: handovers.map((h) {
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      child: ListTile(
+                        title: Text(
+                            '${h.fromSupervisorName} ➜ ${h.toSupervisorName}',
+                            textAlign: TextAlign.right),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text('قراءة العداد: ${h.meterReading}'),
+                            if (h.notes != null && h.notes!.isNotEmpty)
+                              Text(h.notes!),
+                            Text(intl.DateFormat('yyyy-MM-dd HH:mm')
+                                .format(h.createdAt.toDate())),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+            if ((currentUser.userRoleEnum == UserRole.productionShiftSupervisor &&
+                    widget.order.status == ProductionOrderStatus.inProduction) ||
+                (currentUser.userRoleEnum ==
+                        UserRole.moldInstallationSupervisor &&
+                    widget.order.currentStage ==
+                        'تسليم القالب لمشرف الإنتاج'))
+              Align(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: () => _showHandoverDialog(
+                      context, widget.order, currentUser),
+                  child: const Text('تسليم الوردية'),
                 ),
               ),
             SizedBox(height: 24),
@@ -1186,6 +1246,92 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     );
   }
 
+  Future<void> _showHandoverDialog(
+      BuildContext context, ProductionOrderModel order, UserModel currentUser) async {
+    final userUseCases = Provider.of<UserUseCases>(context, listen: false);
+    final handoverUseCases = Provider.of<ShiftHandoverUseCases>(context, listen: false);
+    final supervisors = await userUseCases.getUsersByRole(UserRole.productionShiftSupervisor);
+    UserModel? selected;
+    String? notes;
+    double? meter;
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('تسليم الوردية'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<UserModel>(
+                      items: supervisors
+                          .map((u) => DropdownMenuItem(
+                                value: u,
+                                child: Text(u.name),
+                              ))
+                          .toList(),
+                      onChanged: (val) => setState(() => selected = val),
+                      decoration: const InputDecoration(
+                        labelText: 'إلى المشرف',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (v) => meter = double.tryParse(v),
+                      decoration: const InputDecoration(
+                        labelText: 'قراءة العداد',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      onChanged: (v) => notes = v,
+                      decoration: const InputDecoration(
+                        labelText: 'ملاحظات',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('إلغاء'),
+                ),
+                ElevatedButton(
+                  onPressed: selected == null || meter == null
+                      ? null
+                      : () async {
+                          Navigator.of(dialogContext).pop();
+                          await handoverUseCases.addHandover(
+                            orderId: order.id,
+                            fromSupervisor: currentUser,
+                            toSupervisor: selected!,
+                            meterReading: meter!,
+                            notes: notes,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('تم حفظ التسليم')),);
+                        },
+                  child: const Text('حفظ'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   // Helper function to upload file to external server
   Future<Uri?> _uploadFile({File? file, Uint8List? bytes, required String path}) async {
     try {
@@ -1200,5 +1346,4 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
       print('Error uploading file: $e');
       return null;
     }
-  }
-}
+  }}
