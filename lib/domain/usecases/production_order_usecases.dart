@@ -568,4 +568,19 @@ class ProductionOrderUseCases {
   Future<ProductModel?> getProductById(String productId) {
     return repository.getProductById(productId);
   }
-}
+
+  /// Update the shift supervisor responsible for a production order
+  Future<void> updateShiftSupervisor(
+      ProductionOrderModel order, UserModel supervisor) async {
+    final updated = order.copyWith(
+      shiftSupervisorUid: supervisor.uid,
+      shiftSupervisorName: supervisor.name,
+    );
+    await repository.updateProductionOrder(updated);
+
+    await notificationUseCases.sendNotification(
+      userId: supervisor.uid,
+      title: 'تم اسناد طلب انتاج جديد',
+      message: 'يرجى متابعة أمر الإنتاج رقم ${order.batchNumber}',
+    );
+  }}

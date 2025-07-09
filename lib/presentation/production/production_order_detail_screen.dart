@@ -1286,6 +1286,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
       BuildContext context, ProductionOrderModel order, UserModel currentUser) async {
     final userUseCases = Provider.of<UserUseCases>(context, listen: false);
     final handoverUseCases = Provider.of<ShiftHandoverUseCases>(context, listen: false);
+    final productionUseCases = Provider.of<ProductionOrderUseCases>(context, listen: false);
     final supervisors = await userUseCases.getUsersByRole(UserRole.productionShiftSupervisor);
     UserModel? selected;
     String? notes;
@@ -1355,6 +1356,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                             meterReading: meter!,
                             notes: notes,
                           );
+                          await productionUseCases.updateShiftSupervisor(order, selected!);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('تم حفظ التسليم')),);
                         },
