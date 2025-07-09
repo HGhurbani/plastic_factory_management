@@ -473,6 +473,7 @@ class ProductionOrderUseCases {
     } else if (stageName == 'تسليم القالب لمشرف الإنتاج') {
       nextStageName = 'بدء الإنتاج';
       updatedWorkflow.add(ProductionWorkflowStage(stageName: nextStageName, status: 'pending'));
+      newOverallStatus = ProductionOrderStatus.inProduction; // الطلب بات قيد الإنتاج بعد التسليم لمشرف الوردية
     } else if (stageName == 'بدء الإنتاج' && order.requiredQuantity > 0) { // Assuming this means a batch completed
       // This is where more complex batch logic would go. For simplicity,
       // let's assume 'بدء الإنتاج' completion means moving to 'انتهاء الإنتاج'.
