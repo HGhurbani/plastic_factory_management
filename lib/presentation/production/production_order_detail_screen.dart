@@ -25,6 +25,8 @@ import 'package:plastic_factory_management/theme/app_colors.dart';
 import 'package:plastic_factory_management/domain/usecases/shift_handover_usecases.dart';
 import 'package:plastic_factory_management/data/models/shift_handover_model.dart';
 import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
+import 'package:plastic_factory_management/data/models/sales_order_model.dart';
+import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
 
 // شاشة تفاصيل طلب الإنتاج
 class ProductionOrderDetailScreen extends StatefulWidget {
@@ -48,6 +50,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
   String? _rejectionReason; // For delay justification
   TemplateModel? _template;
   MachineModel? _machine;
+  SalesOrderModel? _salesOrder;
 
   @override
   void initState() {
@@ -67,6 +70,15 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     if (widget.order.machineId != null) {
       machineryUseCases.getMachineById(widget.order.machineId!).then((value) {
         if (mounted) setState(() => _machine = value);
+      });
+    }
+    if (widget.order.salesOrderId != null) {
+      final salesUseCases =
+          Provider.of<SalesUseCases>(context, listen: false);
+      salesUseCases
+          .getSalesOrderById(widget.order.salesOrderId!)
+          .then((value) {
+        if (mounted) setState(() => _salesOrder = value);
       });
     }
   }
@@ -473,7 +485,9 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
             ),
             const SizedBox(height: 8),
             if ((currentUser.userRoleEnum == UserRole.productionShiftSupervisor &&
-                    widget.order.status == ProductionOrderStatus.inProduction) ||
+                    widget.order.status == ProductionOrderStatus.inProduction &&
+                    _salesOrder != null &&
+                    _salesOrder!.shiftSupervisorUid == currentUser.uid) ||
                 (currentUser.userRoleEnum ==
                         UserRole.moldInstallationSupervisor &&
                     widget.order.currentStage ==

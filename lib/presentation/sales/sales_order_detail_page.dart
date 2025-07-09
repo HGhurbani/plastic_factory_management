@@ -195,7 +195,8 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
               ],
               if (currentUser != null &&
                   currentUser.userRoleEnum == UserRole.productionShiftSupervisor &&
-                  widget.order.status == SalesOrderStatus.inProduction)
+                  widget.order.status == SalesOrderStatus.inProduction &&
+                  widget.order.shiftSupervisorUid == currentUser.uid)
                 Align(
                   alignment: Alignment.center,
                   child: ElevatedButton(
