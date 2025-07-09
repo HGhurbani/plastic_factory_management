@@ -24,6 +24,9 @@ import 'package:plastic_factory_management/domain/usecases/production_order_usec
 import 'package:plastic_factory_management/data/datasources/production_daily_log_datasource.dart';
 import 'package:plastic_factory_management/data/repositories/production_daily_log_repository_impl.dart';
 import 'package:plastic_factory_management/domain/usecases/production_daily_log_usecases.dart';
+import 'package:plastic_factory_management/data/datasources/shift_handover_datasource.dart';
+import 'package:plastic_factory_management/data/repositories/shift_handover_repository_impl.dart';
+import 'package:plastic_factory_management/domain/usecases/shift_handover_usecases.dart';
 
 // استيرادات Inventory
 import 'package:plastic_factory_management/data/datasources/inventory_datasource.dart';
@@ -214,6 +217,20 @@ class MyApp extends StatelessWidget {
         Provider<ProductionDailyLogUseCases>(
           create: (context) => ProductionDailyLogUseCases(
             Provider.of<ProductionDailyLogRepositoryImpl>(context, listen: false),
+          ),
+        ),
+        // Shift Handover dependencies
+        Provider<ShiftHandoverDatasource>(
+          create: (_) => ShiftHandoverDatasource(),
+        ),
+        Provider<ShiftHandoverRepositoryImpl>(
+          create: (context) => ShiftHandoverRepositoryImpl(
+            Provider.of<ShiftHandoverDatasource>(context, listen: false),
+          ),
+        ),
+        Provider<ShiftHandoverUseCases>(
+          create: (context) => ShiftHandoverUseCases(
+            Provider.of<ShiftHandoverRepositoryImpl>(context, listen: false),
           ),
         ),
         // توفير Machinery & Operator Dependencies

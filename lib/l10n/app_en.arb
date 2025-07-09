@@ -505,6 +505,8 @@
   "rejectedQuantity": "Rejected Quantity",
   "acceptedQuantity": "Accepted Quantity",
   "shiftSupervisor": "Shift Supervisor",
+  "shiftHandover": "Shift Handover",
+  "shiftHandoverHistory": "Shift Handover History",
   "defectAnalysis": "Defect Analysis",
   "qualityChecks": "Quality Checks",
   "defectPhotos": "Defect Photos",
