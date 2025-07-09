@@ -31,6 +31,16 @@ class ProcurementUseCases {
       accountantApprovedAt: Timestamp.now(),
     );
     await repository.updatePurchaseRequest(updated);
+
+    // adjust inventory quantities once approved
+    for (final item in request.items) {
+      await inventoryUseCases.adjustInventoryWithNotification(
+        itemId: item.itemId,
+        itemName: item.itemName,
+        type: item.itemType,
+        delta: item.quantity.toDouble(),
+      );
+    }
   }
 
   Future<void> rejectByAccountant(
@@ -54,14 +64,5 @@ class ProcurementUseCases {
       warehouseReceivedAt: Timestamp.now(),
     );
     await repository.updatePurchaseRequest(updated);
-
-    for (final item in request.items) {
-      await inventoryUseCases.adjustInventoryWithNotification(
-        itemId: item.itemId,
-        itemName: item.itemName,
-        type: item.itemType,
-        delta: item.quantity.toDouble(),
-      );
-    }
   }
 }
