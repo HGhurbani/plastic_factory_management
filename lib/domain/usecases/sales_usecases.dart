@@ -418,6 +418,22 @@ class SalesUseCases {
     }
   }
 
+  /// Update the shift supervisor responsible for the order
+  Future<void> updateShiftSupervisor(
+      SalesOrderModel order, UserModel supervisor) async {
+    final updated = order.copyWith(
+      shiftSupervisorUid: supervisor.uid,
+      shiftSupervisorName: supervisor.name,
+    );
+    await repository.updateSalesOrder(updated);
+
+    await notificationUseCases.sendNotification(
+      userId: supervisor.uid,
+      title: 'تم اسناد طلب انتاج جديد',
+      message: 'يرجى متابعة طلب العميل ${order.customerName}',
+    );
+  }
+
   // Mold installer adds documentation
   Future<void> addMoldInstallationDocs({
     required SalesOrderModel order,
