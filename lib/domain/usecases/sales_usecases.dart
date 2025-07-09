@@ -285,6 +285,7 @@ class SalesUseCases {
   Future<void> forwardToMoldSupervisor(
       SalesOrderModel order,
       UserModel operationsOfficer, {
+      UserModel? supervisor,
       String? notes,
       MachineModel? machine,
     }) async {
@@ -293,17 +294,27 @@ class SalesUseCases {
       operationsNotes: notes ?? order.operationsNotes,
       machineId: machine?.id ?? order.machineId,
       machineName: machine?.name ?? order.machineName,
+      moldSupervisorUid: supervisor?.uid ?? order.moldSupervisorUid,
+      moldSupervisorName: supervisor?.name ?? order.moldSupervisorName,
     );
     await repository.updateSalesOrder(updated);
 
-    final supervisors =
-        await userUseCases.getUsersByRole(UserRole.moldInstallationSupervisor);
-    for (final sup in supervisors) {
+    if (supervisor != null) {
       await notificationUseCases.sendNotification(
-        userId: sup.uid,
+        userId: supervisor.uid,
         title: 'طلب بانتظار اعتماد القوالب',
         message: 'يرجى مراجعة طلب العميل ${order.customerName}',
       );
+    } else {
+      final supervisors =
+          await userUseCases.getUsersByRole(UserRole.moldInstallationSupervisor);
+      for (final sup in supervisors) {
+        await notificationUseCases.sendNotification(
+          userId: sup.uid,
+          title: 'طلب بانتظار اعتماد القوالب',
+          message: 'يرجى مراجعة طلب العميل ${order.customerName}',
+        );
+      }
     }
   }
 

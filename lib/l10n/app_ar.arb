@@ -375,6 +375,7 @@
   "assignOrderToStorekeeper": "إسناد الطلب إلى أمين المخزن",
   "storekeeper": "أمين المخزن",
   "selectStorekeeperError": "يرجى اختيار أمين مخزن",
+  "selectMoldSupervisorError": "يرجى اختيار مشرف القوالب",
   "supplyInitiatedSuccessfully": "تم بدء التزويد بنجاح",
   "errorInitiatingSupply": "خطأ في بدء التزويد",
   "forwardToMoldSupervisor": "تحويل إلى مشرف القوالب",
