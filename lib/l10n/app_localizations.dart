@@ -47,7 +47,6 @@ class AppLocalizations {
   String get status => _strings["status"] ?? "status";
   String get pending => _strings["pending"] ?? "pending";
   String get approved => _strings["approved"] ?? "approved";
-  String get inCreation => _strings["inCreation"] ?? "inCreation";
   String get inProduction => _strings["inProduction"] ?? "inProduction";
   String get completed => _strings["completed"] ?? "completed";
   String get canceled => _strings["canceled"] ?? "canceled";
