@@ -386,21 +386,35 @@ class SalesUseCases {
   }
 
   // Mold supervisor approves order and enables mold tasks
-  Future<void> approveMoldTasks(SalesOrderModel order, UserModel supervisor) async {
+  Future<void> approveMoldTasks(
+    SalesOrderModel order,
+    UserModel supervisor, {
+    UserModel? shiftSupervisor,
+  }) async {
     if (order.moldTasksEnabled) return;
     final updated = order.copyWith(
       moldTasksEnabled: true,
       moldSupervisorUid: supervisor.uid,
       moldSupervisorName: supervisor.name,
       moldSupervisorApprovedAt: Timestamp.now(),
+      shiftSupervisorUid: shiftSupervisor?.uid ?? order.shiftSupervisorUid,
+      shiftSupervisorName: shiftSupervisor?.name ?? order.shiftSupervisorName,
     );
     await repository.updateSalesOrder(updated);
 
     await notificationUseCases.sendNotification(
       userId: supervisor.uid,
       title: 'تم اعتماد مهام التركيب',
-      message: 'تم اعتماد طلب العميل ${order.customerName}' ,
+      message: 'تم اعتماد طلب العميل ${order.customerName}',
     );
+
+    if (shiftSupervisor != null) {
+      await notificationUseCases.sendNotification(
+        userId: shiftSupervisor.uid,
+        title: 'تم اسناد طلب انتاج جديد',
+        message: 'يرجى متابعة طلب العميل ${order.customerName}',
+      );
+    }
   }
 
   // Mold installer adds documentation

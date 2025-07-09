@@ -112,6 +112,8 @@ class SalesOrderModel {
   final String? moldSupervisorUid; // UID مشرف التركيب الذي اعتمد الطلب
   final String? moldSupervisorName; // اسم مشرف التركيب
   final Timestamp? moldSupervisorApprovedAt; // وقت اعتماد المشرف
+  final String? shiftSupervisorUid; // UID مشرف الوردية المسؤول عن الإنتاج
+  final String? shiftSupervisorName; // اسم مشرف الوردية
   final String? moldInstallationNotes; // ملاحظات عملية التركيب
   final List<String> moldInstallationImages; // صور توثيقية للتركيب
   final String? operationsNotes; // ملاحظات مسؤول العمليات
@@ -149,6 +151,8 @@ class SalesOrderModel {
     this.moldSupervisorUid,
     this.moldSupervisorName,
     this.moldSupervisorApprovedAt,
+    this.shiftSupervisorUid,
+    this.shiftSupervisorName,
     this.moldInstallationNotes,
     this.moldInstallationImages = const [],
     this.operationsNotes,
@@ -192,6 +196,8 @@ class SalesOrderModel {
       moldSupervisorUid: data['moldSupervisorUid'],
       moldSupervisorName: data['moldSupervisorName'],
       moldSupervisorApprovedAt: data['moldSupervisorApprovedAt'],
+      shiftSupervisorUid: data['shiftSupervisorUid'],
+      shiftSupervisorName: data['shiftSupervisorName'],
       moldInstallationNotes: data['moldInstallationNotes'],
       moldInstallationImages: List<String>.from(data['moldInstallationImages'] ?? []),
       operationsNotes: data['operationsNotes'],
@@ -233,6 +239,8 @@ class SalesOrderModel {
       'moldSupervisorUid': moldSupervisorUid,
       'moldSupervisorName': moldSupervisorName,
       'moldSupervisorApprovedAt': moldSupervisorApprovedAt,
+      'shiftSupervisorUid': shiftSupervisorUid,
+      'shiftSupervisorName': shiftSupervisorName,
       'moldInstallationNotes': moldInstallationNotes,
       'moldInstallationImages': moldInstallationImages,
       'operationsNotes': operationsNotes,
@@ -272,6 +280,8 @@ class SalesOrderModel {
     String? moldSupervisorUid,
     String? moldSupervisorName,
     Timestamp? moldSupervisorApprovedAt,
+    String? shiftSupervisorUid,
+    String? shiftSupervisorName,
     String? moldInstallationNotes,
     List<String>? moldInstallationImages,
     String? operationsNotes,
@@ -309,6 +319,8 @@ class SalesOrderModel {
       moldSupervisorUid: moldSupervisorUid ?? this.moldSupervisorUid,
       moldSupervisorName: moldSupervisorName ?? this.moldSupervisorName,
       moldSupervisorApprovedAt: moldSupervisorApprovedAt ?? this.moldSupervisorApprovedAt,
+      shiftSupervisorUid: shiftSupervisorUid ?? this.shiftSupervisorUid,
+      shiftSupervisorName: shiftSupervisorName ?? this.shiftSupervisorName,
       moldInstallationNotes: moldInstallationNotes ?? this.moldInstallationNotes,
       moldInstallationImages: moldInstallationImages ?? this.moldInstallationImages,
       operationsNotes: operationsNotes ?? this.operationsNotes,
@@ -326,5 +338,4 @@ class SalesOrderModel {
       productionManagerName: productionManagerName ?? this.productionManagerName,
       productionRejectionReason: productionRejectionReason ?? this.productionRejectionReason,
     );
-  }
-}
+  }}
