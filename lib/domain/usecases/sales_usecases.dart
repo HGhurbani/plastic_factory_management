@@ -393,8 +393,8 @@ class SalesUseCases {
   }) async {
     if (order.moldTasksEnabled) return;
     final updated = order.copyWith(
-      moldTasksEnabled: true,
-      status: SalesOrderStatus.inProduction,
+      moldTasksEnabled: false,
+      status: SalesOrderStatus.inCreation,
       moldSupervisorUid: supervisor.uid,
       moldSupervisorName: supervisor.name,
       moldSupervisorApprovedAt: Timestamp.now(),

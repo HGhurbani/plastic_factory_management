@@ -132,6 +132,11 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                   //     _selectedStatusFilter = value;
                   //   });
                   // }),
+                  _buildFilterChip(appLocalizations.inCreation, SalesOrderStatus.inCreation.toFirestoreString(), _selectedStatusFilter, (value) {
+                    setState(() {
+                      _selectedStatusFilter = value;
+                    });
+                  }),
                   _buildFilterChip(appLocalizations.inProduction, SalesOrderStatus.inProduction.toFirestoreString(), _selectedStatusFilter, (value) {
                     setState(() {
                       _selectedStatusFilter = value;
@@ -543,6 +548,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         return Colors.blue.shade700;
       case SalesOrderStatus.awaitingOperationsForward:
         return Colors.orange.shade700;
+      case SalesOrderStatus.inCreation:
+        return Colors.blueGrey.shade700;
       case SalesOrderStatus.inProduction:
         return Colors.deepPurple.shade700;
       case SalesOrderStatus.fulfilled:
@@ -1121,7 +1128,6 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 );
                 try {
                   await useCases.approveMoldTasks(order, supervisor, shiftSupervisor: selectedShift);
-                  await productionUseCases.createProductionOrdersFromSalesOrder(order, supervisor);
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(appLocalizations.moldTasksApprovedSuccessfully)),

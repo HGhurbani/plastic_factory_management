@@ -67,6 +67,7 @@
   "status": "الحالة",
   "pending": "قيد الانتظار",
   "approved": "معتمد",
+  "inCreation": "Under Creation",
   "inProduction": "قيد الإنتاج",
   "completed": "مكتمل",
   "canceled": "ملغي",

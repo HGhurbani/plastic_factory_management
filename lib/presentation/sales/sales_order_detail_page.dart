@@ -159,6 +159,8 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
         return Colors.blue.shade700;
       case SalesOrderStatus.awaitingOperationsForward:
         return Colors.orange.shade700;
+      case SalesOrderStatus.inCreation:
+        return Colors.blueGrey.shade700;
       case SalesOrderStatus.inProduction:
         return Colors.deepPurple.shade700;
       case SalesOrderStatus.fulfilled:
