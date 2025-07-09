@@ -75,6 +75,7 @@ class ProductionOrderUseCases {
     required int requiredQuantity,
     MachineModel? selectedMachine,
     required UserModel orderPreparer, // Pass the current user model
+    required UserModel shiftSupervisor,
     String? salesOrderId,
   }) async {
     for (final material in selectedProduct.billOfMaterials) {
@@ -114,6 +115,8 @@ class ProductionOrderUseCases {
       templateName: null,
       machineId: selectedMachine?.id,
       machineName: selectedMachine?.name,
+      shiftSupervisorUid: shiftSupervisor.uid,
+      shiftSupervisorName: shiftSupervisor.name,
       orderPreparerUid: orderPreparer.uid,
       orderPreparerName: orderPreparer.name,
       orderPreparerRole: orderPreparer.userRoleEnum.toFirestoreString(),
@@ -171,6 +174,8 @@ class ProductionOrderUseCases {
         requiredQuantity: item.quantity,
       batchNumber: '${order.id}-$i',
       salesOrderId: order.id,
+      shiftSupervisorUid: order.shiftSupervisorUid,
+      shiftSupervisorName: order.shiftSupervisorName,
       orderPreparerUid: preparer.uid,
       orderPreparerName: preparer.name,
       orderPreparerRole: preparer.userRoleEnum.toFirestoreString(),
