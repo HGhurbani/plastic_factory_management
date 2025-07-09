@@ -111,7 +111,22 @@ class ProcurementScreen extends StatelessWidget {
                         _buildInfoRow(appLocalizations.orderDate,
                             intl.DateFormat('yyyy-MM-dd').format(r.createdAt.toDate()),
                             icon: Icons.calendar_today_outlined),
-                        _buildInfoRow(appLocalizations.quantity, r.items.length.toString(), icon: Icons.list_alt),
+                        _buildInfoRow(appLocalizations.quantity,
+                            r.items.length.toString(), icon: Icons.list_alt),
+                        if (r.totalAmount > 0)
+                          _buildInfoRow(appLocalizations.amount,
+                              r.totalAmount.toString(),
+                              icon: Icons.price_change_outlined),
+                        if (r.accountantApprovedAt != null)
+                          _buildInfoRow(
+                              appLocalizations.approvalDate,
+                              intl.DateFormat('yyyy-MM-dd')
+                                  .format(r.accountantApprovedAt!.toDate()),
+                              icon: Icons.calendar_month_outlined),
+                        if (r.accountantName != null)
+                          _buildInfoRow(appLocalizations.approvedBy,
+                              r.accountantName ?? appLocalizations.unknown,
+                              icon: Icons.person_outline),
                       ],
                     ),
                   ),
@@ -285,9 +300,22 @@ class ProcurementScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ...request.items.map((e) => Text('${e.itemName} x${e.quantity}', textDirection: TextDirection.rtl)),
+            ...request.items.map((e) => Text('${e.itemName} x${e.quantity}',
+                textDirection: TextDirection.rtl)),
             const SizedBox(height: 8),
-            Text('${appLocalizations.statusColon}${_statusToArabic(request.status, context)}', textDirection: TextDirection.rtl),
+            _buildInfoRow(appLocalizations.status,
+                _statusToArabic(request.status, context)),
+            if (request.accountantApprovedAt != null)
+              _buildInfoRow(
+                  appLocalizations.approvalDate,
+                  intl.DateFormat('yyyy-MM-dd')
+                      .format(request.accountantApprovedAt!.toDate())),
+            if (request.totalAmount > 0)
+              _buildInfoRow(
+                  appLocalizations.amount, request.totalAmount.toString()),
+            if (request.accountantName != null)
+              _buildInfoRow(appLocalizations.approvedBy,
+                  request.accountantName ?? appLocalizations.unknown),
             if (user != null &&
                 user.userRoleEnum == UserRole.accountant &&
                 request.status == PurchaseRequestStatus.awaitingApproval) ...[
