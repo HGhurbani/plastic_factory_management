@@ -1554,12 +1554,13 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
 
     showDialog(
       context: parentContext,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(appLocalizations.forwardToMoldSupervisor,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Column(
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.forwardToMoldSupervisor,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(appLocalizations.confirmForwardToMoldSupervisor,
@@ -1578,7 +1579,9 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                         child: Text(u.name, textDirection: TextDirection.rtl),
                       ))
                   .toList(),
-              onChanged: (u) => selectedSupervisor = u,
+              onChanged: (u) => setState(() {
+                selectedSupervisor = u;
+              }),
             ),
             const SizedBox(height: 12),
             StreamBuilder<List<MachineModel>>(
@@ -1620,7 +1623,9 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                       );
                       return;
                     }
-                    selectedMachine = val;
+                    setState(() {
+                      selectedMachine = val;
+                    });
                   },
                   validator: (value) =>
                       value == null ? appLocalizations.machineRequired : null,
@@ -1696,6 +1701,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             ),
           ),
         ],
+        ),
       ),
     );
   }
