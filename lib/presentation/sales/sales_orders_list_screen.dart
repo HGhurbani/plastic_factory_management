@@ -486,7 +486,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
       );
 
     } else if (isOperationsOfficer &&
-        order.status == SalesOrderStatus.warehouseProcessing) {
+        order.status == SalesOrderStatus.awaitingOperationsForward) {
       actions.add(
         ElevatedButton.icon(
           icon: const Icon(Icons.send, color: Colors.white),
@@ -541,6 +541,8 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
         return AppColors.secondary; // Use a distinct color for this stage
       case SalesOrderStatus.warehouseProcessing:
         return Colors.blue.shade700;
+      case SalesOrderStatus.awaitingOperationsForward:
+        return Colors.orange.shade700;
       case SalesOrderStatus.inProduction:
         return Colors.deepPurple.shade700;
       case SalesOrderStatus.fulfilled:

@@ -279,6 +279,7 @@ class AppLocalizations {
   String get pendingApproval => _strings["pendingApproval"] ?? "pendingApproval";
   String get pendingFulfillment => _strings["pendingFulfillment"] ?? "pendingFulfillment";
   String get warehouseProcessing => _strings["warehouseProcessing"] ?? "warehouseProcessing";
+  String get awaitingOperationsForward => _strings["awaitingOperationsForward"] ?? "awaitingOperationsForward";
   String get fulfilled => _strings["fulfilled"] ?? "fulfilled";
   String get rejected => _strings["rejected"] ?? "rejected";
   String get markAsFulfilled => _strings["markAsFulfilled"] ?? "markAsFulfilled";

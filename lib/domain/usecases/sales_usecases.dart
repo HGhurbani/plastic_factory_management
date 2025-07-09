@@ -276,7 +276,7 @@ class SalesUseCases {
       deliveryTime: deliveryTime != null
           ? Timestamp.fromDate(deliveryTime)
           : order.deliveryTime,
-      status: SalesOrderStatus.warehouseProcessing,
+      status: SalesOrderStatus.awaitingOperationsForward,
     );
     await repository.updateSalesOrder(updated);
   }
