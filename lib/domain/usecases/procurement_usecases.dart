@@ -19,9 +19,13 @@ class ProcurementUseCases {
   }
 
   Future<void> approveByAccountant(
-      PurchaseRequestModel request, String approverUid, String approverName) async {
+      PurchaseRequestModel request,
+      String approverUid,
+      String approverName,
+      double amount) async {
     final updated = request.copyWith(
       status: PurchaseRequestStatus.awaitingWarehouse,
+      totalAmount: amount,
       accountantUid: approverUid,
       accountantName: approverName,
       accountantApprovedAt: Timestamp.now(),
@@ -55,7 +59,7 @@ class ProcurementUseCases {
       await inventoryUseCases.adjustInventoryWithNotification(
         itemId: item.itemId,
         itemName: item.itemName,
-        type: InventoryItemType.rawMaterial,
+        type: item.itemType,
         delta: item.quantity.toDouble(),
       );
     }

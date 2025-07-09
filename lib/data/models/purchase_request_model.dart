@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'inventory_balance_model.dart';
 
 enum PurchaseRequestStatus {
   awaitingApproval, // بانتظار اعتماد المحاسب
@@ -21,10 +22,13 @@ class PurchaseRequestItem {
   final String itemId;
   final String itemName;
   final int quantity;
+  final InventoryItemType itemType;
+
   PurchaseRequestItem({
     required this.itemId,
     required this.itemName,
     required this.quantity,
+    required this.itemType,
   });
 
   factory PurchaseRequestItem.fromMap(Map<String, dynamic> map) {
@@ -32,6 +36,7 @@ class PurchaseRequestItem {
       itemId: map['itemId'] ?? '',
       itemName: map['itemName'] ?? '',
       quantity: map['quantity'] ?? 0,
+      itemType: inventoryItemTypeFromString(map['itemType'] ?? 'raw'),
     );
   }
 
@@ -40,7 +45,22 @@ class PurchaseRequestItem {
       'itemId': itemId,
       'itemName': itemName,
       'quantity': quantity,
+      'itemType': inventoryItemTypeToString(itemType),
     };
+  }
+
+  PurchaseRequestItem copyWith({
+    String? itemId,
+    String? itemName,
+    int? quantity,
+    InventoryItemType? itemType,
+  }) {
+    return PurchaseRequestItem(
+      itemId: itemId ?? this.itemId,
+      itemName: itemName ?? this.itemName,
+      quantity: quantity ?? this.quantity,
+      itemType: itemType ?? this.itemType,
+    );
   }
 }
 

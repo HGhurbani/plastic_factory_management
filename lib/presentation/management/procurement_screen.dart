@@ -157,14 +157,21 @@ class ProcurementScreen extends StatelessWidget {
                       labelText: appLocalizations.selectInventoryType,
                       border: const OutlineInputBorder(),
                     ),
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: InventoryItemType.rawMaterial,
-                        child: Text('عناصر المخزون', textDirection: TextDirection.rtl),
+                        child: Text(appLocalizations.rawMaterials,
+                            textDirection: TextDirection.rtl),
+                      ),
+                      DropdownMenuItem(
+                        value: InventoryItemType.sparePart,
+                        child: Text(appLocalizations.spareParts,
+                            textDirection: TextDirection.rtl),
                       ),
                       DropdownMenuItem(
                         value: InventoryItemType.finishedProduct,
-                        child: Text('الإنتاج التام', textDirection: TextDirection.rtl),
+                        child: Text(appLocalizations.other,
+                            textDirection: TextDirection.rtl),
                       ),
                     ],
                     onChanged: (val) => setState(() {
@@ -232,6 +239,7 @@ class ProcurementScreen extends StatelessWidget {
                           itemId: _getId(selectedItem),
                           itemName: _getName(selectedItem),
                           quantity: quantity,
+                          itemType: type!,
                         );
                         final request = PurchaseRequestModel(
                           id: '',
@@ -266,6 +274,8 @@ class ProcurementScreen extends StatelessWidget {
       ProcurementUseCases useCases,
       UserModel? user,
       AppLocalizations appLocalizations) {
+    final amountController =
+        TextEditingController(text: request.totalAmount.toString());
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -278,6 +288,21 @@ class ProcurementScreen extends StatelessWidget {
             ...request.items.map((e) => Text('${e.itemName} x${e.quantity}', textDirection: TextDirection.rtl)),
             const SizedBox(height: 8),
             Text('${appLocalizations.statusColon}${_statusToArabic(request.status, context)}', textDirection: TextDirection.rtl),
+            if (user != null &&
+                user.userRoleEnum == UserRole.accountant &&
+                request.status == PurchaseRequestStatus.awaitingApproval) ...[
+              const SizedBox(height: 8),
+              TextField(
+                controller: amountController,
+                decoration: InputDecoration(
+                  labelText: appLocalizations.amount,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.price_change_outlined),
+                ),
+                keyboardType: TextInputType.number,
+                textDirection: TextDirection.rtl,
+              ),
+            ]
           ],
         ),
         actionsAlignment: MainAxisAlignment.spaceAround,
@@ -292,8 +317,9 @@ class ProcurementScreen extends StatelessWidget {
               request.status == PurchaseRequestStatus.awaitingApproval)
             ElevatedButton.icon(
               onPressed: () async {
+                final amount = double.tryParse(amountController.text) ?? 0.0;
                 await useCases.approveByAccountant(
-                    request, user.uid, user.name);
+                    request, user.uid, user.name, amount);
                 Navigator.pop(context);
               },
               icon: const Icon(Icons.check_circle_outline,
