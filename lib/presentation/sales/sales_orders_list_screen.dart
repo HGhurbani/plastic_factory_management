@@ -1056,58 +1056,91 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showMoldApprovalDialog(BuildContext context, SalesUseCases useCases, ProductionOrderUseCases productionUseCases,
-      AppLocalizations appLocalizations, SalesOrderModel order, UserModel supervisor) {
-    showDialog(
+  Future<void> _showMoldApprovalDialog(BuildContext context, SalesUseCases useCases, ProductionOrderUseCases productionUseCases,
+      AppLocalizations appLocalizations, SalesOrderModel order, UserModel supervisor) async {
+    final userUseCases = Provider.of<UserUseCases>(context, listen: false);
+    final shiftSupervisors = await userUseCases.getUsersByRole(UserRole.productionShiftSupervisor);
+    if (shiftSupervisors.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(appLocalizations.noUsersAvailable)),
+      );
+      return;
+    }
+    UserModel? selectedShift = shiftSupervisors.first;
+
+    await showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(appLocalizations.approveMoldTasks, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(
-          '${appLocalizations.confirmApproveMoldTasks}: "${order.customerName}"؟\n\n${appLocalizations.thisActionWillCreateProductionOrder}', // Added warning
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 16),
-        ),
-        actions: [
-          TextButton(
-            child: Text(appLocalizations.cancel),
-            onPressed: () => Navigator.of(ctx).pop(),
-            style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(appLocalizations.approveMoldTasks, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${appLocalizations.confirmApproveMoldTasks}: "${order.customerName}"?\n\n${appLocalizations.thisActionWillCreateProductionOrder}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<UserModel>(
+                value: selectedShift,
+                decoration: InputDecoration(
+                  labelText: appLocalizations.shiftSupervisor,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.supervisor_account_outlined),
+                ),
+                items: shiftSupervisors
+                    .map((u) => DropdownMenuItem(value: u, child: Text(u.name, textDirection: TextDirection.rtl)))
+                    .toList(),
+                onChanged: (u) => setState(() => selectedShift = u),
+              ),
+            ],
           ),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.check),
-            label: Text(appLocalizations.approve),
-            onPressed: () async {
-              Navigator.of(ctx).pop(); // Pop the confirmation dialog
-              // Show loading indicator
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (BuildContext loadingContext) {
-                  return const Center(child: CircularProgressIndicator());
-                },
-              );
-              try {
-                await useCases.approveMoldTasks(order, supervisor);
-                await productionUseCases.createProductionOrdersFromSalesOrder(order, supervisor);
-                Navigator.of(context).pop(); // Pop the loading indicator
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(appLocalizations.moldTasksApprovedSuccessfully)), // New confirmation
-                );
-              } catch (e) {
-                Navigator.of(context).pop(); // Pop the loading indicator
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${appLocalizations.errorApprovingMoldTasks}: ${e.toString()}')), // New error message
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          actions: [
+            TextButton(
+              child: Text(appLocalizations.cancel),
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey[700]),
             ),
-          ),
-        ],
+            ElevatedButton.icon(
+              icon: const Icon(Icons.check),
+              label: Text(appLocalizations.approve),
+              onPressed: () async {
+                if (selectedShift == null) {
+                  ScaffoldMessenger.of(dialogCtx).showSnackBar(
+                    SnackBar(content: Text(appLocalizations.fieldRequired)),
+                  );
+                  return;
+                }
+                Navigator.of(dialogCtx).pop();
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(child: CircularProgressIndicator()),
+                );
+                try {
+                  await useCases.approveMoldTasks(order, supervisor, shiftSupervisor: selectedShift);
+                  await productionUseCases.createProductionOrdersFromSalesOrder(order, supervisor);
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(appLocalizations.moldTasksApprovedSuccessfully)),
+                  );
+                } catch (e) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${appLocalizations.errorApprovingMoldTasks}: ${e.toString()}')),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
