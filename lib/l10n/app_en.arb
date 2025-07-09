@@ -318,6 +318,7 @@
   "pendingApproval": "بانتظار الاعتماد",
   "pendingFulfillment": "بانتظار منسق الطلبات",
   "warehouseProcessing": "قيد التحضير بالمخزن",
+  "awaitingOperationsForward": "Awaiting operations manager to forward",
   "fulfilled": "تم التوريد",
   "rejected": "مرفوض",
   "markAsFulfilled": "تحديد كمورد",

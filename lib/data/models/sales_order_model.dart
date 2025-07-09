@@ -8,6 +8,7 @@ enum SalesOrderStatus {
   pendingApproval,    // بانتظار اعتماد المحاسب
   pendingFulfillment, // بانتظار قرار منسق طلبات الإنتاج
   warehouseProcessing, // لدى أمين المخزن للتجهيز
+  awaitingOperationsForward, // بانتظار تحويل مسؤول العمليات
   awaitingMoldApproval, // بانتظار اعتماد مشرف القوالب
   inProduction,       // قيد الإنتاج بعد تحديد موعد التسليم
   fulfilled,          // تم التوريد
@@ -24,6 +25,8 @@ extension SalesOrderStatusExtension on SalesOrderStatus {
         return 'بانتظار منسق الطلبات';
       case SalesOrderStatus.warehouseProcessing:
         return 'قيد التحضير بالمخزن';
+      case SalesOrderStatus.awaitingOperationsForward:
+        return 'بانتظار تحويل إلى مشرف القوالب';
       case SalesOrderStatus.awaitingMoldApproval:
         return 'بانتظار اعتماد القوالب';
       case SalesOrderStatus.inProduction:
