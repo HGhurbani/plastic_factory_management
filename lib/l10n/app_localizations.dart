@@ -519,6 +519,9 @@ class AppLocalizations {
   String get rejectedQuantity => _strings["rejectedQuantity"] ?? "rejectedQuantity";
   String get acceptedQuantity => _strings["acceptedQuantity"] ?? "acceptedQuantity";
   String get shiftSupervisor => _strings["shiftSupervisor"] ?? "shiftSupervisor";
+  String get shiftHandover => _strings["shiftHandover"] ?? "shiftHandover";
+  String get shiftHandoverHistory =>
+      _strings["shiftHandoverHistory"] ?? "shiftHandoverHistory";
   String get defectAnalysis => _strings["defectAnalysis"] ?? "defectAnalysis";
   String get qualityChecks => _strings["qualityChecks"] ?? "qualityChecks";
   String get defectPhotos => _strings["defectPhotos"] ?? "defectPhotos";

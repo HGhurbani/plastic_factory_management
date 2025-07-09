@@ -7,6 +7,12 @@ import 'package:intl/intl.dart' as intl;
 import 'package:plastic_factory_management/core/constants/app_enums.dart'; // Import app_enums for SalesOrderStatusExtension
 import 'package:plastic_factory_management/theme/app_colors.dart'; // Ensure this defines your app's color scheme
 import 'package:plastic_factory_management/core/extensions/string_extensions.dart';
+import 'package:provider/provider.dart';
+import '../../data/models/user_model.dart';
+import '../../data/models/shift_handover_model.dart';
+import '../../domain/usecases/shift_handover_usecases.dart';
+import '../../domain/usecases/sales_usecases.dart';
+import '../../domain/usecases/user_usecases.dart';
 
 class SalesOrderDetailPage extends StatefulWidget {
   final SalesOrderModel order;
@@ -21,6 +27,7 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
+    final currentUser = Provider.of<UserModel?>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -142,6 +149,60 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                 _buildInfoRow(appLocalizations.productionManager, widget.order.productionManagerName!, icon: Icons.engineering),
               if (widget.order.productionRejectionReason != null && widget.order.productionRejectionReason!.isNotEmpty)
                 _buildInfoRow(appLocalizations.rejectionReason, widget.order.productionRejectionReason!, icon: Icons.cancel, textColor: Colors.red),
+
+              if (widget.order.status == SalesOrderStatus.inProduction) ...[
+                const SizedBox(height: 24),
+                Text(appLocalizations.shiftHandoverHistory,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                    textAlign: TextAlign.right),
+                const SizedBox(height: 8),
+                StreamBuilder<List<ShiftHandoverModel>>( 
+                  stream: Provider.of<ShiftHandoverUseCases>(context)
+                      .getHandoversForOrder(widget.order.id),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    final handovers = snapshot.data!;
+                    if (handovers.isEmpty) {
+                      return Text(appLocalizations.noData);
+                    }
+                    return Column(
+                      children: handovers.map((h) {
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          child: ListTile(
+                            title: Text(
+                              '${h.fromSupervisorName} ➜ ${h.toSupervisorName}',
+                              textAlign: TextAlign.right,
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text('${appLocalizations.meterReading}: ${h.meterReading}'),
+                                if (h.notes != null && h.notes!.isNotEmpty)
+                                  Text(h.notes!),
+                                Text(intl.DateFormat('yyyy-MM-dd HH:mm').format(h.createdAt.toDate())),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
+              if (currentUser != null &&
+                  currentUser.userRoleEnum == UserRole.productionShiftSupervisor &&
+                  widget.order.status == SalesOrderStatus.inProduction)
+                Align(
+                  alignment: Alignment.center,
+                  child: ElevatedButton(
+                    onPressed: () => _showHandoverDialog(context, widget.order, currentUser),
+                    child: Text(appLocalizations.shiftHandover),
+                  ),
+                ),
             ],
           ),
         ),
@@ -268,4 +329,91 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
       },
     );
   }
-}
+
+  Future<void> _showHandoverDialog(
+      BuildContext context, SalesOrderModel order, UserModel currentUser) async {
+    final userUseCases = Provider.of<UserUseCases>(context, listen: false);
+    final handoverUseCases =
+        Provider.of<ShiftHandoverUseCases>(context, listen: false);
+    final salesUseCases = Provider.of<SalesUseCases>(context, listen: false);
+    final supervisors =
+        await userUseCases.getUsersByRole(UserRole.productionShiftSupervisor);
+    UserModel? selected;
+    String? notes;
+    double? meter;
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(AppLocalizations.of(context)!.shiftHandover),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<UserModel>(
+                      items: supervisors
+                          .map((u) => DropdownMenuItem(value: u, child: Text(u.name)))
+                          .toList(),
+                      onChanged: (val) => setState(() => selected = val),
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.shiftSupervisor,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (v) => meter = double.tryParse(v),
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.meterReading,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      onChanged: (v) => notes = v,
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)!.notes,
+                        border: const OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text(AppLocalizations.of(context)!.cancel),
+                ),
+                ElevatedButton(
+                  onPressed: selected == null || meter == null
+                      ? null
+                      : () async {
+                          Navigator.of(dialogContext).pop();
+                          await handoverUseCases.addHandover(
+                            orderId: order.id,
+                            fromSupervisor: currentUser,
+                            toSupervisor: selected!,
+                            meterReading: meter!,
+                            notes: notes,
+                          );
+                          await salesUseCases.updateShiftSupervisor(order, selected!);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(AppLocalizations.of(context)!.save)),
+                          );
+                        },
+                  child: Text(AppLocalizations.of(context)!.save),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }}
