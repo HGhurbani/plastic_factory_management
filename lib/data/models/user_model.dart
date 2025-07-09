@@ -85,6 +85,15 @@ class UserModel {
     );
   }
 
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is UserModel && other.uid == uid;
+  }
+
+  @override
+  int get hashCode => uid.hashCode;
+
   // دالة مساعدة للحصول على الدور كـ Enum
   // UserRole get userRoleEnum => UserRoleExtension.fromString(role);
 }
