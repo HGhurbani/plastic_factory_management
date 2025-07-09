@@ -1530,17 +1530,27 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
     );
   }
 
-  void _showForwardToMoldDialog(
+  Future<void> _showForwardToMoldDialog(
       BuildContext parentContext,
       SalesUseCases useCases,
       AppLocalizations appLocalizations,
       SalesOrderModel order,
-      UserModel officer) {
+      UserModel officer) async {
     final machineryUseCases =
         Provider.of<MachineryOperatorUseCases>(parentContext, listen: false);
+    final userUseCases = Provider.of<UserUseCases>(parentContext, listen: false);
     final TextEditingController notesController =
         TextEditingController(text: order.operationsNotes);
     MachineModel? selectedMachine;
+    final supervisors =
+        await userUseCases.getUsersByRole(UserRole.moldInstallationSupervisor);
+    if (supervisors.isEmpty) {
+      ScaffoldMessenger.of(parentContext).showSnackBar(
+        SnackBar(content: Text(appLocalizations.noUsersAvailable)),
+      );
+      return;
+    }
+    UserModel? selectedSupervisor = supervisors.first;
 
     showDialog(
       context: parentContext,
@@ -1554,6 +1564,22 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
           children: [
             Text(appLocalizations.confirmForwardToMoldSupervisor,
                 textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<UserModel>(
+              value: selectedSupervisor,
+              decoration: InputDecoration(
+                labelText: appLocalizations.moldInstallationSupervisor,
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.person_outline),
+              ),
+              items: supervisors
+                  .map((u) => DropdownMenuItem(
+                        value: u,
+                        child: Text(u.name, textDirection: TextDirection.rtl),
+                      ))
+                  .toList(),
+              onChanged: (u) => selectedSupervisor = u,
+            ),
             const SizedBox(height: 12),
             StreamBuilder<List<MachineModel>>(
               stream: machineryUseCases.getMachines(),
@@ -1631,6 +1657,12 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 );
                 return;
               }
+              if (selectedSupervisor == null) {
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  SnackBar(content: Text(appLocalizations.selectMoldSupervisorError)),
+                );
+                return;
+              }
               Navigator.of(dialogContext).pop();
               showDialog(
                 context: parentContext,
@@ -1641,6 +1673,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                 await useCases.forwardToMoldSupervisor(
                   order,
                   officer,
+                  supervisor: selectedSupervisor!,
                   notes: notesController.text.trim(),
                   machine: selectedMachine,
                 );

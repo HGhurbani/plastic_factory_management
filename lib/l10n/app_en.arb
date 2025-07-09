@@ -415,6 +415,7 @@
   "assignOrderToStorekeeper": "Assign order to storekeeper",
   "storekeeper": "Storekeeper",
   "selectStorekeeperError": "Please select a storekeeper",
+  "selectMoldSupervisorError": "Please select a mold supervisor",
   "supplyInitiatedSuccessfully": "Supply initiated successfully",
   "errorInitiatingSupply": "Error initiating supply",
   "forwardToMoldSupervisor": "Forward to Mold Supervisor",
