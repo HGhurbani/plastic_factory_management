@@ -119,7 +119,9 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
                   }
 
                   return DropdownButtonFormField<ProductModel>(
-                    value: _selectedProduct,
+                    value: snapshot.data!.contains(_selectedProduct)
+                        ? _selectedProduct
+                        : null,
                     decoration: InputDecoration(
                       labelText: appLocalizations.product,
                       border: OutlineInputBorder(),
@@ -156,7 +158,9 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
                   }
 
                   return DropdownButtonFormField<MachineModel>(
-                    value: _selectedMachine,
+                    value: snapshot.data!.contains(_selectedMachine)
+                        ? _selectedMachine
+                        : null,
                     decoration: InputDecoration(
                       labelText: appLocalizations.machine,
                       border: const OutlineInputBorder(),
@@ -198,7 +202,10 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
                     return Text(appLocalizations.noUsersAvailable);
                   }
                   return DropdownButtonFormField<UserModel>(
-                    value: _selectedSupervisor,
+                    value: snapshot.data!
+                            .any((u) => u.uid == _selectedSupervisor?.uid)
+                        ? _selectedSupervisor
+                        : null,
                     decoration: InputDecoration(
                       labelText: appLocalizations.shiftSupervisor,
                       border: const OutlineInputBorder(),
