@@ -109,6 +109,7 @@
   "maintenanceType": "نوع الصيانة",
   "responsiblePerson": "المسؤول",
   "notes": "الملاحظات",
+  "counterReading": "قراءة العداد",
   "checklist": "قائمة تحقق",
   "salesModule": "وحدة المبيعات",
   "inventoryModule": "وحدة المخزون",

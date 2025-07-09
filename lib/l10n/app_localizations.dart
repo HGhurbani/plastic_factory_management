@@ -108,6 +108,7 @@ class AppLocalizations {
   String get maintenanceType => _strings["maintenanceType"] ?? "maintenanceType";
   String get responsiblePerson => _strings["responsiblePerson"] ?? "responsiblePerson";
   String get notes => _strings["notes"] ?? "notes";
+  String get counterReading => _strings["counterReading"] ?? "counterReading";
   String get checklist => _strings["checklist"] ?? "checklist";
   String get salesModule => _strings["salesModule"] ?? "salesModule";
   String get inventoryModule => _strings["inventoryModule"] ?? "inventoryModule";
