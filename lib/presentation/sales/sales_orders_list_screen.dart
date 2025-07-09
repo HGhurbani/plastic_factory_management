@@ -1553,7 +1553,7 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
             Text(appLocalizations.confirmForwardToMoldSupervisor,
                 textAlign: TextAlign.center),
             const SizedBox(height: 12),
-            StreamBuilder<List<MachineModel>>( 
+            StreamBuilder<List<MachineModel>>(
               stream: machineryUseCases.getMachines(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -1575,13 +1575,25 @@ class _SalesOrdersListScreenState extends State<SalesOrdersListScreen> {
                     border: const OutlineInputBorder(),
                   ),
                   items: machines
-                      .map((machine) => DropdownMenuItem(
-                            value: machine,
-                            child: Text(machine.name,
-                                textDirection: TextDirection.rtl),
-                          ))
+                      .map((machine) {
+                        final label = machine.status == MachineStatus.underMaintenance
+                            ? '${machine.name} (${appLocalizations.underMaintenance})'
+                            : machine.name;
+                        return DropdownMenuItem(
+                          value: machine,
+                          child: Text(label, textDirection: TextDirection.rtl),
+                        );
+                      })
                       .toList(),
-                  onChanged: (val) => selectedMachine = val,
+                  onChanged: (val) {
+                    if (val != null && val.status == MachineStatus.underMaintenance) {
+                      ScaffoldMessenger.of(parentContext).showSnackBar(
+                        SnackBar(content: Text(appLocalizations.machineUnderMaintenanceMessage)),
+                      );
+                      return;
+                    }
+                    selectedMachine = val;
+                  },
                   validator: (value) =>
                       value == null ? appLocalizations.machineRequired : null,
                 );

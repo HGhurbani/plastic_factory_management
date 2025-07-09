@@ -329,6 +329,7 @@
   "enterActualTime": "الرجاء إدخال الوقت الفعلي المستغرق.",
   "productionStartingMachineSelection": "اختر الآلة التي سيتم تشغيلها لهذا الطلب:",
   "machineRequired": "الآلة مطلوبة.",
+  "machineUnderMaintenanceMessage": "لا يمكن اختيار هذه الآلة لأنها تحت الصيانة",
   "finishMachineWork": "إنهاء عمل المكينة",
   "installMoldCompletion": "إتمام تركيب القالب",
   "deliverMoldToSupervisor": "تسليم القالب لمشرف الإنتاج",

@@ -95,6 +95,7 @@ class AppLocalizations {
   String get ready => _strings["ready"] ?? "ready";
   String get inOperation => _strings["inOperation"] ?? "inOperation";
   String get underMaintenance => _strings["underMaintenance"] ?? "underMaintenance";
+  String get machineUnderMaintenanceMessage => _strings["machineUnderMaintenanceMessage"] ?? "machineUnderMaintenanceMessage";
   String get maintenanceLog => _strings["maintenanceLog"] ?? "maintenanceLog";
   String get operatorProfiles => _strings["operatorProfiles"] ?? "operatorProfiles";
   String get employeeName => _strings["employeeName"] ?? "employeeName";

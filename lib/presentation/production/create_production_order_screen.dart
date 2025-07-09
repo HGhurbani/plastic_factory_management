@@ -132,7 +132,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
               ),
               SizedBox(height: 16),
               // Required Quantity
-              StreamBuilder<List<MachineModel>>( 
+              StreamBuilder<List<MachineModel>>(
                 stream: machineryUseCases.getMachines(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -152,12 +152,21 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
                       border: const OutlineInputBorder(),
                     ),
                     items: snapshot.data!.map((machine) {
+                      final label = machine.status == MachineStatus.underMaintenance
+                          ? '${machine.name} (${appLocalizations.underMaintenance})'
+                          : machine.name;
                       return DropdownMenuItem(
                         value: machine,
-                        child: Text(machine.name, textDirection: TextDirection.rtl),
+                        child: Text(label, textDirection: TextDirection.rtl),
                       );
                     }).toList(),
                     onChanged: (MachineModel? newValue) {
+                      if (newValue != null && newValue.status == MachineStatus.underMaintenance) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(appLocalizations.machineUnderMaintenanceMessage)),
+                        );
+                        return;
+                      }
                       setState(() {
                         _selectedMachine = newValue;
                       });
