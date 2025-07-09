@@ -146,6 +146,7 @@
   "maintenanceType": "نوع الصيانة",
   "responsiblePerson": "المسؤول",
   "notes": "الملاحظات",
+  "counterReading": "Counter Reading",
   "checklist": "قائمة تحقق",
   "salesModule": "وحدة المبيعات",
   "inventoryModule": "Inventory Module",

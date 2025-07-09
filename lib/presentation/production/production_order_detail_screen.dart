@@ -388,6 +388,12 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                               style: const TextStyle(fontWeight: FontWeight.bold),
                               textAlign: TextAlign.right,
                             ),
+                            if (log.counterReading != null)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Text('قراءة العداد: ${log.counterReading}',
+                                    textAlign: TextAlign.right),
+                              ),
                             if (log.notes != null && log.notes!.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -1094,6 +1100,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
       UserModel currentUser) async {
     List<File> logImages = [];
     String? notes;
+    int? counterReading;
 
     await showDialog(
       context: context,
@@ -1113,6 +1120,17 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 3,
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (v) => counterReading = int.tryParse(v),
+                      decoration: const InputDecoration(
+                        labelText: 'قراءة العداد',
+                        border: OutlineInputBorder(),
+                      ),
                       textAlign: TextAlign.right,
                       textDirection: TextDirection.rtl,
                     ),
@@ -1170,6 +1188,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                       orderId: order.id,
                       supervisorUid: currentUser.uid,
                       supervisorName: currentUser.name,
+                      counterReading: counterReading,
                       notes: notes,
                       images: logImages,
                     );

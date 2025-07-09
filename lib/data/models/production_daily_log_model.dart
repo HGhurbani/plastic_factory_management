@@ -7,6 +7,7 @@ class ProductionDailyLogModel {
   final String orderId;
   final String supervisorUid;
   final String supervisorName;
+  final int? counterReading;
   final String? notes;
   final List<String> imageUrls;
   final Timestamp createdAt;
@@ -16,6 +17,7 @@ class ProductionDailyLogModel {
     required this.orderId,
     required this.supervisorUid,
     required this.supervisorName,
+    this.counterReading,
     this.notes,
     this.imageUrls = const [],
     required this.createdAt,
@@ -28,6 +30,7 @@ class ProductionDailyLogModel {
       orderId: data['orderId'] ?? '',
       supervisorUid: data['supervisorUid'] ?? '',
       supervisorName: data['supervisorName'] ?? '',
+      counterReading: data['counterReading'],
       notes: data['notes'],
       imageUrls: List<String>.from(data['imageUrls'] ?? []),
       createdAt: data['createdAt'] ?? Timestamp.now(),
@@ -39,6 +42,7 @@ class ProductionDailyLogModel {
       'orderId': orderId,
       'supervisorUid': supervisorUid,
       'supervisorName': supervisorName,
+      'counterReading': counterReading,
       'notes': notes,
       'imageUrls': imageUrls,
       'createdAt': createdAt,
@@ -50,6 +54,7 @@ class ProductionDailyLogModel {
     String? orderId,
     String? supervisorUid,
     String? supervisorName,
+    int? counterReading,
     String? notes,
     List<String>? imageUrls,
     Timestamp? createdAt,
@@ -59,6 +64,7 @@ class ProductionDailyLogModel {
       orderId: orderId ?? this.orderId,
       supervisorUid: supervisorUid ?? this.supervisorUid,
       supervisorName: supervisorName ?? this.supervisorName,
+      counterReading: counterReading ?? this.counterReading,
       notes: notes ?? this.notes,
       imageUrls: imageUrls ?? this.imageUrls,
       createdAt: createdAt ?? this.createdAt,

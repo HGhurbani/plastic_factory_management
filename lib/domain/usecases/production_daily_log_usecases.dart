@@ -20,6 +20,7 @@ class ProductionDailyLogUseCases {
     required String orderId,
     required String supervisorUid,
     required String supervisorName,
+    int? counterReading,
     String? notes,
     List<File>? images,
   }) async {
@@ -39,6 +40,7 @@ class ProductionDailyLogUseCases {
       orderId: orderId,
       supervisorUid: supervisorUid,
       supervisorName: supervisorName,
+      counterReading: counterReading,
       notes: notes,
       imageUrls: imageUrls,
       createdAt: Timestamp.now(),
