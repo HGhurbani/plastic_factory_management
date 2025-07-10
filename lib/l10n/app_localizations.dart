@@ -521,6 +521,9 @@ class AppLocalizations {
   String get shiftHandover => _strings["shiftHandover"] ?? "shiftHandover";
   String get shiftHandoverHistory =>
       _strings["shiftHandoverHistory"] ?? "shiftHandoverHistory";
+  String get shiftSupervisorFollowUp =>
+      _strings["shiftSupervisorFollowUp"] ?? "shiftSupervisorFollowUp";
+  String get addFollowUp => _strings["addFollowUp"] ?? "addFollowUp";
   String get defectAnalysis => _strings["defectAnalysis"] ?? "defectAnalysis";
   String get qualityChecks => _strings["qualityChecks"] ?? "qualityChecks";
   String get defectPhotos => _strings["defectPhotos"] ?? "defectPhotos";
