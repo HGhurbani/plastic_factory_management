@@ -708,6 +708,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                             child: Signature(
                               controller: _signatureController,
                               height: 150,
+                              width: MediaQuery.of(context).size.width,
                               backgroundColor: Colors.grey[100]!,
                             ),
                           ),
@@ -1078,6 +1079,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                             child: Signature(
                               controller: _signatureController,
                               height: 150,
+                              width: MediaQuery.of(context).size.width,
                               backgroundColor: Colors.grey[100]!,
                             ),
                           ),
