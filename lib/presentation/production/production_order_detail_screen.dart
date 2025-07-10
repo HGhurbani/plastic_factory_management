@@ -109,9 +109,6 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
       if (stage.stageName == 'استلام مشرف تركيب القوالب' && currentUser.userRoleEnum == UserRole.moldInstallationSupervisor) {
         return true;
       }
-      if (stage.stageName == 'تسليم القالب لمشرف الإنتاج' && currentUser.userRoleEnum == UserRole.productionShiftSupervisor) {
-        return true;
-      }
       if (stage.stageName == 'بدء الإنتاج' && currentUser.userRoleEnum == UserRole.productionShiftSupervisor) {
         return true;
       }
@@ -176,30 +173,12 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     }
     if (currentUser.userRoleEnum == UserRole.moldInstallationSupervisor && currentActiveStage.stageName == 'استلام مشرف تركيب القوالب' && currentActiveStage.status == 'accepted') {
       return ElevatedButton(
-        onPressed: () => _showCompleteStageDialog(context, order, 'تركيب القالب', currentUser, useCases, false), // No signature for this
-        child: Text('إتمام تركيب القالب'), // Add to ARB
+        onPressed: () => _showCompleteStageDialog(context, order, 'تركيب القالب', currentUser, useCases, false, false, true),
+        child: Text(appLocalizations.handoverToShiftSupervisor),
       );
     }
 
     // Production Shift Supervisor actions
-    if (currentUser.userRoleEnum == UserRole.productionShiftSupervisor && currentActiveStage.stageName == 'تسليم القالب لمشرف الإنتاج' && currentActiveStage.status == 'pending') {
-      return ElevatedButton(
-        onPressed: () async {
-          final accepted = await Navigator.of(context).push<bool>(
-            MaterialPageRoute(
-              builder: (_) => AcceptResponsibilityScreen(
-                order: order,
-                stageName: 'تسليم القالب لمشرف الإنتاج',
-                currentUser: currentUser,
-                requiresSignature: true,
-              ),
-            ),
-          );
-          if (accepted == true) setState(() {});
-        },
-        child: Text(appLocalizations.acceptResponsibility),
-      );
-    }
     if (currentUser.userRoleEnum == UserRole.productionShiftSupervisor && currentActiveStage.stageName == 'بدء الإنتاج' && currentActiveStage.status == 'pending') {
       return ElevatedButton(
         onPressed: () => _showStartProductionDialog(context, order, 'بدء الإنتاج', currentUser, useCases),
@@ -515,13 +494,9 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
               },
             ),
             const SizedBox(height: 8),
-            if ((currentUser.userRoleEnum == UserRole.productionShiftSupervisor &&
-                    widget.order.status == ProductionOrderStatus.inProduction &&
-                    widget.order.shiftSupervisorUid == currentUser.uid) ||
-                (currentUser.userRoleEnum ==
-                        UserRole.moldInstallationSupervisor &&
-                    widget.order.currentStage ==
-                        'تسليم القالب لمشرف الإنتاج'))
+            if (currentUser.userRoleEnum == UserRole.productionShiftSupervisor &&
+                widget.order.status == ProductionOrderStatus.inProduction &&
+                widget.order.shiftSupervisorUid == currentUser.uid)
               Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
@@ -783,16 +758,23 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
       UserModel currentUser,
       ProductionOrderUseCases useCases,
       bool requiresSignature,
-      [bool isOperatorCompleting = false] // New parameter for operator specific completion
-      ) async {
+      [bool isOperatorCompleting = false,
+      bool selectShiftSupervisor = false]) async {
     _pickedImages.clear();
     _signatureController.clear();
     String? notes;
     String? delayReason;
     double? actualTimeMinutes;
+    List<UserModel> supervisors = [];
+    UserModel? selectedSupervisor;
 
     // Calculate expected time if needed (from product model)
     final expectedTimeMinutes = order.requiredQuantity * (await Provider.of<ProductionOrderUseCases>(context, listen: false).getProductById(order.productId))!.expectedProductionTimePerUnit;
+
+    if (selectShiftSupervisor) {
+      final userUseCases = Provider.of<UserUseCases>(context, listen: false);
+      supervisors = await userUseCases.getUsersByRole(UserRole.productionShiftSupervisor);
+    }
 
 
     await showDialog(
@@ -817,6 +799,22 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                       textAlign: TextAlign.right,
                       textDirection: TextDirection.rtl,
                     ),
+                    if (selectShiftSupervisor) ...[
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<UserModel>(
+                        items: supervisors
+                            .map((u) => DropdownMenuItem(
+                                  value: u,
+                                  child: Text(u.name),
+                                ))
+                            .toList(),
+                        onChanged: (val) => setState(() => selectedSupervisor = val),
+                        decoration: InputDecoration(
+                          labelText: appLocalizations.shiftSupervisor,
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
                     SizedBox(height: 16),
                     TextField(
                       keyboardType: TextInputType.number,
@@ -957,6 +955,12 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                       );
                       return;
                     }
+                    if (selectShiftSupervisor && selectedSupervisor == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(appLocalizations.selectShiftSupervisorError)),
+                      );
+                      return;
+                    }
 
                     Uint8List? signatureBytes;
                     if (requiresSignature) {
@@ -996,6 +1000,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                         attachments: _pickedImages, // Pass files directly, useCase will upload
                         delayReason: delayReason,
                         actualTimeMinutes: actualTimeMinutes,
+                        shiftSupervisor: selectedSupervisor,
                       );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('${appLocalizations.stageCompletedSuccessfully}: $stageName')), // Add to ARB

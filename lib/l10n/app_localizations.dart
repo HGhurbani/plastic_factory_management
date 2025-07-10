@@ -382,6 +382,8 @@ class AppLocalizations {
   String get storekeeper => _strings["storekeeper"] ?? "storekeeper";
   String get selectStorekeeperError => _strings["selectStorekeeperError"] ?? "selectStorekeeperError";
   String get selectMoldSupervisorError => _strings["selectMoldSupervisorError"] ?? "selectMoldSupervisorError";
+  String get handoverToShiftSupervisor => _strings["handoverToShiftSupervisor"] ?? "handoverToShiftSupervisor";
+  String get selectShiftSupervisorError => _strings["selectShiftSupervisorError"] ?? "selectShiftSupervisorError";
   String get supplyInitiatedSuccessfully => _strings["supplyInitiatedSuccessfully"] ?? "supplyInitiatedSuccessfully";
   String get errorInitiatingSupply => _strings["errorInitiatingSupply"] ?? "errorInitiatingSupply";
   String get forwardToMoldSupervisor => _strings["forwardToMoldSupervisor"] ?? "forwardToMoldSupervisor";
