@@ -294,7 +294,6 @@
   "errorSavingSupply": "حدث خطأ أثناء حفظ التوريد",
   "orderFulfilledSuccessfully": "تم تحديد الطلب كمورد بنجاح!",
   "errorFulfillingOrder": "حدث خطأ أثناء تحديد الطلب كمورد",
-  "salesRepresentative": "مندوب المبيعات",
   "salesOrders": "طلبات المبيعات",
   "salesOrder": "طلب مبيعات",
   "quantityUnit": "كمية",
@@ -412,7 +411,6 @@
               "statusColon": "الحالة:",
               "selectStorekeeper": "اختر أمين المخزن",
               "selectMachineForOrder": "اختر الآلة التي سيتم تشغيلها لهذا الطلب:",
-              "machineRequired": "الآلة مطلوبة.",
               "enterActualTimeRequired": "الرجاء إدخال الوقت الفعلي المستغرق.",
               "approvedBy": "بواسطة",
               "unknown": "مجهول",
@@ -521,7 +519,6 @@
   ,"schedulePickup": "تنسيق الاستلام"
   ,"driver": "السائق"
   ,"warehouseKeeper": "أمين المخزن",
-  "complete": "إكمال",
   "scheduleDelivery": "جدولة التوصيل",
   "transportMode": "وسيلة النقل",
   "companyTransport": "سيارة الشركة",
