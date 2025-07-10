@@ -1176,6 +1176,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
   Future<void> _showAddDailyLogDialog(BuildContext context,
       ProductionDailyLogUseCases logUseCases, ProductionOrderModel order,
       UserModel currentUser) async {
+    final appLocalizations = AppLocalizations.of(context)!;
     List<File> logImages = [];
     String? notes;
     int? counterReading;
@@ -1286,6 +1287,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
 
   Future<void> _showHandoverDialog(
       BuildContext context, ProductionOrderModel order, UserModel currentUser) async {
+    final appLocalizations = AppLocalizations.of(context)!;
     final userUseCases = Provider.of<UserUseCases>(context, listen: false);
     final handoverUseCases = Provider.of<ShiftHandoverUseCases>(context, listen: false);
     final productionUseCases = Provider.of<ProductionOrderUseCases>(context, listen: false);
