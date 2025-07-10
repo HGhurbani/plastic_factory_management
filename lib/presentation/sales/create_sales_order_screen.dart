@@ -417,6 +417,7 @@ class _CreateSalesOrderScreenState extends State<CreateSalesOrderScreen> {
                   border: Border.all(color: Colors.grey.shade300, width: 2),
                   borderRadius: BorderRadius.circular(12),
                 ),
+                width: double.infinity,
                 child: Signature(
                   controller: _signatureController,
                   height: 200,
