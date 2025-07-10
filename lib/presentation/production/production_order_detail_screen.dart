@@ -514,7 +514,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
           ],
         ),
       ),
-      ), );
+    );
   }
 
   Widget _buildDetailRow(String label, String value,
@@ -688,7 +688,6 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                               ],
                             );
                           }).toList(),
-                        ),
                         ),
                       ],
                     )
@@ -1392,4 +1391,5 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
       print('Error uploading file: $e');
       return null;
     }
-  }}
+  }
+}
