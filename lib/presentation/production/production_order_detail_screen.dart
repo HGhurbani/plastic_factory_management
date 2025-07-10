@@ -489,8 +489,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
             const SizedBox(height: 8),
             if ((currentUser.userRoleEnum == UserRole.productionShiftSupervisor &&
                     widget.order.status == ProductionOrderStatus.inProduction &&
-                    _salesOrder != null &&
-                    _salesOrder!.shiftSupervisorUid == currentUser.uid) ||
+                    widget.order.shiftSupervisorUid == currentUser.uid) ||
                 (currentUser.userRoleEnum ==
                         UserRole.moldInstallationSupervisor &&
                     widget.order.currentStage ==
