@@ -442,12 +442,9 @@ class ProductionOrderUseCases {
   }) async {
     final updatedWorkflow = List<ProductionWorkflowStage>.from(order.workflowStages);
     final stageIndex = updatedWorkflow.indexWhere(
-          (stage) => stage.stageName == stageName && (stage.status == 'accepted' || stage.status == 'in_progress'),
+      (stage) => stage.stageName == stageName &&
+          (stage.status == 'accepted' || stage.status == 'in_progress'),
     );
-
-    if (stageIndex == -1) {
-      throw Exception('Stage "$stageName" not found or not in progress.');
-    }
 
     // Upload attachments to external server
     List<String> uploadedAttachmentUrls = [];
@@ -463,15 +460,29 @@ class ProductionOrderUseCases {
       }
     }
 
-    final currentStage = updatedWorkflow[stageIndex];
-    updatedWorkflow[stageIndex] = currentStage.copyWith(
-      status: 'completed',
-      completedAt: Timestamp.now(),
-      notes: notes,
-      attachments: [...currentStage.attachments, ...uploadedAttachmentUrls],
-      delayReason: delayReason,
-      actualTimeMinutes: actualTimeMinutes,
-    );
+    if (stageIndex == -1) {
+      updatedWorkflow.add(ProductionWorkflowStage(
+        stageName: stageName,
+        status: 'completed',
+        assignedToUid: responsibleUser.uid,
+        assignedToName: responsibleUser.name,
+        completedAt: Timestamp.now(),
+        notes: notes,
+        attachments: uploadedAttachmentUrls,
+        delayReason: delayReason,
+        actualTimeMinutes: actualTimeMinutes,
+      ));
+    } else {
+      final currentStage = updatedWorkflow[stageIndex];
+      updatedWorkflow[stageIndex] = currentStage.copyWith(
+        status: 'completed',
+        completedAt: Timestamp.now(),
+        notes: notes,
+        attachments: [...currentStage.attachments, ...uploadedAttachmentUrls],
+        delayReason: delayReason,
+        actualTimeMinutes: actualTimeMinutes,
+      );
+    }
 
     // Determine the next stage and update overall order status
     String nextStageName = '';
