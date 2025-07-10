@@ -501,6 +501,8 @@
   "shiftSupervisor": "مشرف الوردية",
   "shiftHandover": "تسليم الوردية",
   "shiftHandoverHistory": "سجل تسليم الورديات",
+  "shiftSupervisorFollowUp": "متابعة مشرف الوردية",
+  "addFollowUp": "إضافة متابعة",
   "defectAnalysis": "تحليل التالف",
   "qualityChecks": "سجلات الجودة",
   "defectPhotos": "صور التالف",

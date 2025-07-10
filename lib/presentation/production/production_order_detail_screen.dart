@@ -377,8 +377,8 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
             }).toList(),
             SizedBox(height: 24),
             Text(
-              'متابعة مشرف الوردية:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              appLocalizations.shiftSupervisorFollowUp,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.right,
             ),
             const SizedBox(height: 8),
@@ -390,7 +390,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                 }
                 final logs = snapshot.data!;
                 if (logs.isEmpty) {
-                  return const Text('لا توجد متابعات بعد');
+                  return Text(appLocalizations.noData);
                 }
                 return Column(
                   children: logs.map((log) {
@@ -441,13 +441,13 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                 child: ElevatedButton(
                   onPressed: () => _showAddDailyLogDialog(
                       context, logUseCases, widget.order, currentUser),
-                  child: const Text('إضافة متابعة'),
+                  child: Text(appLocalizations.addFollowUp),
                 ),
               ),
             const SizedBox(height: 24),
             Text(
-              'سجل تسليم الورديات:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              appLocalizations.shiftHandoverHistory,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.right,
             ),
             const SizedBox(height: 8),
@@ -460,7 +460,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                 }
                 final handovers = snapshot.data!;
                 if (handovers.isEmpty) {
-                  return const Text('لا توجد عمليات تسليم');
+                  return Text(appLocalizations.noData);
                 }
                 return Column(
                   children: handovers.map((h) {
@@ -500,7 +500,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                 child: ElevatedButton(
                   onPressed: () => _showHandoverDialog(
                       context, widget.order, currentUser),
-                  child: const Text('تسليم الوردية'),
+                  child: Text(appLocalizations.shiftHandover),
                 ),
               ),
             SizedBox(height: 24),
@@ -530,8 +530,9 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
           Text(
             '$label:',
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
@@ -541,7 +542,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 color: textColor ?? Colors.black87,
                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
               ),
@@ -1185,7 +1186,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('إضافة متابعة يومية'),
+              title: Text(appLocalizations.addFollowUp),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -1256,7 +1257,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('إلغاء'),
+                  child: Text(appLocalizations.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -1270,9 +1271,10 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                       images: logImages,
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('تم حفظ المتابعة')),);
+                      SnackBar(content: Text(appLocalizations.save)),
+                    );
                   },
-                  child: const Text('حفظ'),
+                  child: Text(appLocalizations.save),
                 ),
               ],
             );
@@ -1298,7 +1300,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('تسليم الوردية'),
+              title: Text(appLocalizations.shiftHandover),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -1342,7 +1344,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('إلغاء'),
+                  child: Text(appLocalizations.cancel),
                 ),
                 ElevatedButton(
                   onPressed: selected == null || meter == null
@@ -1358,9 +1360,10 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                           );
                           await productionUseCases.updateShiftSupervisor(order, selected!);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('تم حفظ التسليم')),);
+                            SnackBar(content: Text(appLocalizations.save)),
+                          );
                         },
-                  child: const Text('حفظ'),
+                  child: Text(appLocalizations.save),
                 ),
               ],
             );
