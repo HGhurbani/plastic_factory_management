@@ -160,6 +160,8 @@ class ProductionOrderModel {
   final String? machineId; // الآلة المستخدمة
   final String? machineName;
   final String? salesOrderId; // If this order was generated from a sales order
+  final String? moldSupervisorUid; // UID مشرف القوالب المسؤول
+  final String? moldSupervisorName; // اسم مشرف القوالب
   final String? shiftSupervisorUid; // UID مشرف الوردية المسؤول عن الإنتاج
   final String? shiftSupervisorName; // اسم مشرف الوردية
   final String orderPreparerUid; // UID of the user who prepared the order
@@ -184,6 +186,8 @@ class ProductionOrderModel {
     this.machineId,
     this.machineName,
     this.salesOrderId,
+    this.moldSupervisorUid,
+    this.moldSupervisorName,
     this.shiftSupervisorUid,
     this.shiftSupervisorName,
     required this.orderPreparerUid,
@@ -211,6 +215,8 @@ class ProductionOrderModel {
       machineId: data['machineId'],
       machineName: data['machineName'],
       salesOrderId: data['salesOrderId'],
+      moldSupervisorUid: data['moldSupervisorUid'],
+      moldSupervisorName: data['moldSupervisorName'],
       shiftSupervisorUid: data['shiftSupervisorUid'],
       shiftSupervisorName: data['shiftSupervisorName'],
       orderPreparerUid: data['orderPreparerUid'] ?? '',
@@ -240,6 +246,8 @@ class ProductionOrderModel {
       'machineId': machineId,
       'machineName': machineName,
       'salesOrderId': salesOrderId,
+      'moldSupervisorUid': moldSupervisorUid,
+      'moldSupervisorName': moldSupervisorName,
       'shiftSupervisorUid': shiftSupervisorUid,
       'shiftSupervisorName': shiftSupervisorName,
       'orderPreparerUid': orderPreparerUid,
@@ -267,6 +275,8 @@ class ProductionOrderModel {
     String? machineId,
     String? machineName,
     String? salesOrderId,
+    String? moldSupervisorUid,
+    String? moldSupervisorName,
     String? shiftSupervisorUid,
     String? shiftSupervisorName,
     String? orderPreparerUid,
@@ -291,6 +301,8 @@ class ProductionOrderModel {
       machineId: machineId ?? this.machineId,
       machineName: machineName ?? this.machineName,
       salesOrderId: salesOrderId ?? this.salesOrderId,
+      moldSupervisorUid: moldSupervisorUid ?? this.moldSupervisorUid,
+      moldSupervisorName: moldSupervisorName ?? this.moldSupervisorName,
       shiftSupervisorUid: shiftSupervisorUid ?? this.shiftSupervisorUid,
       shiftSupervisorName: shiftSupervisorName ?? this.shiftSupervisorName,
       orderPreparerUid: orderPreparerUid ?? this.orderPreparerUid,
