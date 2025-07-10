@@ -707,6 +707,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                               border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(8),
                             ),
+                            width: double.infinity,
                             child: Signature(
                               controller: _signatureController,
                               height: 150,
@@ -1077,6 +1078,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                               border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(8),
                             ),
+                            width: double.infinity,
                             child: Signature(
                               controller: _signatureController,
                               height: 150,
