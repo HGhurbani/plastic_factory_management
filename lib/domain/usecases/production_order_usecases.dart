@@ -352,9 +352,15 @@ class ProductionOrderUseCases {
       attachments: [...currentStage.attachments, ...uploadedAttachmentUrls], // Add new attachments
     );
 
+    ProductionOrderStatus newStatus = order.status;
+    if (stageName == 'بدء الإنتاج') {
+      newStatus = ProductionOrderStatus.inProduction;
+    }
+
     final updatedOrder = order.copyWith(
       workflowStages: updatedWorkflow,
-      currentStage: stageName, // Keep current stage name as it's now 'accepted'
+      currentStage: stageName,
+      status: newStatus,
     );
     await repository.updateProductionOrder(updatedOrder);
   }
@@ -496,11 +502,9 @@ class ProductionOrderUseCases {
         assignedToUid: shiftSupervisor?.uid,
         assignedToName: shiftSupervisor?.name,
       ));
-      newOverallStatus = ProductionOrderStatus.inProduction;
     } else if (stageName == 'تسليم القالب لمشرف الإنتاج') {
       nextStageName = 'بدء الإنتاج';
       updatedWorkflow.add(ProductionWorkflowStage(stageName: nextStageName, status: 'pending'));
-      newOverallStatus = ProductionOrderStatus.inProduction; // الطلب بات قيد الإنتاج بعد التسليم لمشرف الوردية
     } else if (stageName == 'بدء الإنتاج' && order.requiredQuantity > 0) { // Assuming this means a batch completed
       // This is where more complex batch logic would go. For simplicity,
       // let's assume 'بدء الإنتاج' completion means moving to 'انتهاء الإنتاج'.

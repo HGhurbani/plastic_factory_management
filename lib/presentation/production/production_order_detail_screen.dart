@@ -173,7 +173,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     }
     if (currentUser.userRoleEnum == UserRole.moldInstallationSupervisor && currentActiveStage.stageName == 'استلام مشرف تركيب القوالب' && currentActiveStage.status == 'accepted') {
       return ElevatedButton(
-        onPressed: () => _showCompleteStageDialog(context, order, 'تركيب القالب', currentUser, useCases, false, false, true),
+        onPressed: () => _showCompleteStageDialog(context, order, 'تركيب القالب', currentUser, useCases, false, false, true, true),
         child: Text(appLocalizations.handoverToShiftSupervisor),
       );
     }
@@ -759,7 +759,8 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
       ProductionOrderUseCases useCases,
       bool requiresSignature,
       [bool isOperatorCompleting = false,
-      bool selectShiftSupervisor = false]) async {
+      bool selectShiftSupervisor = false,
+      bool simpleShiftHandover = false]) async {
     _pickedImages.clear();
     _signatureController.clear();
     String? notes;
@@ -815,121 +816,130 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                         ),
                       ),
                     ],
-                    SizedBox(height: 16),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'الوقت الفعلي المستغرق (بالدقائق)', // Add to ARB
-                        hintText: 'مثال: 120',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (value) {
-                        actualTimeMinutes = double.tryParse(value);
-                        // Optional: Trigger delay reason prompt if actualTime > expectedTime * threshold
-                        if (actualTimeMinutes != null && expectedTimeMinutes > 0 && actualTimeMinutes! > expectedTimeMinutes * 1.1) {
-                          // If actual time is more than 10% over expected
-                          // You can show a specific field or dialog for delayReason here
-                        }
-                      },
-                      textAlign: TextAlign.right,
-                      textDirection: TextDirection.rtl,
-                    ),
-                    SizedBox(height: 16),
-                    if (actualTimeMinutes != null && expectedTimeMinutes > 0 && actualTimeMinutes! > expectedTimeMinutes * 1.1)
+                    if (!simpleShiftHandover) ...[
+                      SizedBox(height: 16),
                       TextField(
-                        onChanged: (value) => delayReason = value,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          labelText: appLocalizations.delayReason,
+                          labelText: 'الوقت الفعلي المستغرق (بالدقائق)', // Add to ARB
+                          hintText: 'مثال: 120',
                           border: OutlineInputBorder(),
                         ),
-                        maxLines: 2,
+                        onChanged: (value) {
+                          actualTimeMinutes = double.tryParse(value);
+                          if (actualTimeMinutes != null &&
+                              expectedTimeMinutes > 0 &&
+                              actualTimeMinutes! > expectedTimeMinutes * 1.1) {
+                            // Extra delay field can be shown here
+                          }
+                        },
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
                       ),
-                    SizedBox(height: 16),
-                    // Image picker (similar to accept responsibility)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera).then((_) => setState(() {})),
-                          icon: Icon(Icons.camera_alt),
-                          label: Text(appLocalizations.camera),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery).then((_) => setState(() {})),
-                          icon: Icon(Icons.photo_library),
-                          label: Text(appLocalizations.gallery),
-                        ),
-                      ],
-                    ),
-                    _pickedImages.isNotEmpty
-                        ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 8),
-                        Text(appLocalizations.attachedImages, style: TextStyle(fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4),
-                        Wrap(
-                          spacing: 8.0,
-                          runSpacing: 4.0,
-                          textDirection: TextDirection.rtl,
-                          children: _pickedImages.map((file) {
-                            return Stack(
-                              children: [
-                                Image.file(file, width: 80, height: 80, fit: BoxFit.cover),
-                                Positioned(
-                                  right: 0,
-                                  top: 0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _pickedImages.remove(file);
-                                      });
-                                    },
-                                    child: CircleAvatar(
-                                      radius: 10,
-                                      backgroundColor: Colors.red,
-                                      child: Icon(Icons.close, size: 12, color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    )
-                        : SizedBox.shrink(),
-                    SizedBox(height: 16),
-                    if (requiresSignature)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(appLocalizations.customerSignature, style: TextStyle(fontWeight: FontWeight.bold)),
-                          SizedBox(height: 8),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Signature(
-                              controller: _signatureController,
-                              height: 150,
-                              width: MediaQuery.of(context).size.width,
-                              backgroundColor: Colors.grey[100]!,
-                            ),
+                      SizedBox(height: 16),
+                      if (actualTimeMinutes != null &&
+                          expectedTimeMinutes > 0 &&
+                          actualTimeMinutes! > expectedTimeMinutes * 1.1)
+                        TextField(
+                          onChanged: (value) => delayReason = value,
+                          decoration: InputDecoration(
+                            labelText: appLocalizations.delayReason,
+                            border: OutlineInputBorder(),
                           ),
-                          SizedBox(height: 8),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextButton(
-                              onPressed: () => _signatureController.clear(),
-                              child: Text(appLocalizations.clearSignature),
-                            ),
+                          maxLines: 2,
+                          textAlign: TextAlign.right,
+                          textDirection: TextDirection.rtl,
+                        ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () =>
+                                _pickImage(ImageSource.camera).then((_) => setState(() {})),
+                            icon: Icon(Icons.camera_alt),
+                            label: Text(appLocalizations.camera),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () =>
+                                _pickImage(ImageSource.gallery).then((_) => setState(() {})),
+                            icon: Icon(Icons.photo_library),
+                            label: Text(appLocalizations.gallery),
                           ),
                         ],
                       ),
+                      _pickedImages.isNotEmpty
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 8),
+                                Text(appLocalizations.attachedImages,
+                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                                SizedBox(height: 4),
+                                Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 4.0,
+                                  textDirection: TextDirection.rtl,
+                                  children: _pickedImages.map((file) {
+                                    return Stack(
+                                      children: [
+                                        Image.file(file,
+                                            width: 80, height: 80, fit: BoxFit.cover),
+                                        Positioned(
+                                          right: 0,
+                                          top: 0,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _pickedImages.remove(file);
+                                              });
+                                            },
+                                            child: CircleAvatar(
+                                              radius: 10,
+                                              backgroundColor: Colors.red,
+                                              child:
+                                                  Icon(Icons.close, size: 12, color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            )
+                          : SizedBox.shrink(),
+                      SizedBox(height: 16),
+                      if (requiresSignature)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(appLocalizations.customerSignature,
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            SizedBox(height: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Signature(
+                                controller: _signatureController,
+                                height: 150,
+                                width: MediaQuery.of(context).size.width,
+                                backgroundColor: Colors.grey[100]!,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton(
+                                onPressed: () => _signatureController.clear(),
+                                child: Text(appLocalizations.clearSignature),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
                   ],
                 ),
               ),
@@ -949,7 +959,8 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                       );
                       return;
                     }
-                    if (actualTimeMinutes == null || actualTimeMinutes! <= 0) {
+                    if (!simpleShiftHandover &&
+                        (actualTimeMinutes == null || actualTimeMinutes! <= 0)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('الرجاء إدخال الوقت الفعلي المستغرق.')), // Add to ARB
                       );
@@ -982,12 +993,17 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                       // Create a copy of the existing stage from the order and update its status
                       final currentStageData = order.workflowStages.firstWhere((s) => s.stageName == stageName);
                       final updatedStage = currentStageData.copyWith(
-                        status: 'completed', // Or appropriate status for operator completion
+                        status: 'completed',
                         completedAt: Timestamp.now(),
                         notes: notes,
-                        attachments: [...currentStageData.attachments, ..._pickedImages.map((e) => e.path)], // Need to upload these files
-                        delayReason: delayReason,
-                        actualTimeMinutes: actualTimeMinutes,
+                        attachments: [
+                          ...currentStageData.attachments,
+                          if (!simpleShiftHandover)
+                            ..._pickedImages.map((e) => e.path)
+                        ],
+                        delayReason: simpleShiftHandover ? null : delayReason,
+                        actualTimeMinutes:
+                            simpleShiftHandover ? null : actualTimeMinutes,
                         signatureImageUrl: signatureUrl,
                       );
 
@@ -997,9 +1013,12 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                         stageName: stageName,
                         responsibleUser: currentUser,
                         notes: notes,
-                        attachments: _pickedImages, // Pass files directly, useCase will upload
-                        delayReason: delayReason,
-                        actualTimeMinutes: actualTimeMinutes,
+                        attachments:
+                            simpleShiftHandover ? null : _pickedImages,
+                        delayReason:
+                            simpleShiftHandover ? null : delayReason,
+                        actualTimeMinutes:
+                            simpleShiftHandover ? null : actualTimeMinutes,
                         shiftSupervisor: selectedSupervisor,
                       );
                       ScaffoldMessenger.of(context).showSnackBar(
