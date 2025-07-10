@@ -60,7 +60,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
           requiredQuantity: int.parse(_quantityController.text),
           orderPreparer: currentUser,
           selectedMachine: _selectedMachine!,
-          shiftSupervisor: _selectedSupervisor!,
+          moldSupervisor: _selectedSupervisor!,
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppLocalizations.of(context)!.orderCreatedSuccessfully)), // إضافة هذا النص في ARB
@@ -193,7 +193,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
               SizedBox(height: 16),
               FutureBuilder<List<UserModel>>( 
                 future: Provider.of<UserUseCases>(context, listen: false)
-                    .getUsersByRole(UserRole.productionShiftSupervisor),
+                    .getUsersByRole(UserRole.moldInstallationSupervisor),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -207,7 +207,7 @@ class _CreateProductionOrderScreenState extends State<CreateProductionOrderScree
                         ? _selectedSupervisor
                         : null,
                     decoration: InputDecoration(
-                      labelText: appLocalizations.shiftSupervisor,
+                      labelText: appLocalizations.moldInstallationSupervisor,
                       border: const OutlineInputBorder(),
                     ),
                     items: snapshot.data!
