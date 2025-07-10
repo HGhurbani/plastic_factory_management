@@ -661,33 +661,36 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                         SizedBox(height: 8),
                         Text(appLocalizations.attachedImages, style: TextStyle(fontWeight: FontWeight.bold)), // Add to ARB
                         SizedBox(height: 4),
-                        Wrap(
-                          spacing: 8.0,
-                          runSpacing: 4.0,
-                          textDirection: TextDirection.rtl,
-                          children: _pickedImages.map((file) {
-                            return Stack(
-                              children: [
-                                Image.file(file, width: 80, height: 80, fit: BoxFit.cover),
-                                Positioned(
-                                  right: 0,
-                                  top: 0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _pickedImages.remove(file);
-                                      });
-                                    },
-                                    child: CircleAvatar(
-                                      radius: 10,
-                                      backgroundColor: Colors.red,
-                                      child: Icon(Icons.close, size: 12, color: Colors.white),
+                        SizedBox(
+                          width: double.maxFinite,
+                          child: Wrap(
+                            spacing: 8.0,
+                            runSpacing: 4.0,
+                            textDirection: TextDirection.rtl,
+                            children: _pickedImages.map((file) {
+                              return Stack(
+                                children: [
+                                  Image.file(file, width: 80, height: 80, fit: BoxFit.cover),
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _pickedImages.remove(file);
+                                        });
+                                      },
+                                      child: CircleAvatar(
+                                        radius: 10,
+                                        backgroundColor: Colors.red,
+                                        child: Icon(Icons.close, size: 12, color: Colors.white),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
+                                ],
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ],
                     )
