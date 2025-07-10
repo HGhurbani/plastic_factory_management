@@ -438,6 +438,7 @@ class ProductionOrderUseCases {
     List<File>? attachments,
     String? delayReason, // If there was a delay
     double? actualTimeMinutes, // Actual time spent on this stage
+    UserModel? shiftSupervisor,
   }) async {
     final updatedWorkflow = List<ProductionWorkflowStage>.from(order.workflowStages);
     final stageIndex = updatedWorkflow.indexWhere(
@@ -477,8 +478,14 @@ class ProductionOrderUseCases {
     ProductionOrderStatus newOverallStatus = order.status;
 
     if (stageName == 'تركيب القالب') {
-      nextStageName = 'تسليم القالب لمشرف الإنتاج';
-      updatedWorkflow.add(ProductionWorkflowStage(stageName: nextStageName, status: 'pending'));
+      nextStageName = 'بدء الإنتاج';
+      updatedWorkflow.add(ProductionWorkflowStage(
+        stageName: nextStageName,
+        status: 'pending',
+        assignedToUid: shiftSupervisor?.uid,
+        assignedToName: shiftSupervisor?.name,
+      ));
+      newOverallStatus = ProductionOrderStatus.inProduction;
     } else if (stageName == 'تسليم القالب لمشرف الإنتاج') {
       nextStageName = 'بدء الإنتاج';
       updatedWorkflow.add(ProductionWorkflowStage(stageName: nextStageName, status: 'pending'));
@@ -508,6 +515,8 @@ class ProductionOrderUseCases {
       workflowStages: updatedWorkflow,
       currentStage: nextStageName, // Update overall current stage
       status: newOverallStatus,
+      shiftSupervisorUid: shiftSupervisor?.uid ?? order.shiftSupervisorUid,
+      shiftSupervisorName: shiftSupervisor?.name ?? order.shiftSupervisorName,
     );
     await repository.updateProductionOrder(updatedOrder);
 
