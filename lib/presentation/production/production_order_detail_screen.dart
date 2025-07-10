@@ -27,6 +27,7 @@ import 'package:plastic_factory_management/data/models/shift_handover_model.dart
 import 'package:plastic_factory_management/domain/usecases/user_usecases.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:plastic_factory_management/domain/usecases/sales_usecases.dart';
+import 'accept_responsibility_screen.dart';
 
 // شاشة تفاصيل طلب الإنتاج
 class ProductionOrderDetailScreen extends StatefulWidget {
@@ -149,7 +150,19 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ElevatedButton(
-            onPressed: () => _showAcceptResponsibilityDialog(context, order, 'استلام مشرف تركيب القوالب', currentUser, useCases, true),
+            onPressed: () async {
+              final accepted = await Navigator.of(context).push<bool>(
+                MaterialPageRoute(
+                  builder: (_) => AcceptResponsibilityScreen(
+                    order: order,
+                    stageName: 'استلام مشرف تركيب القوالب',
+                    currentUser: currentUser,
+                    requiresSignature: true,
+                  ),
+                ),
+              );
+              if (accepted == true) setState(() {});
+            },
             child: Text(appLocalizations.acceptResponsibility),
           ),
           const SizedBox(width: 16),
@@ -171,7 +184,19 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     // Production Shift Supervisor actions
     if (currentUser.userRoleEnum == UserRole.productionShiftSupervisor && currentActiveStage.stageName == 'تسليم القالب لمشرف الإنتاج' && currentActiveStage.status == 'pending') {
       return ElevatedButton(
-        onPressed: () => _showAcceptResponsibilityDialog(context, order, 'تسليم القالب لمشرف الإنتاج', currentUser, useCases, true),
+        onPressed: () async {
+          final accepted = await Navigator.of(context).push<bool>(
+            MaterialPageRoute(
+              builder: (_) => AcceptResponsibilityScreen(
+                order: order,
+                stageName: 'تسليم القالب لمشرف الإنتاج',
+                currentUser: currentUser,
+                requiresSignature: true,
+              ),
+            ),
+          );
+          if (accepted == true) setState(() {});
+        },
         child: Text(appLocalizations.acceptResponsibility),
       );
     }
@@ -602,192 +627,6 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     }
   }
 
-  // --- Dialogs for Workflow Actions ---
-
-  Future<void> _showAcceptResponsibilityDialog(
-      BuildContext context,
-      ProductionOrderModel order,
-      String stageName,
-      UserModel currentUser,
-      ProductionOrderUseCases useCases,
-      bool requiresSignature,
-      ) async {
-    _pickedImages.clear(); // Clear previous selections
-    _signatureController.clear();
-    String? notes;
-
-    await showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            final appLocalizations = AppLocalizations.of(context)!;
-            return AlertDialog(
-              title: Text('${appLocalizations.acceptResponsibility}: ${stageName}'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      onChanged: (value) => notes = value,
-                      decoration: InputDecoration(
-                        labelText: appLocalizations.addNotes,
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 3,
-                      textAlign: TextAlign.right,
-                      textDirection: TextDirection.rtl,
-                    ),
-                    SizedBox(height: 16),
-                    // Image picker
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera).then((_) => setState(() {})),
-                          icon: Icon(Icons.camera_alt),
-                          label: Text(appLocalizations.camera), // Add to ARB
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery).then((_) => setState(() {})),
-                          icon: Icon(Icons.photo_library),
-                          label: Text(appLocalizations.gallery), // Add to ARB
-                        ),
-                      ],
-                    ),
-                    _pickedImages.isNotEmpty
-                        ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 8),
-                        Text(appLocalizations.attachedImages, style: TextStyle(fontWeight: FontWeight.bold)), // Add to ARB
-                        SizedBox(height: 4),
-                        Wrap(
-                          spacing: 8.0,
-                          runSpacing: 4.0,
-                          textDirection: TextDirection.rtl,
-                          children: _pickedImages.map((file) {
-                            return Stack(
-                              children: [
-                                Image.file(file, width: 80, height: 80, fit: BoxFit.cover),
-                                Positioned(
-                                  right: 0,
-                                  top: 0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _pickedImages.remove(file);
-                                      });
-                                    },
-                                    child: CircleAvatar(
-                                      radius: 10,
-                                      backgroundColor: Colors.red,
-                                      child: Icon(Icons.close, size: 12, color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    )
-                        : SizedBox.shrink(),
-                    SizedBox(height: 16),
-                    if (requiresSignature)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(appLocalizations.customerSignature, style: TextStyle(fontWeight: FontWeight.bold)), // Reuse text
-                          SizedBox(height: 8),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Signature(
-                              controller: _signatureController,
-                              height: 150,
-                              width: MediaQuery.of(context).size.width,
-                              backgroundColor: Colors.grey[100]!,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextButton(
-                              onPressed: () => _signatureController.clear(),
-                              child: Text(appLocalizations.clearSignature), // Add to ARB
-                            ),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text(appLocalizations.cancel),
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                  },
-                ),
-                ElevatedButton(
-                  child: Text(appLocalizations.acceptResponsibility),
-                  onPressed: () async {
-                    if (requiresSignature && _signatureController.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(appLocalizations.signatureRequired)), // Add to ARB
-                      );
-                      return;
-                    }
-                    Uint8List? signatureBytes;
-                    if (requiresSignature) {
-                      signatureBytes = await _exportSignature();
-                    }
-
-                    Navigator.of(dialogContext).pop(); // Dismiss dialog
-                    try {
-                      String? signatureUrl;
-                      if (signatureBytes != null) {
-                        final ref = await _uploadFile(
-                          bytes: signatureBytes,
-                          path:
-                              'signatures/${order.id}_${stageName}_${DateTime.now().microsecondsSinceEpoch}.png',
-                        );
-                        signatureUrl = ref?.toString();
-                      }
-
-                      await useCases.acceptStageResponsibility(
-                        order: order,
-                        stageName: stageName,
-                        responsibleUser: currentUser,
-                        signatureImageUrl: signatureUrl,
-                        notes: notes,
-                        attachments: _pickedImages,
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${appLocalizations.stageAcceptedSuccessfully}: $stageName')), // Add to ARB
-                      );
-                      // Refresh the current order details to show updated workflow
-                      setState(() {
-                        // This will trigger a re-build of the current screen to show updated order state
-                      });
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('${appLocalizations.errorAcceptingStage}: $e')), // Add to ARB
-                      );
-                      print('Error accepting stage: $e');
-                    }
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
 
   Future<void> _showRejectStageDialog(
       BuildContext context,
