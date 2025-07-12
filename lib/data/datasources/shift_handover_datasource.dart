@@ -15,7 +15,16 @@ class ShiftHandoverDatasource {
             .toList());
   }
 
-  Future<void> addHandover(ShiftHandoverModel handover) async {
-    await _firestore.collection('shift_handovers').add(handover.toMap());
+  Future<String> addHandover(ShiftHandoverModel handover) async {
+    final doc = await _firestore.collection('shift_handovers').add(handover.toMap());
+    await doc.update({'id': doc.id});
+    return doc.id;
+  }
+
+  Future<void> updateHandover(ShiftHandoverModel handover) async {
+    await _firestore
+        .collection('shift_handovers')
+        .doc(handover.id)
+        .update(handover.toMap());
   }
 }

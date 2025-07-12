@@ -9,7 +9,10 @@ class ShiftHandoverModel {
   final String toSupervisorName;
   final double meterReading;
   final String? notes;
+  final double? receivingMeterReading;
+  final String? receivingNotes;
   final Timestamp createdAt;
+  final Timestamp? receivedAt;
 
   ShiftHandoverModel({
     required this.id,
@@ -20,7 +23,10 @@ class ShiftHandoverModel {
     required this.toSupervisorName,
     required this.meterReading,
     this.notes,
+    this.receivingMeterReading,
+    this.receivingNotes,
     required this.createdAt,
+    this.receivedAt,
   });
 
   factory ShiftHandoverModel.fromDocumentSnapshot(DocumentSnapshot doc) {
@@ -34,7 +40,11 @@ class ShiftHandoverModel {
       toSupervisorName: data['toSupervisorName'] ?? '',
       meterReading: (data['meterReading'] as num?)?.toDouble() ?? 0.0,
       notes: data['notes'],
+      receivingMeterReading:
+          (data['receivingMeterReading'] as num?)?.toDouble(),
+      receivingNotes: data['receivingNotes'],
       createdAt: data['createdAt'] ?? Timestamp.now(),
+      receivedAt: data['receivedAt'] as Timestamp?,
     );
   }
 
@@ -47,7 +57,10 @@ class ShiftHandoverModel {
       'toSupervisorName': toSupervisorName,
       'meterReading': meterReading,
       'notes': notes,
+      'receivingMeterReading': receivingMeterReading,
+      'receivingNotes': receivingNotes,
       'createdAt': createdAt,
+      'receivedAt': receivedAt,
     };
   }
 
@@ -60,7 +73,10 @@ class ShiftHandoverModel {
     String? toSupervisorName,
     double? meterReading,
     String? notes,
+    double? receivingMeterReading,
+    String? receivingNotes,
     Timestamp? createdAt,
+    Timestamp? receivedAt,
   }) {
     return ShiftHandoverModel(
       id: id ?? this.id,
@@ -71,7 +87,11 @@ class ShiftHandoverModel {
       toSupervisorName: toSupervisorName ?? this.toSupervisorName,
       meterReading: meterReading ?? this.meterReading,
       notes: notes ?? this.notes,
+      receivingMeterReading:
+          receivingMeterReading ?? this.receivingMeterReading,
+      receivingNotes: receivingNotes ?? this.receivingNotes,
       createdAt: createdAt ?? this.createdAt,
+      receivedAt: receivedAt ?? this.receivedAt,
     );
   }
 }

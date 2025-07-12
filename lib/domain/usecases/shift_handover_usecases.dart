@@ -12,7 +12,7 @@ class ShiftHandoverUseCases {
     return repository.getHandoversForOrder(orderId);
   }
 
-  Future<void> addHandover({
+  Future<String> addHandover({
     required String orderId,
     required UserModel fromSupervisor,
     required UserModel toSupervisor,
@@ -30,6 +30,20 @@ class ShiftHandoverUseCases {
       notes: notes,
       createdAt: Timestamp.now(),
     );
-    await repository.addHandover(handover);
+    final id = await repository.addHandover(handover);
+    return id;
+  }
+
+  Future<void> receiveHandover({
+    required ShiftHandoverModel handover,
+    required double meterReading,
+    String? notes,
+  }) async {
+    final updated = handover.copyWith(
+      receivingMeterReading: meterReading,
+      receivingNotes: notes,
+      receivedAt: Timestamp.now(),
+    );
+    await repository.updateHandover(updated);
   }
 }

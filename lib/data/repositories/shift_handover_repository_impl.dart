@@ -12,7 +12,12 @@ class ShiftHandoverRepositoryImpl implements ShiftHandoverRepository {
   }
 
   @override
-  Future<void> addHandover(ShiftHandoverModel handover) {
+  Future<String> addHandover(ShiftHandoverModel handover) {
     return datasource.addHandover(handover);
+  }
+
+  @override
+  Future<void> updateHandover(ShiftHandoverModel handover) {
+    return datasource.updateHandover(handover);
   }
 }
