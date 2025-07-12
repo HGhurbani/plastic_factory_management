@@ -16,6 +16,8 @@ import '../../data/models/shift_handover_model.dart';
 import '../../domain/usecases/shift_handover_usecases.dart';
 import '../../domain/usecases/sales_usecases.dart';
 import '../../domain/usecases/user_usecases.dart';
+import '../../domain/usecases/production_daily_log_usecases.dart';
+import '../../data/models/production_daily_log_model.dart';
 
 class SalesOrderDetailPage extends StatefulWidget {
   final SalesOrderModel order;
@@ -27,10 +29,12 @@ class SalesOrderDetailPage extends StatefulWidget {
 }
 
 class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
+  final ImagePicker _picker = ImagePicker();
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context)!;
     final currentUser = Provider.of<UserModel?>(context);
+    final logUseCases = Provider.of<ProductionDailyLogUseCases>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -155,11 +159,77 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
 
               if (widget.order.status == SalesOrderStatus.inProduction) ...[
                 const SizedBox(height: 24),
+                Text(appLocalizations.shiftSupervisorFollowUp,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                    textAlign: TextAlign.right),
+                const SizedBox(height: 8),
+                StreamBuilder<List<ProductionDailyLogModel>>( 
+                  stream: logUseCases.getLogsForOrder(widget.order.id),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    final logs = snapshot.data!;
+                    if (logs.isEmpty) {
+                      return Text(appLocalizations.noData);
+                    }
+                    return Column(
+                      children: logs.map((log) {
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  intl.DateFormat('yyyy-MM-dd').format(log.createdAt.toDate()),
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.right,
+                                ),
+                                if (log.counterReading != null)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                    child: Text('قراءة العداد: ${log.counterReading}', textAlign: TextAlign.right),
+                                  ),
+                                if (log.notes != null && log.notes!.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                    child: Text(log.notes!, textAlign: TextAlign.right),
+                                  ),
+                                if (log.imageUrls.isNotEmpty)
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 4,
+                                    children: log.imageUrls
+                                        .map((u) => Image.network(u, width: 60, height: 60))
+                                        .toList(),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+                if (currentUser != null &&
+                    currentUser.userRoleEnum == UserRole.productionShiftSupervisor &&
+                    widget.order.shiftSupervisorUid == currentUser.uid)
+                  Align(
+                    alignment: Alignment.center,
+                    child: ElevatedButton(
+                      onPressed: () => _showAddDailyLogDialog(context, logUseCases, widget.order, currentUser),
+                      child: Text(appLocalizations.addFollowUp),
+                    ),
+                  ),
+                const SizedBox(height: 24),
                 Text(appLocalizations.shiftHandoverHistory,
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
                     textAlign: TextAlign.right),
                 const SizedBox(height: 8),
-                StreamBuilder<List<ShiftHandoverModel>>( 
+                StreamBuilder<List<ShiftHandoverModel>>(
                   stream: Provider.of<ShiftHandoverUseCases>(context)
                       .getHandoversForOrder(widget.order.id),
                   builder: (context, snapshot) {
@@ -205,8 +275,7 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                                     h.toSupervisorUid == currentUser.uid &&
                                     widget.order.shiftSupervisorUid == currentUser.uid)
                                   TextButton(
-                                    onPressed: () => _showReceiveHandoverDialog(
-                                        context, h, currentUser),
+                                    onPressed: () => _showReceiveHandoverDialog(context, h, currentUser),
                                     child: Text(AppLocalizations.of(context)!.receiveOrder),
                                   ),
                               ],
@@ -350,6 +419,119 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
               ),
             ),
           ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showAddDailyLogDialog(
+      BuildContext context,
+      ProductionDailyLogUseCases logUseCases,
+      SalesOrderModel order,
+      UserModel currentUser) async {
+    final appLocalizations = AppLocalizations.of(context)!;
+    List<File> logImages = [];
+    String? notes;
+    int? counterReading;
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(appLocalizations.addFollowUp),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      onChanged: (v) => notes = v,
+                      decoration: const InputDecoration(
+                        labelText: 'ملاحظات',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 3,
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      onChanged: (v) => counterReading = int.tryParse(v),
+                      decoration: const InputDecoration(
+                        labelText: 'قراءة العداد',
+                        border: OutlineInputBorder(),
+                      ),
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final picked =
+                                await _picker.pickImage(source: ImageSource.camera);
+                            if (picked != null) {
+                              setState(() => logImages.add(File(picked.path)));
+                            }
+                          },
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text('كاميرا'),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final picked =
+                                await _picker.pickImage(source: ImageSource.gallery);
+                            if (picked != null) {
+                              setState(() => logImages.add(File(picked.path)));
+                            }
+                          },
+                          icon: const Icon(Icons.photo_library),
+                          label: const Text('معرض'),
+                        ),
+                      ],
+                    ),
+                    if (logImages.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children:
+                              logImages.map((f) => Image.file(f, width: 60, height: 60)).toList(),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text(appLocalizations.cancel),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.of(dialogContext).pop();
+                    await logUseCases.addDailyLog(
+                      orderId: order.id,
+                      supervisorUid: currentUser.uid,
+                      supervisorName: currentUser.name,
+                      counterReading: counterReading,
+                      notes: notes,
+                      images: logImages,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(appLocalizations.save)),
+                    );
+                  },
+                  child: Text(appLocalizations.save),
+                ),
+              ],
+            );
+          },
         );
       },
     );
