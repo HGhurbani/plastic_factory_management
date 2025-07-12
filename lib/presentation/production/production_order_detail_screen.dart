@@ -1215,7 +1215,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                     const SizedBox(height: 8),
                     TextField(
                       keyboardType: TextInputType.number,
-                      onChanged: (v) => meter = double.tryParse(v),
+                      onChanged: (v) => setState(() => meter = double.tryParse(v)),
                       decoration: const InputDecoration(
                         labelText: 'قراءة العداد',
                         border: OutlineInputBorder(),
@@ -1286,7 +1286,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                 children: [
                   TextField(
                     keyboardType: TextInputType.number,
-                    onChanged: (v) => meter = double.tryParse(v),
+                    onChanged: (v) => setState(() => meter = double.tryParse(v)),
                     decoration: const InputDecoration(
                       labelText: 'قراءة العداد',
                       border: OutlineInputBorder(),
