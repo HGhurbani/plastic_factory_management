@@ -537,6 +537,7 @@ class AppLocalizations {
   String get rootCauseAnalysis => _strings["rootCauseAnalysis"] ?? "rootCauseAnalysis";
   String get openRootCauseAnalysis => _strings["openRootCauseAnalysis"] ?? "openRootCauseAnalysis";
   String get totalOrders => _strings["totalOrders"] ?? "totalOrders";
+  String get receiveOrder => _strings["receiveOrder"] ?? "receiveOrder";
 
 
 }
