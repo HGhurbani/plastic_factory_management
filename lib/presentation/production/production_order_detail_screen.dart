@@ -173,7 +173,7 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
     }
     if (currentUser.userRoleEnum == UserRole.moldInstallationSupervisor && currentActiveStage.stageName == 'استلام مشرف تركيب القوالب' && currentActiveStage.status == 'accepted') {
       return ElevatedButton(
-        onPressed: () => _showCompleteStageDialog(context, order, 'تركيب القالب', currentUser, useCases, false, false, true, true),
+        onPressed: () => _showHandoverDialog(context, order, currentUser),
         child: Text(appLocalizations.handoverToShiftSupervisor),
       );
     }
