@@ -560,14 +560,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.createProductionOrderRoute),
       ));
 
-      // modules.add(_buildModuleButton(
-      //   context: context,
-      //   title: appLocalizations.productionOrderManagement,
-      //   subtitle: "إدارة الطلبات",
-      //   icon: Icons.production_quantity_limits,
-      //   color: moduleColors['production']!,
-      //   onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
-      // ));
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.productionOrderManagement,
+        subtitle: "إدارة الطلبات",
+        icon: Icons.production_quantity_limits,
+        color: moduleColors['production']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
+      ));
 
       modules.add(_buildModuleButton(
         context: context,
@@ -581,14 +581,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     // Modules for Mold Installation Supervisor (مشرف تركيب القوالب)
     if (role == UserRole.moldInstallationSupervisor) {
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.moldInstallationTasks,
-        subtitle: "تركيب وصيانة القوالب",
-        icon: Icons.extension,
-        color: moduleColors['machinery']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.moldInstallationTasksRoute),
-      ));
+      // modules.add(_buildModuleButton(
+      //   context: context,
+      //   title: appLocalizations.moldInstallationTasks,
+      //   subtitle: "تركيب وصيانة القوالب",
+      //   icon: Icons.extension,
+      //   color: moduleColors['machinery']!,
+      //   onPressed: () => Navigator.of(context).pushNamed(AppRouter.moldInstallationTasksRoute),
+      // ));
       modules.add(_buildModuleButton(
         context: context,
         title: appLocalizations.salesOrders,
@@ -596,6 +596,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         icon: Icons.shopping_cart,
         color: moduleColors['sales']!,
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.salesOrdersListRoute),
+      ));
+      modules.add(_buildModuleButton(
+        context: context,
+        title: appLocalizations.productionOrderManagement,
+        subtitle: "طلبات الإنتاج",
+        icon: Icons.production_quantity_limits,
+        color: moduleColors['production']!,
+        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
       ));
     }
 
@@ -619,32 +627,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         onPressed: () => Navigator.of(context).pushNamed(AppRouter.productionOrdersListRoute),
       ));
 
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.rawMaterials,
-        subtitle: "المواد الخام",
-        icon: Icons.warehouse,
-        color: moduleColors['inventory']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.rawMaterialsRoute),
-      ));
-
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.factoryElements,
-        subtitle: "عناصر المصنع",
-        icon: Icons.widgets_outlined,
-        color: moduleColors['inventory']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.factoryElementsRoute),
-      ));
-
-      modules.add(_buildModuleButton(
-        context: context,
-        title: appLocalizations.productCatalog,
-        subtitle: "كتالوج المنتجات",
-        icon: Icons.category,
-        color: moduleColors['inventory']!,
-        onPressed: () => Navigator.of(context).pushNamed(AppRouter.productCatalogRoute),
-      ));
+      // modules.add(_buildModuleButton(
+      //   context: context,
+      //   title: appLocalizations.rawMaterials,
+      //   subtitle: "المواد الخام",
+      //   icon: Icons.warehouse,
+      //   color: moduleColors['inventory']!,
+      //   onPressed: () => Navigator.of(context).pushNamed(AppRouter.rawMaterialsRoute),
+      // ));
+      //
+      // modules.add(_buildModuleButton(
+      //   context: context,
+      //   title: appLocalizations.factoryElements,
+      //   subtitle: "عناصر المصنع",
+      //   icon: Icons.widgets_outlined,
+      //   color: moduleColors['inventory']!,
+      //   onPressed: () => Navigator.of(context).pushNamed(AppRouter.factoryElementsRoute),
+      // ));
+      //
+      // modules.add(_buildModuleButton(
+      //   context: context,
+      //   title: appLocalizations.productCatalog,
+      //   subtitle: "كتالوج المنتجات",
+      //   icon: Icons.category,
+      //   color: moduleColors['inventory']!,
+      //   onPressed: () => Navigator.of(context).pushNamed(AppRouter.productCatalogRoute),
+      // ));
 
 
     }
