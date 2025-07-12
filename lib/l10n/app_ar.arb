@@ -539,5 +539,6 @@
   "fileImportedSuccessfully": "تم استيراد الملف بنجاح",
   "mapColumnsTitle": "تعيين أعمدة إكسل",
   "selectColumnForField": "اختر العمود لحقل {field}",
-  "importAction": "استيراد"
+  "importAction": "استيراد",
+  "receiveOrder": "استلام الطلب"
 }

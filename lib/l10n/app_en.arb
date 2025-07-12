@@ -549,5 +549,6 @@
   "fileImportedSuccessfully": "File imported successfully",
   "mapColumnsTitle": "Map Excel Columns",
   "selectColumnForField": "Select column for {field}",
-  "importAction": "Import"
+  "importAction": "Import",
+  "receiveOrder": "Receive Order"
 }

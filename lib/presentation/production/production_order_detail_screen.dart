@@ -483,8 +483,23 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                             Text('قراءة العداد: ${h.meterReading}'),
                             if (h.notes != null && h.notes!.isNotEmpty)
                               Text(h.notes!),
+                            if (h.receivingMeterReading != null)
+                              Text('قراءة الاستلام: ${h.receivingMeterReading}'),
+                            if (h.receivingNotes != null &&
+                                h.receivingNotes!.isNotEmpty)
+                              Text(h.receivingNotes!),
                             Text(intl.DateFormat('yyyy-MM-dd HH:mm')
                                 .format(h.createdAt.toDate())),
+                            if (h.receivedAt != null)
+                              Text(intl.DateFormat('yyyy-MM-dd HH:mm')
+                                  .format(h.receivedAt!.toDate())),
+                            if (h.receivedAt == null &&
+                                h.toSupervisorUid == currentUser.uid)
+                              TextButton(
+                                onPressed: () => _showReceiveHandoverDialog(
+                                    context, h, currentUser),
+                                child: Text(AppLocalizations.of(context)!.receiveOrder),
+                              ),
                           ],
                         ),
                       ),
@@ -1234,6 +1249,73 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
                           );
                         },
                   child: Text(appLocalizations.save),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _showReceiveHandoverDialog(
+      BuildContext context, ShiftHandoverModel handover, UserModel currentUser) async {
+    String? notes;
+    double? meter;
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(AppLocalizations.of(context)!.receiveOrder),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    onChanged: (v) => meter = double.tryParse(v),
+                    decoration: const InputDecoration(
+                      labelText: 'قراءة العداد',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    onChanged: (v) => notes = v,
+                    decoration: const InputDecoration(
+                      labelText: 'ملاحظات',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text(AppLocalizations.of(context)!.cancel),
+                ),
+                ElevatedButton(
+                  onPressed: meter == null
+                      ? null
+                      : () async {
+                          Navigator.of(dialogContext).pop();
+                          final useCases =
+                              Provider.of<ShiftHandoverUseCases>(context, listen: false);
+                          await useCases.receiveHandover(
+                            handover: handover,
+                            meterReading: meter!,
+                            notes: notes,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(AppLocalizations.of(context)!.save)),
+                          );
+                        },
+                  child: Text(AppLocalizations.of(context)!.save),
                 ),
               ],
             );
