@@ -191,7 +191,8 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                                   Text(intl.DateFormat('yyyy-MM-dd HH:mm').format(h.receivedAt!.toDate())),
                                 if (h.receivedAt == null &&
                                     currentUser != null &&
-                                    h.toSupervisorUid == currentUser.uid)
+                                    h.toSupervisorUid == currentUser.uid &&
+                                    widget.order.shiftSupervisorUid == currentUser.uid)
                                   TextButton(
                                     onPressed: () => _showReceiveHandoverDialog(
                                         context, h, currentUser),
