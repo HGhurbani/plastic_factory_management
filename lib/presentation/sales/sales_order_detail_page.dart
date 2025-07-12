@@ -1,6 +1,9 @@
 // plastic_factory_management/lib/presentation/sales/sales_order_detail_page.dart
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:plastic_factory_management/l10n/app_localizations.dart';
 import 'package:plastic_factory_management/data/models/sales_order_model.dart';
 import 'package:intl/intl.dart' as intl;
@@ -186,6 +189,14 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                                   Text('قراءة الاستلام: ${h.receivingMeterReading}'),
                                 if (h.receivingNotes != null && h.receivingNotes!.isNotEmpty)
                                   Text(h.receivingNotes!),
+                                if (h.receivingImageUrls.isNotEmpty)
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 4,
+                                    children: h.receivingImageUrls
+                                        .map((u) => Image.network(u, width: 60, height: 60))
+                                        .toList(),
+                                  ),
                                 Text(intl.DateFormat('yyyy-MM-dd HH:mm').format(h.createdAt.toDate())),
                                 if (h.receivedAt != null)
                                   Text(intl.DateFormat('yyyy-MM-dd HH:mm').format(h.receivedAt!.toDate())),
@@ -436,6 +447,8 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
       BuildContext context, ShiftHandoverModel handover, UserModel currentUser) async {
     String? notes;
     double? meter;
+    List<File> images = [];
+    final ImagePicker picker = ImagePicker();
 
     await showDialog(
       context: context,
@@ -466,6 +479,42 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                     textAlign: TextAlign.right,
                     textDirection: TextDirection.rtl,
                   ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final picked = await picker.pickImage(source: ImageSource.camera);
+                          if (picked != null) {
+                            setState(() => images.add(File(picked.path)));
+                          }
+                        },
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text('كاميرا'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final picked = await picker.pickImage(source: ImageSource.gallery);
+                          if (picked != null) {
+                            setState(() => images.add(File(picked.path)));
+                          }
+                        },
+                        icon: const Icon(Icons.photo_library),
+                        label: const Text('معرض'),
+                      ),
+                    ],
+                  ),
+                  if (images.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children:
+                            images.map((f) => Image.file(f, width: 60, height: 60)).toList(),
+                      ),
+                    ),
                 ],
               ),
               actions: [
@@ -484,6 +533,7 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                             handover: handover,
                             meterReading: meter!,
                             notes: notes,
+                            images: images,
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(AppLocalizations.of(context)!.save)),

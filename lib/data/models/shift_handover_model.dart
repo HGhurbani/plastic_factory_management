@@ -11,6 +11,7 @@ class ShiftHandoverModel {
   final String? notes;
   final double? receivingMeterReading;
   final String? receivingNotes;
+  final List<String> receivingImageUrls;
   final Timestamp createdAt;
   final Timestamp? receivedAt;
 
@@ -25,6 +26,7 @@ class ShiftHandoverModel {
     this.notes,
     this.receivingMeterReading,
     this.receivingNotes,
+    this.receivingImageUrls = const [],
     required this.createdAt,
     this.receivedAt,
   });
@@ -43,6 +45,7 @@ class ShiftHandoverModel {
       receivingMeterReading:
           (data['receivingMeterReading'] as num?)?.toDouble(),
       receivingNotes: data['receivingNotes'],
+      receivingImageUrls: List<String>.from(data['receivingImageUrls'] ?? []),
       createdAt: data['createdAt'] ?? Timestamp.now(),
       receivedAt: data['receivedAt'] as Timestamp?,
     );
@@ -59,6 +62,7 @@ class ShiftHandoverModel {
       'notes': notes,
       'receivingMeterReading': receivingMeterReading,
       'receivingNotes': receivingNotes,
+      'receivingImageUrls': receivingImageUrls,
       'createdAt': createdAt,
       'receivedAt': receivedAt,
     };
@@ -75,6 +79,7 @@ class ShiftHandoverModel {
     String? notes,
     double? receivingMeterReading,
     String? receivingNotes,
+    List<String>? receivingImageUrls,
     Timestamp? createdAt,
     Timestamp? receivedAt,
   }) {
@@ -90,6 +95,7 @@ class ShiftHandoverModel {
       receivingMeterReading:
           receivingMeterReading ?? this.receivingMeterReading,
       receivingNotes: receivingNotes ?? this.receivingNotes,
+      receivingImageUrls: receivingImageUrls ?? this.receivingImageUrls,
       createdAt: createdAt ?? this.createdAt,
       receivedAt: receivedAt ?? this.receivedAt,
     );
