@@ -391,7 +391,7 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                     const SizedBox(height: 8),
                     TextField(
                       keyboardType: TextInputType.number,
-                      onChanged: (v) => meter = double.tryParse(v),
+                      onChanged: (v) => setState(() => meter = double.tryParse(v)),
                       decoration: InputDecoration(
                         labelText: AppLocalizations.of(context)!.meterReading,
                         border: const OutlineInputBorder(),
@@ -462,7 +462,7 @@ class _SalesOrderDetailPageState extends State<SalesOrderDetailPage> {
                 children: [
                   TextField(
                     keyboardType: TextInputType.number,
-                    onChanged: (v) => meter = double.tryParse(v),
+                    onChanged: (v) => setState(() => meter = double.tryParse(v)),
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context)!.meterReading,
                       border: const OutlineInputBorder(),
