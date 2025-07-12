@@ -603,6 +603,9 @@ class ProductionOrderUseCases {
     final updated = order.copyWith(
       shiftSupervisorUid: supervisor.uid,
       shiftSupervisorName: supervisor.name,
+      status: order.status == ProductionOrderStatus.inProduction
+          ? order.status
+          : ProductionOrderStatus.inProduction,
     );
     await repository.updateProductionOrder(updated);
 
