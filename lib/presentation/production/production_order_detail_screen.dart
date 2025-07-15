@@ -588,6 +588,13 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          Text(
+            '$label:',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            textAlign: TextAlign.right,
+            textDirection: TextDirection.rtl,
+          ),
+          SizedBox(width: 4),
           Expanded(
             child: Text(
               value,
@@ -595,13 +602,6 @@ class _ProductionOrderDetailScreenState extends State<ProductionOrderDetailScree
               textAlign: TextAlign.right,
               textDirection: TextDirection.rtl,
             ),
-          ),
-          SizedBox(width: 4),
-          Text(
-            '$label:',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            textAlign: TextAlign.right,
-            textDirection: TextDirection.rtl,
           ),
         ],
       ),

@@ -15,26 +15,26 @@ class AccountingScreen extends StatelessWidget {
         label: appLocalizations.salesOrders,
         route: AppRouter.salesOrdersListRoute,
       ),
-      _AccountingOption(
-        icon: Icons.check_circle_outline,
-        label: appLocalizations.sparePartRequests,
-        route: AppRouter.sparePartRequestsRoute,
-      ),
-      _AccountingOption(
-        icon: Icons.account_balance_wallet_outlined,
-        label: 'التحقق من الموازنات',
-        route: null,
-      ),
+      // _AccountingOption(
+      //   icon: Icons.check_circle_outline,
+      //   label: appLocalizations.sparePartRequests,
+      //   route: AppRouter.sparePartRequestsRoute,
+      // ),
+      // _AccountingOption(
+      //   icon: Icons.account_balance_wallet_outlined,
+      //   label: 'التحقق من الموازنات',
+      //   route: null,
+      // ),
       _AccountingOption(
         icon: Icons.payments_outlined,
         label: appLocalizations.paymentsManagement,
         route: AppRouter.paymentsRoute,
       ),
-      _AccountingOption(
-        icon: Icons.shopping_cart_checkout,
-        label: appLocalizations.purchasesManagement,
-        route: AppRouter.purchasesRoute,
-      ),
+      // _AccountingOption(
+      //   icon: Icons.shopping_cart_checkout,
+      //   label: appLocalizations.purchasesManagement,
+      //   route: AppRouter.purchasesRoute,
+      // ),
     ];
 
     return Scaffold(

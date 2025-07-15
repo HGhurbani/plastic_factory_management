@@ -20,11 +20,11 @@ class ProductionBoardScreen extends StatelessWidget {
         icon: Icons.analytics_outlined,
         routeName: AppRouter.productionOrdersListRoute,
       ),
-      _BoardOption(
-        title: appLocalizations.logMoldReceipt,
-        icon: Icons.assignment_turned_in_outlined,
-        routeName: AppRouter.productionOrdersListRoute,
-      ),
+      // _BoardOption(
+      //   title: appLocalizations.logMoldReceipt,
+      //   icon: Icons.assignment_turned_in_outlined,
+      //   routeName: AppRouter.productionOrdersListRoute,
+      // ),
     ];
 
     return Scaffold(
